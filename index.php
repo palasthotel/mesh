@@ -63,19 +63,71 @@
 
     ?>
     <form action="?modus=save" method="post">
-      <div id="thediv" contenteditable="true"><?php print($thetext);?></div>
+		<input type="button" value="b" class="bold" />
+		<input type="button" value="i" class="italic" />
+		<input type="button" value="Link" class="link" />
+      <div id="thediv" contenteditable="true">
+		
+	  <?php print($thetext);?></div>
       <textarea id="thearea" name="thearea"><?php print($thetext);?></textarea>
-      <p><input type="submit" id="save" value="save">save</input></p>
+      <p><input type="submit" id="save" value="save" /></p>
     </form>
 
     <script>
     jQuery(function($) {
-      $('#save').bind("click",function(){
-        $('#thearea').html($('#thediv').html());
-      });
+		
+	function getSelectionText() {
+		var text = "";
+		if (window.getSelection) {
+			text = window.getSelection().toString();
+		} else if (document.selection && document.selection.type != "Control") {
+			text = document.selection.createRange().text;
+		}
+     return text;
+	}
+	
+	
+	  $('#save').click(function(){
+		$('#thearea').html($('#thediv').html());
+	  });
+	  
+	  $('input[type="button"]').click(function() {
+		var mode = $(this).attr('class');
+		var divcontent = $('#thediv').html();
+		var selection = getSelectionText();
+		
+		switch(mode) {
+			case 'bold':
+				if (selection)
+					var new_content = divcontent.replace(selection, '<b>' + selection + '</b>');
+				break;
+			
+			case 'italic':
+				if (selection)
+					var new_content = divcontent.replace(selection, '<em>' + selection + '</em>');
+				break;
+				
+			case 'link':
+				if (selection) {
+					var linkurl = prompt('URL');
+					var new_content = divcontent.replace(selection, '<a href="' + linkurl + '">' + selection + '</a>');
+				}	else {
+						var linkurl = prompt('URL');
+						var linktext = prompt('Link-Text');
+						var new_content = divcontent + '<a href="' + linkurl + '">' + linktext + '</a>';
+					}
+				break;
+		}
+		
+		if (new_content) {
+			$('#thediv').html(new_content.trim());
+			$('#thearea').html($('#thediv').html());
+	    }
+	  });
+	  
     });
+	
     </script>
 
   </body>
 </html>
-
