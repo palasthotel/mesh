@@ -1,12 +1,12 @@
-#editor {
+#mesh-editor {
   width: 600px;
 }
 
-#content:focus {
+#mesh-content:focus {
   outline: none;
 }
 
-#content > * {
+#mesh-content>* {
   border: 1px solid #fff;
   border-left: 10px solid #fff;
   padding: 1em;
@@ -14,40 +14,44 @@
   margin-bottom: 0;
 }
 
-#content>*:hover {
+#mesh-content>*:hover {
   border-color: #8a8;
 }
 
-#content > *.focus, #content > *.focus:hover {
+#mesh-content>*.focus,#mesh-content>*.focus:hover {
   border-color: #575;
 }
 
-#content > div.insert-here {
+#mesh-content>.insert-here {
   border: 1px dashed #cfc;
   background: #fafffa;
   padding: .5em;
   border-width: 3px;
 }
 
-#content blockquote, #content blockquote:hover {
+#mesh-content blockquote,#mesh-content blockquote:hover {
   color: #333;
   padding-left: 2em;
   margin-left: 0;
   margin-right: 0;
 }
 
-blockquote p:first-child {
+#mesh-content blockquote p:first-child {
   margin-top: 0;
 }
 
-blockquote p:last-child {
+#mesh-content blockquote p:last-child {
   margin-bottom: 0;
 }
 
-[unselectable=on] {
+#mesh-content [unselectable=on] {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+#mesh-tools button {
+  font-family: serif;
 }

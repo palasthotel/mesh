@@ -1,4 +1,9 @@
-var draggableBorderWidth = 10;
+var conf = {
+  tools : [ 'bold', 'italic', 'link' ],
+  controls : {
+    draggableBorderWidth : 10
+  }
+};
 
 var dragSrc = null;
 
@@ -37,25 +42,26 @@ function isInUpperHalf(e) {
 /**
  * Make the node editable and draggable.
  * 
- * @param {JQueryDOMNode}
+ * @param {DOMNode}
  *                node
  */
-function makeEditable(node) {
-  node.bind('mousemove', function(e) {
+function makeEditable() {
+  var $node = $(this);
+  $node.bind('mousemove', function(e) {
     var x = e.offsetX || e.layerX - e.target.offsetLeft;
 
-    if (x <= draggableBorderWidth) {
+    if (x <= conf.controls.draggableBorderWidth) {
       $(this).css('cursor', 'move');
       this.draggable = true;
-      setSelectable(node[0], false);
+      setSelectable($node[0], false);
     } else {
       $(this).css('cursor', 'text');
       this.draggable = false;
-      setSelectable(node[0], true);
+      setSelectable($node[0], true);
     }
   });
 
-  node.bind('dragstart', function(e) {
+  $node.bind('dragstart', function(e) {
     dragSrc = this;
 
     if (e.dataTransfer)
@@ -64,20 +70,20 @@ function makeEditable(node) {
     this.contentEditable = 'false';
   });
 
-  node.bind('dragover', function(e) {
+  $node.bind('dragover', function(e) {
     e.preventDefault();
-    $('#content > div.insert-here').remove();
+    $('#mesh-content > div.insert-here').remove();
 
     if (isInUpperHalf(e))
       $(this).before('<div class="insert-here"></div>');
     else
       $(this).after('<div class="insert-here"></div>');
 
-    $('#content > div.insert-here').bind('dragover', function(e) {
+    $('#mesh-content > div.insert-here').bind('dragover', function(e) {
       e.preventDefault();
     });
 
-    $('#content > div.insert-here').bind('drop', function(e) {
+    $('#mesh-content > div.insert-here').bind('drop', function(e) {
       if (!dragSrc)
         return;
 
@@ -86,11 +92,11 @@ function makeEditable(node) {
     });
   });
 
-  node.bind('dragend', function(e) {
-    $('#content > div.insert-here').remove();
+  $node.bind('dragend', function(e) {
+    $('#mesh-content > div.insert-here').remove();
   });
 
-  node.bind('drop', function(e) {
+  $node.bind('drop', function(e) {
     if (!dragSrc || dragSrc === this)
       return;
 
@@ -102,31 +108,98 @@ function makeEditable(node) {
   });
 }
 
+function sanitizeContent() {
+  
+}
+
+function initTools(toolsDiv, editorDiv) {
+  conf.tools = conf.tools || [];
+
+  var button, tool;
+  for ( var i = 0; i < conf.tools.length; i++) {
+    tool = conf.tools[i];
+    switch (tool) {
+    case 'bold':
+      button = '<button data-tag="bold"><strong>B</strong></button>';
+      break;
+    case 'italic':
+      button = '<button data-tag="italic"><em>I</em></button>';
+      break;
+    case 'link':
+      button =
+          '<button data-tag="createLink"><a style="color: blue; text-decoration: underline">Link</a></button>';
+      break;
+    default:
+      return; // skip adding a button, if the tool is unknown
+    }
+
+    // add the button to toolsDiv
+    toolsDiv.append(button);
+  }
+
+  // select all of our buttons
+  $('button[data-tag]').each(function() {
+    this.onclick = function(e) {
+      var tag = this.getAttribute('data-tag');
+      switch (tag) {
+      case 'createLink':
+        var url = prompt('Please specify the URL');
+        if (url)
+          document.execCommand(tag, false, url);
+        break;
+      // case 'insertImage':
+      // break;
+      // case 'heading':
+      // break;
+      default:
+        // make bold, italic etc.
+        document.execCommand(tag, false, this.getAttribute('data-value'));
+      }
+
+      // sanitize content
+      sanitizeContent();
+
+      // prevent default action (usually submitting the form)
+      e.preventDefault();
+    };
+  });
+}
+
+function initEditor($editor) {
+  if (!$editor)
+    return;
+
+  $editor.attr('contenteditable', true);
+
+  var selectedElement = null;
+  function onSelect(e) {
+    if (selectedElement)
+      $(selectedElement).removeClass('focus');
+
+    var selection = window.getSelection();
+    if (!selection || !selection.focusNode)
+      return;
+
+    selectedElement = window.getSelection().focusNode.parentNode;
+    while (selectedElement.parentNode
+        && selectedElement.parentNode.contentEditable != 'true') {
+      selectedElement = selectedElement.parentNode;
+    }
+    $(selectedElement).addClass('focus');
+  }
+
+  $(document).bind('mouseup keyup', onSelect);
+
+  $('#mesh-content > *').each(makeEditable);
+}
+
 /**
  * Initial setup.
  */
-$(document).ready(
-    function() {
-      var selectedElement = null;
-      $(document).bind(
-          'mouseup keyup',
-          function(e) {
-            if (selectedElement)
-              $(selectedElement).removeClass('focus');
+$(document).ready(function() {
+  var $editor = $('#mesh-content');
+  var $tools = $('#mesh-tools');
 
-            var selection = window.getSelection();
-            if (!selection || !selection.focusNode)
-              return;
-
-            selectedElement = window.getSelection().focusNode.parentNode;
-            while (selectedElement.parentNode
-                && selectedElement.parentNode.contentEditable != 'true') {
-              selectedElement = selectedElement.parentNode;
-            }
-            $(selectedElement).addClass('focus');
-          });
-
-      $('#content > *').each(function() {
-        makeEditable($(this));
-      });
-    });
+  initTools($tools, $editor);
+  initEditor($editor);
+});
