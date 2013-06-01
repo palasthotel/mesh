@@ -22,9 +22,10 @@
   border-color: #575;
 }
 
-#content>hr.insert-here {
-  border-color: #cfc;
-  padding: 0;
+#content > div.insert-here {
+  border: 1px dashed #cfc;
+  background: #fafffa;
+  padding: .5em;
   border-width: 3px;
 }
 
