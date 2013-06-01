@@ -39,6 +39,20 @@ function isInUpperHalf(e) {
   return y < e.target.clientHeight >> 1;
 }
 
+function selectElementContents(el) {
+  if (window.getSelection && document.createRange) {
+    var sel = window.getSelection();
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else if (document.selection && document.body.createTextRange) {
+    var textRange = document.body.createTextRange();
+    textRange.moveToElementText(el);
+    textRange.select();
+  }
+}
+
 /**
  * Make the node editable and draggable.
  * 
@@ -46,7 +60,9 @@ function isInUpperHalf(e) {
  *                node
  */
 function makeEditable() {
+  var node = this;
   var $node = $(this);
+
   $node.bind('mousemove', function(e) {
     var x = e.offsetX || e.layerX - e.target.offsetLeft;
 
@@ -55,7 +71,7 @@ function makeEditable() {
       this.draggable = true;
       setSelectable($node[0], false);
     } else {
-      $(this).css('cursor', 'text');
+      $(this).css('cursor', 'inherit');
       this.draggable = false;
       setSelectable($node[0], true);
     }
@@ -64,14 +80,18 @@ function makeEditable() {
   $node.bind('dragstart', function(e) {
     dragSrc = this;
 
-    if (e.dataTransfer)
-      e.dataTransfer.effectAllowed = 'move';
+    // selectElementContents(this);
+
+    if (e.originalEvent.dataTransfer)
+      e.originalEvent.dataTransfer.effectAllowed = 'move';
+
+    e.originalEvent.dataTransfer.setData('text/html', null);
 
     this.contentEditable = 'false';
   });
 
   $node.bind('dragover', function(e) {
-    e.preventDefault();
+    console.log(e);
     $('#mesh-content > div.insert-here').remove();
 
     if (isInUpperHalf(e))
@@ -81,6 +101,7 @@ function makeEditable() {
 
     $('#mesh-content > div.insert-here').bind('dragover', function(e) {
       e.preventDefault();
+      return false;
     });
 
     $('#mesh-content > div.insert-here').bind('drop', function(e) {
@@ -90,6 +111,9 @@ function makeEditable() {
       $(this).replaceWith(dragSrc);
       dragSrc.contentEditable = 'inherit';
     });
+
+    e.preventDefault();
+    return false;
   });
 
   $node.bind('dragend', function(e) {
@@ -109,7 +133,7 @@ function makeEditable() {
 }
 
 function sanitizeContent() {
-  
+  // TODO sanitize the content div
 }
 
 function initTools(toolsDiv, editorDiv) {
