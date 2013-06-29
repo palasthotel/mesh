@@ -9,7 +9,7 @@ var dragSrc = null;
 
 /**
  * Sets the attribute "unselectable" for the `node`.
- * 
+ *
  * @param {DOMNode}
  *                node
  * @param {Boolean}
@@ -29,7 +29,7 @@ function setSelectable(node, selectable) {
 
 /**
  * Determine if the mouse is in the upper half of the underlying element.
- * 
+ *
  * @param {JQueryMouseEvent}
  *                e
  * @returns {Boolean}
@@ -55,7 +55,7 @@ function selectElementContents(el) {
 
 /**
  * Make the node editable and draggable.
- * 
+ *
  * @param {DOMNode}
  *                node
  */
