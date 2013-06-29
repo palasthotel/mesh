@@ -1,0 +1,113 @@
+<html>
+<head>
+<title>Test</title>
+<link rel="stylesheet" href="test.css">
+<style type="text/css">
+.selectable {
+  position: relative;
+  overflow: visible;
+}
+
+.selectable>*:focus {
+  outline: none;
+}
+
+.handle {
+  position: absolute;
+  left: -14px;
+  cursor: move;
+  background: #777;
+  width: 14px;
+}
+
+.content {
+  border: 1px solid #aaa;
+  padding: 1em;
+}
+
+.handle,.controls {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.controls {
+  background: #aaa;
+  width: 14px;
+  position: absolute;
+  right: -14px;
+  background: #777;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.handle {
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.handle:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+</style>
+</head>
+<body>
+  <div id="mesh-content">
+    <p>Normal paragraph</p>
+    <div class="selected">
+      <p>Single selected paragraph</p>
+    </div>
+    <div class="selected">
+      <p>Multiple ...</p>
+      <p>... selected paragraphs</p>
+    </div>
+    <div class="selected">
+      <div class="selectable">
+        <div class="content p" contenteditable="true">Some test paragraph</div>
+        <ul class="controls">
+          <li><a href="" title="remove element">x</a></li>
+          <li><a href="" title="edit attributes">+</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="editable" contenteditable="true">
+    <p>Hello</p>
+    <p>You</p>
+    <div id="focus"></div>
+  </div>
+  <script type="text/javascript">
+      var ed = document.getElementById('editable');
+      ed.onmouseup = ed.onkeyup = function(e) {
+        var selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          var range = selection.getRangeAt(0);
+
+          var start = range.startContainer;
+          var end = range.endContainer;
+
+          if (start.nodeName == '#text')
+            start = start.parentNode;
+
+          if (end.nodeName == '#text')
+            end = end.parentNode;
+
+          with (document.getElementById('focus').style) {
+            top = start.offsetTop;
+            left = start.offsetLeft;
+            height = end.offsetTop + end.offsetHeight - start.offsetTop;
+            width = Math.max(start.offsetWidth, end.offsetWidth);
+            border = '1px solid lime';
+          }
+        }
+      };
+    </script>
+</body>
+</html>
