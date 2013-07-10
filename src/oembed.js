@@ -1,9 +1,14 @@
-var oembed = exports = {};
-
 if (typeof $ === 'undefined')
   throw new Error('jQuery undefined')
 
-var providers = require('./oembed-providers.js');
+var oembed = {};
+
+oembed.providers = [];
+
+oembed.providers.push({
+  scheme : 'http://www.flickr.com/photos/*',
+  endpoint : 'http://www.flickr.com/services/oembed/'
+});
 
 oembed.isEmbeddable = function isEmbeddable(url) {
   var i, provider, regex;
@@ -19,7 +24,7 @@ oembed.request = function request(url, callback) {
     return callback(new Error('not embeddable'));
 
   $.ajax(url, {
-    
+
   }).done(function(data, textStatus, jqXHR) {
     callback(null, data);
   }).fail(function(jqXHR, textStatus, errorThrown) {
