@@ -1,9 +1,16 @@
-<div id="container">
-  
-</div>
+<div id="container"></div>
 <script src="jquery/jquery-1.4.2.js"></script>
-<script src="jquery/jquery.oembed.js"></script>
+<script src="src/oembed.js"></script>
 
 <script>
-  $("#container").oembed("http://www.flickr.com/photos/14516334@N00/345009210/");
+  oembed.request("http://www.flickr.com/photos/14516334@N00/345009210/", {
+    format : 'json',
+    maxwidth : 640,
+    maxheight : 480
+  }, function(err, data) {
+    if (err)
+      throw err;
+
+    console.log(data)
+  });
 </script>
