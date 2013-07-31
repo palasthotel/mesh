@@ -55,3 +55,7 @@
 #mesh-tools button {
   font-family: serif;
 }
+
+#mesh-source {
+  font-family: monospace;
+}
