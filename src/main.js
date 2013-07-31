@@ -199,6 +199,7 @@
     $editor.attr('contenteditable', true);
 
     var selectedElement = null;
+
     function onSelect(e) {
       if (selectedElement)
         $(selectedElement).removeClass('focus');
@@ -217,7 +218,27 @@
 
     $(document).bind('mouseup keyup', onSelect);
 
+    $('#mesh-content > *').each(function() {
+      $(this).bind('keypress', function(e) {
+        e.preventDefault();
+        console.log(e);
+      });
+    });
+
     $('#mesh-content > *').each(makeEditable);
+  }
+
+  function initSourceView($source, $editor) {
+    function listener() {
+      $source.html(escapeHTML($editor.html()));
+    }
+
+    $editor.bind('input', listener);
+    $editor.bind('DOMNodeInserted', listener);
+    $editor.bind('DOMNodeRemoved', listener);
+    $editor.bind('DOMCharacterDataModified', listener);
+
+    listener();
   }
 
   /**
@@ -226,9 +247,11 @@
   $(document).ready(function() {
     var $editor = $('#mesh-content');
     var $tools = $('#mesh-tools');
+    var $source = $('#mesh-source > pre');
 
     initTools($tools, $editor);
     initEditor($editor);
+    initSourceView($source, $editor);
   });
 
   window.mesh = mesh;
