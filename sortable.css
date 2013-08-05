@@ -1,0 +1,136 @@
+#container {
+  overflow: hidden;
+}
+
+#mesh-editor {
+  float: left;
+  width: 600px;
+  margin-right: 10px;
+}
+
+#mesh-picker {
+  float: left;
+  width: 600px;
+  margin-right: 10px;
+}
+
+#mesh-source {
+  float: left;
+  font-family: monospace;
+  width: 100%;
+}
+
+#mesh-source h2 {
+  margin-top: 0;
+}
+
+#mesh-content {
+  line-height: 1.5;
+}
+
+#mesh-content:focus {
+  outline: none;
+}
+
+#mesh-content .block, #mesh-results .block {
+  position: relative;
+}
+
+#mesh-content .handle, #mesh-results .handle {
+  background: url(res/metal.png);
+  cursor: move;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: .5em;
+  visibility: hidden;
+}
+
+#mesh-content > :hover > .handle, #mesh-results > :hover > .handle {
+  visibility: visible;
+}
+
+#mesh-content .controls, #mesh-results .controls {
+  padding: 1px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  visibility: hidden;
+}
+
+#mesh-content .controls img {
+  vertical-align: top;
+}
+
+#mesh-content :hover .controls {
+  visibility: visible;
+}
+
+#mesh-content .controls img {
+  opacity: .6;
+  cursor: pointer;
+}
+
+#mesh-content .controls img:hover {
+  opacity: 1.0;
+}
+
+#mesh-content .controls img:active {
+  opacity: .8;
+}
+
+#mesh-content > div > * {
+
+}
+
+#mesh-content .block, #mesh-results .block {
+  border: 1px solid #fff;
+  padding: .5em 2em .5em 1.5em;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#mesh-content > :hover, #mesh-results > :hover {
+  border-color: #aaa;
+}
+
+#mesh-content .focus, #mesh-content .focus:hover {
+  border-color: #ccc;
+}
+
+#mesh-content .placeholder {
+  border: 2px dashed #aaa;
+  background: #eee;
+  padding: .5em;
+  border-width: 3px;
+  margin: .5em;
+}
+
+#mesh-content [unselectable=on] {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#mesh-content .blockquote {
+  border-left: 3px solid #999;
+  padding: .3em 1em;
+}
+
+#mesh-content .codeblock {
+  font-family: monospace;
+}
+
+/* no margin between blocks */
+#mesh-content .paragraph + .paragraph {
+  margin-top: 0;
+}
+
+
+#mesh-tools button {
+  font-family: serif;
+}
