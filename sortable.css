@@ -14,10 +14,17 @@
   margin-right: 10px;
 }
 
+#mesh-attributes {
+  clear: both;
+}
+
 #mesh-source {
   float: left;
-  font-family: monospace;
   width: 100%;
+}
+
+#mesh-source pre {
+  font-family: monospace;
 }
 
 #mesh-source h2 {

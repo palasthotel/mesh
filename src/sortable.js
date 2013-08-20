@@ -123,6 +123,17 @@
     return selectedElement;
   }
 
+  function draggableResults() {
+    var $results = $('#mesh-results .block');
+    $results.each(function() {
+      $(this).draggable({
+        connectToSortable : '#mesh-content',
+        helper : 'clone',
+        revert : 'invalid'
+      });
+    });
+  }
+
   function initEditor($editor) {
     if (!$editor)
       return;
@@ -159,6 +170,8 @@
       selectedElement = getSelectedElement();
       // focus that element
       $(selectedElement).addClass('focus');
+      
+      
     }
 
     $(document).bind('mouseup keyup', onSelect);
@@ -171,26 +184,23 @@
       }
     });
 
-    var $results = $('#mesh-results .block');
-    $results.each(function() {
-      $(this).draggable({
-        connectToSortable : '#mesh-content',
-        helper : 'clone',
-        revert : 'invalid'
-      });
-    });
+    draggableResults();
 
+    var $results = $('#mesh-results .block');
     $results.disableSelection();
 
+    var keySeq = [];
     $('#mesh-content').bind('keydown', function(e) {
       console.log(e.keyCode);
       switch (e.keyCode) {
       case 8: // backspace
-        e.preventDefault();
+        keySeq.push(8);
         break;
       case 46: // delete
-        e.preventDefault();
+        keySeq.push(46);
         break;
+      default:
+        keySeq = [];
       }
     });
   }
@@ -211,6 +221,71 @@
     listener();
   }
 
+  function initSearch($search, $results) {
+    var lastQuery = '';
+    var timeout = null;
+    $search.bind('keyup mouseup', function(e) {
+      if (timeout)
+        clearTimeout(timeout);
+
+      // add small timeout
+      timeout = setTimeout(function() {
+        // stop if the query did not change
+        var newQuery = $search.val();
+        if (lastQuery === newQuery)
+          return;
+
+        $results.html('');
+
+        flickr.search(newQuery, null, function(err, result) {
+          if (err)
+            return; // TODO show warning
+
+          try {
+            var todo = result.photos.photo.length; 
+            $(result.photos.photo).each(function() {
+              var url =
+                  'http://www.flickr.com/photos/'
+                      + this.owner + '/' + this.id + '/';
+
+              var options = {
+                format : 'json',
+                maxwidth : 500,
+                maxheight : 300
+              };
+              oembed.request(url, options, function(err, data) {
+                if (err)
+                  throw err;
+                $results.append([ '<div class="block"><div class="handle"',
+                  ' unselectable="on" contenteditable="false">',
+                  '</div><div class="figure"><img alt="',
+                  data.title,
+                  '" title="',
+                  data.title,
+                  '" src="',
+                  data.url,
+                  '" /></div><div class="controls" unselectable="on"',
+                  'contenteditable="false"><img class="remove"',
+                  ' alt="remove" src="res/remove.png" /></div></div>'
+                ].join(''));
+                
+                if (--todo === 0) {
+                  draggableResults();
+                }
+              });
+            });
+          } catch (ex) {
+            // TODO show warning: unexpected format
+            // exception
+          } finally {
+          }
+        });
+
+        lastQuery = newQuery;
+      }, 500);
+    });
+  }
+
   /**
    * Initial setup.
    */
@@ -219,11 +294,14 @@
     var $tools = $('#mesh-tools');
     var $picker = $('#mesh-picker');
     var $source = $('#mesh-source > pre');
+    var $results = $('#mesh-results');
+    var $search = $('#mesh-search input');
 
     initTools($tools, $editor);
     initEditor($editor);
     initPicker($picker);
     initSourceView($source, $editor);
+    initSearch($search, $results);
   });
 
   window.mesh = mesh;
