@@ -2,14 +2,30 @@
 
   var mesh = {};
 
+  /**
+   * Initial setup.
+   */
+  $(document).ready(function() {
+    var $editor = $('#mesh-content');
+    var $tools = $('#mesh-tools');
+    var $picker = $('#mesh-picker');
+    var $source = $('#mesh-source > pre');
+    var $results = $('#mesh-results');
+    var $searchQuery = $('#mesh-search-query');
+    var $searchSubmit = $('#mesh-search-submit');
+
+    initTools($tools, $editor);
+    initEditor($editor);
+    initSourceView($source, $editor);
+    initSearch($searchQuery, $searchSubmit, $results);
+  });
+
   var conf = {
     tools : [ 'bold', 'italic', 'link' ],
     controls : {
       draggableBorderWidth : 10
     }
   };
-
-  var dragSrc = null;
 
   /**
    * Sets the attribute 'unselectable' for the `node`.
@@ -170,8 +186,6 @@
       selectedElement = getSelectedElement();
       // focus that element
       $(selectedElement).addClass('focus');
-      
-      
     }
 
     $(document).bind('mouseup keyup', onSelect);
@@ -189,12 +203,30 @@
     var $results = $('#mesh-results .block');
     $results.disableSelection();
 
-    var keySeq = [];
-    $('#mesh-content').bind('keydown', function(e) {
+    function keyDown(e) {
       console.log(e.keyCode);
       switch (e.keyCode) {
       case 8: // backspace
         keySeq.push(8);
+        break;
+      case 13: // return
+        keySeq.push(13);
+        if (keySeq.length === 2 && keySeq[0] === 13) {
+          e.preventDefault();
+          var sel = getSelectedElement();
+          $(sel).after(
+              '<div class="block"><div class="handle"'
+                  + ' unselectable="on" contenteditable="false"></div>'
+                  + '<div class="paragraph">&nbsp;</div><div '
+                  + 'class="controls" unselectable="on" '
+                  + 'contenteditable="false"><img class="remove" '
+                  + 'alt="remove" src="res/remove.png" /></div></div>');
+          var next = $(sel.nextSibling).find('.paragraph')[0];
+          var range = document.createRange();
+          range.setStart(next, 0);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        }
         break;
       case 46: // delete
         keySeq.push(46);
@@ -202,10 +234,10 @@
       default:
         keySeq = [];
       }
-    });
-  }
+    }
 
-  function initPicker($picker) {
+    var keySeq = [];
+    $('#mesh-content').bind('keydown', keyDown);
   }
 
   function initSourceView($source, $editor) {
@@ -221,88 +253,57 @@
     listener();
   }
 
-  function initSearch($search, $results) {
-    var lastQuery = '';
+  function initSearch($searchQuery, $searchSubmit, $results) {
     var timeout = null;
-    $search.bind('keyup mouseup', function(e) {
-      if (timeout)
-        clearTimeout(timeout);
-
-      // add small timeout
-      timeout = setTimeout(function() {
-        // stop if the query did not change
-        var newQuery = $search.val();
-        if (lastQuery === newQuery)
-          return;
-
-        $results.html('');
-
-        flickr.search(newQuery, null, function(err, result) {
-          if (err)
-            return; // TODO show warning
-
-          try {
-            var todo = result.photos.photo.length; 
-            $(result.photos.photo).each(function() {
-              var url =
-                  'http://www.flickr.com/photos/'
-                      + this.owner + '/' + this.id + '/';
-
-              var options = {
-                format : 'json',
-                maxwidth : 500,
-                maxheight : 300
-              };
-              oembed.request(url, options, function(err, data) {
-                if (err)
-                  throw err;
-                $results.append([ '<div class="block"><div class="handle"',
-                  ' unselectable="on" contenteditable="false">',
-                  '</div><div class="figure"><img alt="',
-                  data.title,
-                  '" title="',
-                  data.title,
-                  '" src="',
-                  data.url,
-                  '" /></div><div class="controls" unselectable="on"',
-                  'contenteditable="false"><img class="remove"',
-                  ' alt="remove" src="res/remove.png" /></div></div>'
-                ].join(''));
-                
-                if (--todo === 0) {
-                  draggableResults();
-                }
-              });
-            });
-          } catch (ex) {
-            // TODO show warning: unexpected format
-            // exception
-          } finally {
-          }
-        });
-
-        lastQuery = newQuery;
-      }, 500);
+    $searchSubmit.bind('click', function(e) {
+      e.preventDefault();
+      $results.html('');
+      search($searchQuery.val(), 1);
     });
+
+    function search(query, page, loadMore) {
+      flickr.search(query, {
+        page : page
+      }, function(err, result) {
+        if (err)
+          return; // TODO show warning
+
+        try {
+          var todo = result.photos.photo.length;
+          $(result.photos.photo).each(function() {
+            flickr.oembed(this, {}, function(err, data) {
+              console.log(loadMore);
+              if (loadMore) {
+                loadMore.remove();
+                loadMore = null;
+              }
+
+              if (err)
+                throw err;
+
+              $results.append(flickr.embedCode(data));
+
+              if (--todo === 0) {
+                draggableResults();
+
+                $results.append('<div class="load-more">Load more</div>');
+                var btn = $('#mesh-results .load-more');
+                btn.bind('click', function() {
+                  btn.html('...');
+                  btn.unbind();
+                  search(query, page + 1, btn);
+                });
+              }
+            });
+          });
+        } catch (ex) {
+          // TODO show warning: unexpected format
+          // exception
+        } finally {
+        }
+      });
+    }
   }
-
-  /**
-   * Initial setup.
-   */
-  $(document).ready(function() {
-    var $editor = $('#mesh-content');
-    var $tools = $('#mesh-tools');
-    var $picker = $('#mesh-picker');
-    var $source = $('#mesh-source > pre');
-    var $results = $('#mesh-results');
-    var $search = $('#mesh-search input');
-
-    initTools($tools, $editor);
-    initEditor($editor);
-    initPicker($picker);
-    initSourceView($source, $editor);
-    initSearch($search, $results);
-  });
 
   window.mesh = mesh;
 

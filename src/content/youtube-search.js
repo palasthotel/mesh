@@ -1,22 +1,18 @@
-/**
- * JS client for Twitter API v1.1
- */
+if (typeof youtube === 'undefined')
+  var youtube = {};
 
-if (typeof twitter === 'undefined')
-  var twitter = {};
-
-function jsonTwitterApi(result) {
-  jsonTwitterApi.callback(null, result);
+function jsonYoutubeApi(result) {
+  jsonFlickrApi.callback(null, result);
 }
 
-jsonTwitterApi.callback = function() {
+jsonYoutubeApi.callback = function() {
 };
 
-(function($, twitter) {
-  var apiKey = '43569ea83198fcb014f0d1b9f2600e72';
-  var secret = '4ff2d8088fb45677';
+(function($, flickr) {
+  var apiKey = 'AIzaSyCKeAafm4ghAci4VWHqwUZbKQP9d-pN0Fs';
 
-  var endpoint = 'https://api.twitter.com/1.1/search/tweets.json';
+  var endpoint = 'https://secure.flickr.com/services/rest';
+  var method = '?method=flickr.photos.search';
   var api = '&api_key=' + apiKey;
   var format = '&format=json';
 
@@ -26,7 +22,7 @@ jsonTwitterApi.callback = function() {
 
     var text = '&text=' + query;
     var perPage = '&per_page=' + (options.perPage || 10);
-    var url = endpoint + api + format + text + perPage;
+    var url = endpoint + method + api + format + text + perPage;
 
     $.ajax({
       url : url,
@@ -40,4 +36,4 @@ jsonTwitterApi.callback = function() {
       }
     });
   };
-})(jQuery, twitter);
+})(jQuery, flickr);
