@@ -1,21 +1,39 @@
+body {
+  background: #eee;
+  font-family: helvetica, arial, sans-serif;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-weight: normal;
+}
+
+h2 {
+  font-size: 1.2em;
+}
+
+h2:first-child {
+  margin: 0 0 .5em;
+}
+
 #container {
+  background: #fff;
   overflow: hidden;
+  width: 960px;
+  margin: 0 auto;
+  padding: 1em;
 }
 
 #mesh-editor {
   float: left;
-  width: 600px;
-  margin-right: 10px;
+  width: 580px;
 }
 
 #mesh-picker {
+  border-left: 1px solid #eee;
   float: left;
-  width: 600px;
-  margin-right: 10px;
-}
-
-#mesh-attributes {
-  clear: both;
+  padding-left: 9px;
+  margin-left: 10px;
+  width: 360px;
 }
 
 #mesh-source {
@@ -33,17 +51,22 @@
 
 #mesh-content {
   line-height: 1.5;
+  margin-bottom: 2em;
+}
+
+#mesh-attributes {
+  margin-bottom: 1em;
 }
 
 #mesh-content:focus {
   outline: none;
 }
 
-#mesh-content .block, #mesh-results .block {
+#mesh-content .block,#mesh-results .block {
   position: relative;
 }
 
-#mesh-content .handle, #mesh-results .handle {
+#mesh-content .handle,#mesh-results .handle {
   background: url(res/metal.png);
   cursor: move;
   position: absolute;
@@ -54,11 +77,11 @@
   visibility: hidden;
 }
 
-#mesh-content > :hover > .handle, #mesh-results > :hover > .handle {
+#mesh-content>:hover>.handle,#mesh-results>:hover>.handle {
   visibility: visible;
 }
 
-#mesh-content .controls, #mesh-results .controls {
+#mesh-content .controls,#mesh-results .controls {
   padding: 1px;
   position: absolute;
   right: 0;
@@ -88,27 +111,29 @@
   opacity: .8;
 }
 
-#mesh-content > div > * {
-
+#mesh-content>div>* {
+  
 }
 
-#mesh-content .block, #mesh-results .block {
+#mesh-content .block,#mesh-results .block {
   border: 1px solid #fff;
+  border-radius: 3px 3px 0 3px;
   padding: .5em 2em .5em 1.5em;
   margin-top: 0;
   margin-bottom: 0;
 }
 
-#mesh-content > :hover, #mesh-results > :hover {
+#mesh-content>:hover,#mesh-results>:hover {
   border-color: #aaa;
 }
 
-#mesh-content .focus, #mesh-content .focus:hover {
+#mesh-content .focus,#mesh-content .focus:hover {
   border-color: #ccc;
 }
 
 #mesh-content .placeholder {
   border: 2px dashed #aaa;
+  border-radius: 5px;
   background: #eee;
   padding: .5em;
   border-width: 3px;
@@ -133,11 +158,35 @@
 }
 
 /* no margin between blocks */
-#mesh-content .paragraph + .paragraph {
+#mesh-content .paragraph+.paragraph {
   margin-top: 0;
 }
 
+#mesh-tools {
+  background: #ccc;
+  border: 1px outset #ddd;
+  border-radius: 5px;
+  margin-bottom: 1em;
+}
 
 #mesh-tools button {
   font-family: serif;
+}
+
+#mesh-results {
+  height: 100%;
+  overflow: auto;
+}
+
+#mesh-results .load-more {
+  cursor: pointer;
+  background: #bdf;
+  border: 1px solid #9bc;
+  border-radius: 3px;
+  padding: .2em;
+  text-align: center;
+}
+
+#mesh-results .load-more:active {
+  background: #ace;
 }
