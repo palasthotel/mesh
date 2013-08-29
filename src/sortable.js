@@ -131,7 +131,7 @@
   }
 
   function getSelectedElement() {
-    var selectedElement = window.getSelection().focusNode.parentNode;
+    var selectedElement = rangy.getSelection().focusNode.parentNode;
     while (selectedElement.parentNode
         && selectedElement.parentNode.contentEditable != 'true') {
       selectedElement = selectedElement.parentNode;
@@ -210,23 +210,24 @@
         keySeq.push(8);
         break;
       case 13: // return
-        keySeq.push(13);
-        if (keySeq.length === 2 && keySeq[0] === 13) {
-          e.preventDefault();
-          var sel = getSelectedElement();
-          $(sel).after(
-              '<div class="block"><div class="handle"'
-                  + ' unselectable="on" contenteditable="false"></div>'
-                  + '<div class="paragraph">&nbsp;</div><div '
-                  + 'class="controls" unselectable="on" '
-                  + 'contenteditable="false"><img class="remove" '
-                  + 'alt="remove" src="res/remove.png" /></div></div>');
-          var next = $(sel.nextSibling).find('.paragraph')[0];
-          var range = document.createRange();
-          range.setStart(next, 0);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-        }
+        e.preventDefault();
+        var sel = rangy.getSelection();
+
+        var textNode = sel.anchorNode;
+        var parentNode = textNode.parentNode;
+
+        var textBefore = textNode.data.slice(0, sel.anchorOffset);
+        var textAfter = textNode.data.slice(sel.anchorOffset);
+
+        var fragment = document.createDocumentFragment();
+        fragment.appendChild(document.createTextNode(textBefore));
+        fragment.appendChild(document.createElement('br'));
+        var nodeAfter = document.createTextNode(textAfter);
+        fragment.appendChild(nodeAfter);
+
+        parentNode.replaceChild(fragment, textNode);
+
+        sel.collapse(nodeAfter, 0);
         break;
       case 46: // delete
         keySeq.push(46);
