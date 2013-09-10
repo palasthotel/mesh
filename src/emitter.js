@@ -1,4 +1,6 @@
 (function() {
+  'use strict';
+
   if (typeof module === 'object')
     module.exports = Emitter;
   else
@@ -13,7 +15,6 @@
     if (obj)
       return mixin(obj);
   }
-  ;
 
   /**
    * Mixin the emitter properties.

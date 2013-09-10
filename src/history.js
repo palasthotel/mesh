@@ -1,4 +1,10 @@
 (function(window) {
+  'use strict';
+
+  if (typeof module === 'object')
+    module.exports = History;
+  else
+    window.History = History;
 
   /**
    * Initialize a `History` with the given `vals`.
@@ -10,7 +16,7 @@
   function History(vals) {
     this.vals = vals || [];
     this.reset();
-    this.max(100);
+    this.setMaximumEntries(100);
   }
 
   /**
@@ -37,7 +43,7 @@
    * @return {History}
    * @api public
    */
-  History.prototype.max = function(n) {
+  History.prototype.setMaximumEntries = function(n) {
     this._max = n;
     this.cap();
     return this;
@@ -92,14 +98,4 @@
     this.i = this.vals.length - 1;
     return this;
   };
-
-  /**
-   * Expose `History`.
-   */
-  if (typeof module === "object" && typeof module.exports === "object") {
-    module.exports = History;
-  } else {
-    window.History = History;
-  }
-
 })(window);
