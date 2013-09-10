@@ -1,4 +1,5 @@
 (function(window) {
+  'use strict';
 
   var mesh = {};
 
@@ -14,8 +15,8 @@
     var $searchQuery = $('#mesh-search-query');
     var $searchSubmit = $('#mesh-search-submit');
 
+    var editor = initEditor($editor);
     initTools($tools, $editor);
-    initEditor($editor);
     initSourceView($source, $editor);
     initSearch($searchQuery, $searchSubmit, $results);
   });
@@ -45,36 +46,6 @@
       setSelectable(child, selectable);
       child = child.nextSibling;
     }
-  }
-
-  /**
-   * Determine if the mouse is in the upper half of the underlying element.
-   * 
-   * @param {JQueryMouseEvent}
-   *                e
-   * @returns {Boolean}
-   */
-  function isInUpperHalf(e) {
-    var y = e.offsetY || e.layerY - e.target.offsetTop;
-    return y < e.target.clientHeight >> 1;
-  }
-
-  function selectElementContents(el) {
-    if (window.getSelection && document.createRange) {
-      var sel = window.getSelection();
-      var range = document.createRange();
-      range.selectNodeContents(el);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    } else if (document.selection && document.body.createTextRange) {
-      var textRange = document.body.createTextRange();
-      textRange.moveToElementText(el);
-      textRange.select();
-    }
-  }
-
-  function sanitizeContent(rootNode) {
-    // TODO sanitize the content div
   }
 
   function initTools(toolsDiv, editorDiv) {
@@ -154,9 +125,15 @@
     if (!$editor)
       return;
 
-    // make contenteditable and fix <br> behavior in firefox
-    $editor.attr('contenteditable', true);
-    document.execCommand('insertBrOnReturn', true);
+    // create editor
+    var editor = new Editor($editor[0]);
+
+    // make editor publicly accessible
+    window.editor = editor;
+
+    // set the editors contents
+    editor
+        .setContents('<p>Text with <b>some</b> <i>formatting</i><br>A <a href="/">Link</a></p><blockquote>Quote</blockquote>');
 
     var selectedElement = null;
 
@@ -203,47 +180,12 @@
     var $results = $('#mesh-results .block');
     $results.disableSelection();
 
-    function keyDown(e) {
-      console.log(e.keyCode);
-      switch (e.keyCode) {
-      case 8: // backspace
-        keySeq.push(8);
-        break;
-      case 13: // return
-        e.preventDefault();
-        var sel = rangy.getSelection();
-
-        var textNode = sel.anchorNode;
-        var parentNode = textNode.parentNode;
-
-        var textBefore = textNode.data.slice(0, sel.anchorOffset);
-        var textAfter = textNode.data.slice(sel.anchorOffset);
-
-        var fragment = document.createDocumentFragment();
-        fragment.appendChild(document.createTextNode(textBefore));
-        fragment.appendChild(document.createElement('br'));
-        var nodeAfter = document.createTextNode(textAfter);
-        fragment.appendChild(nodeAfter);
-
-        parentNode.replaceChild(fragment, textNode);
-
-        sel.collapse(nodeAfter, 0);
-        break;
-      case 46: // delete
-        keySeq.push(46);
-        break;
-      default:
-        keySeq = [];
-      }
-    }
-
-    var keySeq = [];
-    $('#mesh-content').bind('keydown', keyDown);
+    return editor;
   }
 
   function initSourceView($source, $editor) {
     function listener() {
-      $source.html(escapeHTML(simplify($editor)));
+      // TODO $source.html(escapeHTML(simplify($editor)));
     }
 
     $editor.bind('input', listener);

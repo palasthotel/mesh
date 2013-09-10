@@ -15,11 +15,11 @@ function simplify($node) {
     html = child.innerHTML.replace(/&nbsp;$/g, '');
 
     next = child.nextSibling;
-    if (next && next.className && next.className === clss)
+    if (next && next.className === clss)
       html += '<br />' + next.innerHTML;
 
     switch (clss) {
-    case "paragraph":
+    case "p":
       var p = document.createElement("p");
       p.innerHTML = html;
       fragment.appendChild(p);
@@ -41,6 +41,9 @@ function simplify($node) {
       fig.innerHTML = html;
       fragment.appendChild(fig);
       break;
+    break;
+  case "controls":
+  case "handle":
     break;
   default:
     throw new Error("unknown class: " + clss);
