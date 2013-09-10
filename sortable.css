@@ -43,6 +43,7 @@ h2:first-child {
 
 #mesh-source pre {
   font-family: monospace;
+  overflow-x: scroll;
 }
 
 #mesh-source h2 {
@@ -52,6 +53,16 @@ h2:first-child {
 #mesh-content {
   line-height: 1.5;
   margin-bottom: 2em;
+}
+
+#mesh-title {
+  margin-bottom: .5em;
+}
+
+#mesh-title input {
+  border: none;
+  font-size: 2em;
+  outline: none;
 }
 
 #mesh-attributes {
@@ -90,24 +101,26 @@ h2:first-child {
   visibility: hidden;
 }
 
-#mesh-content .controls img {
-  vertical-align: top;
+#mesh-content .controls .remove {
+  width: 14px;
+  height: 14px;
+  background-image: url('res/remove.png');
 }
 
 #mesh-content :hover .controls {
   visibility: visible;
 }
 
-#mesh-content .controls img {
+#mesh-content .controls div {
   opacity: .6;
   cursor: pointer;
 }
 
-#mesh-content .controls img:hover {
+#mesh-content .controls div:hover {
   opacity: 1.0;
 }
 
-#mesh-content .controls img:active {
+#mesh-content .controls div:active {
   opacity: .8;
 }
 
@@ -120,7 +133,7 @@ h2:first-child {
   border-radius: 3px 3px 0 3px;
   padding: .5em 2em .5em 1.5em;
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: 1px;
 }
 
 #mesh-content>:hover,#mesh-results>:hover {
@@ -155,11 +168,21 @@ h2:first-child {
 
 #mesh-content .codeblock {
   font-family: monospace;
+  margin: 0;
 }
 
 /* no margin between blocks */
 #mesh-content .paragraph+.paragraph {
   margin-top: 0;
+}
+
+#mesh-content .break:after {
+  color: #ddd;
+  content: ' ↩';
+}
+
+#mesh-content .break:last-child:after {
+  content: '';
 }
 
 #mesh-tools {

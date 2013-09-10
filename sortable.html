@@ -16,6 +16,7 @@
 <script src="src/emitter.js"></script>
 <script src="src/indexof.js"></script>
 <script src="src/history.js"></script>
+<script src="src/block.js"></script>
 <script src="src/editor.js"></script>
 <script src="src/rangy.js"></script>
 <script src="src/content/flickr-photo-search.js"></script>
@@ -32,12 +33,25 @@
 <body>
   <div id="container">
     <div id="mesh-editor" class="col-1">
+      <form id="mesh-title">
+        <input type="text" name="title" placeholder="Title" />
+      </form>
       <div id="mesh-tools"></div>
       <div id="mesh-content">
+        <!--div class="block">
+          <div class="handle" unselectable="on" contenteditable="false"></div>
+          <div class="paragraph">
+            <div class="break">Some sample text</div>
+            <div class="break">New line</div>
+          </div>
+          <div class="controls" unselectable="on" contenteditable="false">
+            <img class="remove" alt="remove" src="res/remove.png" />
+          </div>
+        </div>
         <div class="block">
           <div class="handle" unselectable="on" contenteditable="false"></div>
           <div class="paragraph">
-            Some sample text<br />New line
+            <div class="break">And another paragraph</div>
           </div>
           <div class="controls" unselectable="on" contenteditable="false">
             <img class="remove" alt="remove" src="res/remove.png" />
@@ -45,32 +59,27 @@
         </div>
         <div class="block">
           <div class="handle" unselectable="on" contenteditable="false"></div>
-          <div class="paragraph">And another paragraph</div>
+          <div class="blockquote">
+            <div class="break">As well as a quote</div>
+          </div>
           <div class="controls" unselectable="on" contenteditable="false">
             <img class="remove" alt="remove" src="res/remove.png" />
           </div>
         </div>
         <div class="block">
           <div class="handle" unselectable="on" contenteditable="false"></div>
-          <div class="blockquote">A quote</div>
+          <pre class="codeblock">// and some code</pre>
           <div class="controls" unselectable="on" contenteditable="false">
             <img class="remove" alt="remove" src="res/remove.png" />
           </div>
-        </div>
-        <div class="block">
-          <div class="handle" unselectable="on" contenteditable="false"></div>
-          <div class="codeblock">// and some code</div>
-          <div class="controls" unselectable="on" contenteditable="false">
-            <img class="remove" alt="remove" src="res/remove.png" />
-          </div>
-        </div>
+        </div-->
       </div>
       <div id="mesh-attributes">
-        <h2>Attributes</h2>
+        <!--h2>Attributes</h2>
         <ul>
           <li><input type="text" /><input type="text" /> x
         </ul>
-        <button>Add attribute</button>
+        <button>Add attribute</button-->
       </div>
       <div id="mesh-source">
         <h2>Source:</h2>
