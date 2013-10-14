@@ -32,7 +32,7 @@
 
     var i, len = this.container.children.length;
     for (i = 0; i < len; i++) {
-      this.blocks.push(new Block(this.container.children[i]));
+      this.blocks.push(new Block(this, this.container.children[i]));
     }
   }
 
@@ -49,7 +49,7 @@
       for (i = 0; i < len; i++) {
         var node = c.children[i];
         var type = node.nodeName.toLowerCase();
-        var block = Block.create(type);
+        var block = Block.create(editor, type);
 
         var html = node.innerHTML;
         html.split(/<br ?\/?>/).forEach(function(part) {
@@ -286,13 +286,13 @@
     e.preventDefault();
   }
 
-  function createMain(clss) {
+  Editor.createMain = function createMain(clss) {
     var main = document.createElement('div');
     main.classList.add(clss);
     return main;
-  }
+  };
 
-  function createBlock(main) {
+  Editor.createBlock = function createBlock(main) {
     var block = document.createElement('div');
     var handle = document.createElement('div');
     var controls = document.createElement('div');
@@ -311,11 +311,11 @@
       main : main,
       controls : controls
     };
-  }
+  };
 
-  function createEmptyBlock(clss) {
-    var main = createMain('paragraph');
+  Editor.createEmptyBlock = function createEmptyBlock(clss) {
+    var main = Editor.createMain('paragraph');
     main.innerHTML = '<br />';
-    return createBlock(main);
-  }
+    return Editor.createBlock(main);
+  };
 })();

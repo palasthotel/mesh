@@ -7,20 +7,27 @@
   else
     window.Block = Block;
 
-  function Block(node) {
+  /**
+   * Block around a given node.
+   */
+  function Block(editor, node) {
     if (!(this instanceof Block))
-      return new Block(node);
+      return new Block(editor, node);
 
-    this.node = node;
+    this.editor = editor; // refs to editor
+    this.node = node; // and node
 
-    this.handle = node.children[0];
+    this.handle = node.children[0]; // div.handle
     this.handle.contentEditable = false;
-    this.content = node.children[1];
-    this.controls = node.children[2];
+    this.content = node.children[1]; // div.content
+    this.controls = node.children[2]; // div.controls
     this.controls.contentEditable = false;
   }
 
-  Block.create = function create(type) {
+  /**
+   * Creates a block of a given type. E.g. p, blockquote, etc.
+   */
+  Block.create = function create(editor, type) {
     var node = document.createElement('div');
     node.classList.add('block');
     var handle = '<div class="handle"></div>';
@@ -28,19 +35,24 @@
     var controls = '<div class="controls"><div class="remove"></div></div>';
     node.innerHTML = handle + content + controls;
 
-    return new Block(node);
+    return new Block(editor, node);
   };
 
-  Block.prototype.insertLineBreak = function insertLineBreak() {
-    var sel = rangy.getSelection();
+  /**
+   * Insert a line break at the given selection.
+   */
+  Block.prototype.insertLineBreak = function insertLineBreak(selection) {
+    var sel;
+    if (typeof selection == 'undefined')
+      sel = this.editor.selection();
+    else
+      sel = selection;
 
-    // FIXME ----
     var before = document.createDocumentFragment();
 
     // before selection
     var brkBefore = document.createElement('div');
     brkBefore.innerText = sel.anchorNode.data.substring(0, sel.anchorOffset);
-
     console.log(brkBefore);
 
     // end of line
@@ -50,13 +62,13 @@
 
     before.appendChild(brkBefore);
 
-    var parent = elem.parentNode;
+    var parent = this.node.parentNode;
     var child = parent.children[0];
-    while (child != null && child != elem.nextSibling) {
+    while (child != null && child != this.node.nextSibling) {
       var next = child.nextSibling;
       parent.removeChild(child);
 
-      if (child == elem) {
+      if (child == this.node) {
         parent.insertBefore(brkAfter, next);
       } else {
         before.appendChild(child);
@@ -65,9 +77,9 @@
       child = child.nextSibling;
     }
 
-    var main = createMain('paragraph');
+    var main = Editor.createMain('paragraph');
     main.appendChild(before);
-    var nodeBefore = createBlock(main);
+    var nodeBefore = Editor.createBlock(main);
 
     $(parent.parentNode).before(nodeBefore.block);
   };
