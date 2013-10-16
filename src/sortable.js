@@ -133,7 +133,7 @@
 
     // set the editors contents
     editor
-        .setContents('<p>Text with <b>some</b> <i>formatting</i><br>A <a href="/">Link</a></p><blockquote>Quote</blockquote>');
+        .setContents('<p>Text with <b>some</b> <i>form<b>atting</b></i><br>A <a href="/">Link</a></p><blockquote>Quote</blockquote>');
 
     var selectedElement = null;
 

@@ -43,45 +43,107 @@
    */
   Block.prototype.insertLineBreak = function insertLineBreak(selection) {
     var sel;
-    if (typeof selection == 'undefined')
+    if (typeof selection === 'undefined')
       sel = this.editor.selection();
     else
       sel = selection;
 
-    var before = document.createDocumentFragment();
+    console.log(sel);
 
-    // before selection
-    var brkBefore = document.createElement('div');
-    brkBefore.innerText = sel.anchorNode.data.substring(0, sel.anchorOffset);
-    console.log(brkBefore);
+    var brkBefore = Block.getBreakForChildNode(sel.anchorNode);
+    var brkAfter = Editor.createBreak();
 
-    // end of line
-    var brkAfter = document.createElement('div');
-    brkAfter.innerText = sel.anchorNode.data.substring(sel.anchorOffset);
-    console.log(brkAfter);
+    function containsNode(a, b) {
+      if (Node && Node.prototype.contains)
+        return a.contains(b);
 
-    before.appendChild(brkBefore);
-
-    var parent = this.node.parentNode;
-    var child = parent.children[0];
-    while (child != null && child != this.node.nextSibling) {
-      var next = child.nextSibling;
-      parent.removeChild(child);
-
-      if (child == this.node) {
-        parent.insertBefore(brkAfter, next);
-      } else {
-        before.appendChild(child);
-      }
-
-      child = child.nextSibling;
+      return !!(a.compareDocumentPosition(b) & 16)
     }
 
-    var main = Editor.createMain('paragraph');
-    main.appendChild(before);
-    var nodeBefore = Editor.createBlock(main);
+    var textAfter = null;
+    // Recursively walk down the DOM tree and split the node at the selection
+    function splitNode(nodeBefore, nodeAfter, selection) {
+      var node = nodeBefore.firstChild;
+      var next = null;
+      var before = null;
+      var after = null;
+      var splitOccurred = false;
+      var splitHere = false;
+      var anchor = selection.anchorNode;
 
-    $(parent.parentNode).before(nodeBefore.block);
+      // Walk through all children of nodeBefore and check if they contain the
+      // anchor
+      while (node !== null) {
+        next = node.nextSibling;
+
+        // Do we need to split within the current node?
+        splitHere = containsNode(node, anchor);
+
+        if (splitHere) {
+          if (node.nodeType === 3) { // text node
+            // split the text node, append it to nodeAfter
+            textAfter = anchor.splitText(selection.anchorOffset);
+            anchor.parentNode.removeChild(textAfter);
+            nodeAfter.appendChild(textAfter);
+          } else {
+            before = node;
+            after = document.createElement(node.nodeName);
+
+            // also copy the attributes
+            var attrs = before.attributes;
+            var len = attrs.length;
+            var attr;
+            for ( var i = 0; i < len; i++) {
+              attr = attrs[i];
+              if (!attr.specified)
+                continue;
+
+              after.setAttribute(attr.nodeName, attr.nodeValue);
+            }
+
+            splitNode(before, after, selection);
+
+            nodeAfter.insertBefore(after);
+          }
+
+          splitOccurred = true;
+        } else if (splitOccurred) {
+          // move that node to brkAfter
+          nodeBefore.removeChild(node);
+          nodeAfter.appendChild(node);
+        }
+
+        node = next;
+      }
+    }
+
+    splitNode(brkBefore, brkAfter, sel);
+
+    // append the newly created .break
+    var brkNext = brkBefore.nextSibling;
+    if (brkNext !== null)
+      brkBefore.parentNode.insertBefore(brkAfter, brkNext);
+    else
+      brkBefore.parentNode.appendChild(brkAfter);
+
+    // move cursor to next line
+    var range = rangy.createRange();
+    range.setStart(textAfter, 0);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+
+  /**
+   * @returns DIV node with class "break" that contains the given node
+   */
+  Block.getBreakForChildNode = function getBreakForChildNode(node) {
+    if (node === null)
+      return null;
+    if (node.className === 'break')
+      return node;
+
+    return Block.getBreakForChildNode(node.parentNode);
   };
 
   Block.prototype.length = function length() {

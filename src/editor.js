@@ -286,6 +286,12 @@
     e.preventDefault();
   }
 
+  Editor.createBreak = function createBreak() {
+    var brk = document.createElement('div');
+    brk.classList.add('break');
+    return brk;
+  };
+
   Editor.createMain = function createMain(clss) {
     var main = document.createElement('div');
     main.classList.add(clss);
