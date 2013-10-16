@@ -42,13 +42,11 @@
    * Insert a line break at the given selection.
    */
   Block.prototype.insertLineBreak = function insertLineBreak(selection) {
-    var sel;
+    var sel = null;
     if (typeof selection === 'undefined')
       sel = this.editor.selection();
     else
       sel = selection;
-
-    console.log(sel);
 
     var brkBefore = Block.getBreakForChildNode(sel.anchorNode);
     var brkAfter = Editor.createBreak();
@@ -92,7 +90,7 @@
             // also copy the attributes
             var attrs = before.attributes;
             var len = attrs.length;
-            var attr;
+            var attr = null;
             for ( var i = 0; i < len; i++) {
               attr = attrs[i];
               if (!attr.specified)
@@ -146,19 +144,48 @@
     return Block.getBreakForChildNode(node.parentNode);
   };
 
-  Block.prototype.length = function length() {
-    this.content.children.length;
+  /**
+   * @returns breaks within this block
+   */
+  Block.prototype.getBreaks = function getBreaks() {
+    return this.content.children;
   };
 
+  /**
+   * @returns number of breaks
+   */
+  Block.prototype.length = function length() {
+    return this.content.children.length;
+  };
+
+  /**
+   * @returns break at position `i`
+   */
   Block.prototype.get = function get(i) {
     if (i >= this.length())
       throw new Error('index out of bounds');
 
-    this.content.children[i];
+    return this.content.children[i];
   };
 
+  /**
+   * Inserts a node at the end of this block.
+   */
   Block.prototype.append = function append(node) {
     this.content.appendChild(node);
+  };
+
+  /**
+   * Inserts a node at the beginning of this block.
+   * 
+   * TODO needed?
+   */
+  Block.prototype.prepend = function prepend(node) {
+    if (this.length() === 0)
+      this.append(node);
+
+    var first = this.get(0);
+    this.content.insertBefore(node, first);
   };
 
   Block.prototype.appendBreak = function appendBreak(html) {
@@ -168,14 +195,9 @@
     this.append(brk);
   };
 
-  Block.prototype.prepend = function prepend(node) {
-    if (this.length == 0)
-      throw new Error('empty block');
-
-    var first = this.get(0);
-    this.content.insertBefore(node, first);
-  };
-
+  /**
+   * Sets/unsets the focus.
+   */
   Block.prototype.setFocus = function setFocus(bool) {
     if (bool)
       this.node.classList.add('focus');
