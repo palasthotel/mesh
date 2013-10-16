@@ -40,7 +40,7 @@
    *                fn
    * @return {Emitter}
    */
-  Emitter.prototype.on = function(event, fn) {
+  Emitter.prototype.addEventListener = function(event, fn) {
     this._callbacks = this._callbacks || {};
     (this._callbacks[event] = this._callbacks[event] || []).push(fn);
     return this;
@@ -56,17 +56,17 @@
    *                fn
    * @return {Emitter}
    */
-  Emitter.prototype.once = function(event, fn) {
+  Emitter.prototype.addOneTimeEventListener = function(event, fn) {
     var self = this;
     this._callbacks = this._callbacks || {};
 
     function on() {
-      self.off(event, on);
+      self.removeEventListener(event, on);
       fn.apply(this, arguments);
     }
 
     fn._off = on;
-    this.on(event, on);
+    this.addEventListener(event, on);
     return this;
   };
 
@@ -79,7 +79,7 @@
    *                fn
    * @return {Emitter}
    */
-  Emitter.prototype.removeListener = function(event, fn) {
+  Emitter.prototype.removeEventListener = function(event, fn) {
     this._callbacks = this._callbacks || {};
 
     // remove all
@@ -107,7 +107,8 @@
   };
 
   // invoke without arguments to remove all listeners
-  Emitter.prototype.removeAllListeners = Emitter.prototype.removeListener;
+  Emitter.prototype.removeAllEventListeners =
+      Emitter.prototype.removeEventListener;
 
   /**
    * Emit `event` with the given args.
@@ -118,7 +119,7 @@
    *                ...
    * @return {Emitter}
    */
-  Emitter.prototype.emit = function(event) {
+  Emitter.prototype.emitEvent = function(event) {
     this._callbacks = this._callbacks || {};
     var args = [].slice.call(arguments, 1);
     var callbacks = this._callbacks[event];
@@ -140,7 +141,7 @@
    *                event
    * @return {Array}
    */
-  Emitter.prototype.listeners = function(event) {
+  Emitter.prototype.getEventListeners = function(event) {
     this._callbacks = this._callbacks || {};
     return this._callbacks[event] || [];
   };
@@ -152,8 +153,8 @@
    *                event
    * @return {Boolean}
    */
-  Emitter.prototype.hasListeners = function(event) {
-    return !!this.listeners(event).length;
+  Emitter.prototype.hasEventListeners = function(event) {
+    return !!this.getEventListeners(event).length;
   };
 
 })();
