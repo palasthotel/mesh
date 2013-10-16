@@ -110,11 +110,11 @@
       $c.bind('keydown', $.proxy(this.onkeydown, this));
       $c.bind('keyup click focus', $.proxy(this.onstatechange, this));
       $c.bind('paste input', $.proxy(this.onchange, this));
-      this.emit('enabled');
+      this.emitEvent('enabled');
     } else {
       this.container.contentEditable = false;
       $c.unbind();
-      this.emit('disabled');
+      this.emitEvent('disabled');
     }
 
     return this;
@@ -157,6 +157,8 @@
       if (block.node.isSameNode(n))
         return block;
     }
+
+    return null;
   };
 
   /**
@@ -226,7 +228,7 @@
    * @return {Editor}
    */
   Editor.prototype.onstatechange = function(e) {
-    this.emit('state', e);
+    this.emitEvent('state', e);
     return this;
   };
 
@@ -240,7 +242,7 @@
   Editor.prototype.onchange = function(e) {
     this.history.add(this.contents());
 
-    this.emit('change', e);
+    this.emitEvent('change', e);
     return this;
   };
 
@@ -259,9 +261,12 @@
 
       prevent(e); // prevent default browser behaviour
 
+      // TODO check if the caret is right behind another break
+      // in that case insert a new block
+
       // insert line break
       var block = this.getSelectedBlock();
-      block.insertLineBreak();
+      block.insertLineBreak(sel);
     }
     return this;
   };

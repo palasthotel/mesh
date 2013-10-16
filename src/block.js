@@ -140,6 +140,12 @@
 
     return Block.getBreakForChildNode(node.parentNode);
   };
+  
+  Block.prototype.isAtBeginning = function isAtBeginning(node) {
+    if (node === null)
+      return false;
+    //if (node.className === 'break' && node.)
+  };
 
   /**
    * @returns breaks within this block
