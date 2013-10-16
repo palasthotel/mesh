@@ -42,13 +42,10 @@
    * Insert a line break at the given selection.
    */
   Block.prototype.insertLineBreak = function insertLineBreak(selection) {
-    var sel = null;
     if (typeof selection === 'undefined')
-      sel = this.editor.selection();
-    else
-      sel = selection;
+      throw new Error('no selection');
 
-    var brkBefore = Block.getBreakForChildNode(sel.anchorNode);
+    var brkBefore = Block.getBreakForChildNode(selection.anchorNode);
     var brkAfter = Editor.createBreak();
 
     function containsNode(a, b) {
@@ -115,7 +112,7 @@
       }
     }
 
-    splitNode(brkBefore, brkAfter, sel);
+    splitNode(brkBefore, brkAfter, selection);
 
     // append the newly created .break
     var brkNext = brkBefore.nextSibling;
@@ -128,8 +125,8 @@
     var range = rangy.createRange();
     range.setStart(textAfter, 0);
     range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    selection.removeAllRanges();
+    selection.addRange(range);
   };
 
   /**
