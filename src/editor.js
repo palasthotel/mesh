@@ -118,29 +118,6 @@
     return this;
   };
 
-  /**
-   * Get range.
-   * 
-   * TODO: x-browser
-   * 
-   * @return {Range}
-   */
-  Editor.prototype.range = function() {
-    return document.createRange();
-  };
-
-  /**
-   * Get selection.
-   * 
-   * TODO: x-browser
-   * 
-   * @return {Selection}
-   */
-
-  Editor.prototype.selection = function() {
-    return rangy.getSelection();
-  };
-
   Editor.prototype.getSelectedBlock = function(selection) {
     var n = selection.anchorNode;
 
@@ -207,7 +184,7 @@
    *                cmd
    * @return {Boolean}
    */
-  Editor.prototype.state = function(cmd) {
+  Editor.prototype.getState = function(cmd) {
     var length = this.history.vals.length - 1;
     var stack = this.history;
 
@@ -335,13 +312,13 @@
     // block.node
   };
 
-  Editor.prototype.numberOfWords = function numberOfWords() {
+  Editor.prototype.getNumberOfWords = function getNumberOfWords() {
     var i = 0;
     var total = 0;
 
     for (i = 0; i < this.blocks.length; i++) {
       var block = this.blocks[i];
-      total += block.numberOfWords();
+      total += block.getNumberOfWords();
     }
 
     return total;

@@ -199,19 +199,6 @@
       this.node.classList.remove('focus');
   };
 
-  Block.isBreakEmpty = function isBreakEmpty(brk) {
-    if (!brk.hasChildNodes())
-      return true;
-    if (brk.innerText.length === 0)
-      return true;
-
-    return false;
-  };
-
-  Block.prototype.removeBreak = function removeBreak(brk) {
-    this.content.removeChild(brk);
-  };
-
   Block.prototype.getPreviousBlock = function getPreviousBlock() {
     var i = 0;
     var blocks = this.editor.blocks;
@@ -242,7 +229,7 @@
     return null;
   };
 
-  Block.prototype.numberOfWords = function numberOfWords() {
+  Block.prototype.getNumberOfWords = function getNumberOfWords() {
     var text = this.content.innerText.trim();
     return text.split(/\s+/).length;
   }
