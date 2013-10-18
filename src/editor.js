@@ -258,12 +258,11 @@
       prevent(e); // prevent default browser behaviour
 
       var block = this.getSelectedBlock(sel);
-      // TODO check if the caret is right behind another break
-      // in that case insert a new block
+      // If the caret is behind another block, insert a new block
       if (Block.isSelectionAfterBreak(sel)) {
         console.log('block');
         block.insertBreak(sel);
-      } else {
+      } else { // otherwise insert a line break
         // insert line break
         block.insertBreak(sel);
       }

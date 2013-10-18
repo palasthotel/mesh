@@ -12,14 +12,7 @@
   /**
    * Moves the caret to the beginning of the given node.
    */
-  Caret.moveToBeginning = function moveToBeginning(node, selection) {
-    var sel = null;
-    if (typeof selection === 'undefined') {
-      sel = rangy.getSelection();
-    } else {
-      sel = selection;
-    }
-
+  Caret.moveToBeginning = function moveToBeginning(node, sel) {
     var range = rangy.createRange();
     range.setStart(node, 0);
     range.collapse(true);
@@ -30,16 +23,17 @@
   /**
    * Moves the caret to the ending of the given node.
    */
-  Caret.moveToEnding = function moveToEnding(node, selection) {
-    var sel = null;
-    if (typeof selection === 'undefined') {
-      sel = rangy.getSelection();
-    } else {
-      sel = selection;
+  Caret.moveToEnding = function moveToEnding(node, sel) {
+    console.log('end?')
+    var range = rangy.createRange();
+    var pos = 0;
+
+    if (node.nodeType === 3)
+      pos = node.length;
+    else {
+      pos = node.childNodes.length;
     }
 
-    var range = rangy.createRange();
-    var pos = (node.innerText || node.data).length;
     range.setStart(node, pos);
     range.collapse(true);
     sel.removeAllRanges();

@@ -41,32 +41,59 @@
   /**
    * Insert a line break at the given selection.
    */
-  Block.prototype.insertBreak = function insertBreak(sel) {
-    if (typeof sel === 'undefined')
-      throw new Error('no selection');
+  Block.prototype.insertBreak =
+      function insertBreak(sel) {
+        if (typeof sel === 'undefined')
+          throw new Error('no selection');
 
-    var anchor = sel.anchorNode;
-    if (anchor.nodeType === 3) {
-      var textNodeAfterSplit = anchor.splitText(sel.anchorOffset);
+        console.log(sel);
 
-      var br = document.createElement('br');
-      anchor.parentNode.insertBefore(br, textNodeAfterSplit);
+        var anchor = sel.anchorNode;
+        var br = document.createElement('br');
+        var grandpa = null;
 
-      if (textNodeAfterSplit.length === 0)
-        anchor.parentNode.insertBefore(br, textNodeAfterSplit);
+        if (sel.anchorOffset === 0
+            && anchor.isSameNode(anchor.parentNode.firstChild)) {
+          // if the caret is at the beginning of the element, insert the <br>
+          // in front of the parent node
+          grandpa = anchor.parentNode.parentNode;
+          grandpa.insertBefore(br, anchor.parentNode);
 
-      // move caret to beginning of next line
-      Caret.moveToBeginning(textNodeAfterSplit, sel);
-    } else {
-      var i = sel.anchorOffset - 1;
-      var nodeAfter = anchor.children[i];
+          console.log('1st');
+        } else if (sel.anchorOffset === anchor.length
+            && anchor.isSameNode(anchor.parentNode.lastChild)) {
+          // if the caret is at the end of the element, insert the <br> after
+          // the anchor
+          grandpa = anchor.parentNode.parentNode;
+          grandpa.appendChild(br);
+          grandpa.appendChild(document.createElement('br'));
 
-      anchor.insertBefore(document.createElement('br'), nodeAfter);
+          Caret.moveToEnding(grandpa, sel);
 
-      // move caret to beginning of next line
-      Caret.moveToBeginning(nodeAfter, sel);
-    }
-  };
+          console.log('last');
+        } else if (anchor.nodeType === 3) {
+          // if the caret is in a text node, split it and insert the line break
+          // in between
+          var textNodeAfterSplit = anchor.splitText(sel.anchorOffset);
+          anchor.parentNode.insertBefore(br, textNodeAfterSplit);
+
+          // move caret to beginning of next line
+          Caret.moveToBeginning(textNodeAfterSplit, sel);
+
+          console.log('text');
+        } else {
+          // if we are in a normal node,
+          var i = sel.anchorOffset;
+          var nodeAfter = anchor.childNodes[i];
+
+          anchor.insertBefore(br, nodeAfter);
+
+          // move caret to beginning of next line
+          Caret.moveToBeginning(nodeAfter, sel);
+
+          console.log('normal');
+        }
+      };
 
   /**
    * @returns DIV node with class "break" that contains the given selection
