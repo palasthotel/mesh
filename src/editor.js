@@ -239,44 +239,37 @@
    * @return {Editor}
    */
   Editor.prototype.onchange = function(e) {
-    this.history.add(this.contents());
+    this.history.add(this.getContent());
 
     this.emitEvent('change', e);
     return this;
   };
 
-  Editor.prototype.onkeydown =
-      function(e) {
-        console.log(e.keyCode);
+  Editor.prototype.onkeydown = function(e) {
+    console.log(e.keyCode);
 
-        if (e.keyCode === 13) { // return/enter key
-          var sel = rangy.getSelection();
-          var elem = sel.anchorNode;
+    if (e.keyCode === 13 || e.keyCode === 10) { // return/enter key
+      var sel = rangy.getSelection();
 
-          if (elem.nodeType === 3) // text node? use parent!
-            elem = elem.parentNode;
+      // TODO handle non-collapsed selections
+      if (!sel.isCollapsed)
+        throw new Error('not collapsed! TO BE HANDLED');
 
-          if (!sel.isCollapsed)
-            throw new Error('not collapsed! TO BE HANDLED');
+      prevent(e); // prevent default browser behaviour
 
-          prevent(e); // prevent default browser behaviour
-
-          var block = this.getSelectedBlock(sel);
-          // TODO check if the caret is right behind another break
-          // in that case insert a new block
-          if (block.isAtBeginning(sel)
-              && (prev.length() === 0 || Block.isBreakEmpty(prev))) {
-            var brk = block.getSelectedBreak(sel);
-            if (Block.isBreakEmpty(brk))
-              block.removeBreak(sel);
-            this.insertBlockAfter(block);
-          } else {
-            // insert line break
-            block.insertLineBreak(sel);
-          }
-        }
-        return this;
-      };
+      var block = this.getSelectedBlock(sel);
+      // TODO check if the caret is right behind another break
+      // in that case insert a new block
+      if (Block.isSelectionAfterBreak(sel)) {
+        console.log('block');
+        block.insertBreak(sel);
+      } else {
+        // insert line break
+        block.insertBreak(sel);
+      }
+    }
+    return this;
+  };
 
   function isEmptyNode(node) {
     return node !== null && node.children && node.children.length === 1

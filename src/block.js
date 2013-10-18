@@ -41,13 +41,13 @@
   /**
    * Insert a line break at the given selection.
    */
-  Block.prototype.insertLineBreak = function insertLineBreak(selection) {
-    if (typeof selection === 'undefined')
+  Block.prototype.insertBreak = function insertBreak(sel) {
+    if (typeof sel === 'undefined')
       throw new Error('no selection');
 
-    var anchor = selection.anchorNode;
-    if (anchor.nodeType === 3) { // text node
-      var textNodeAfterSplit = anchor.splitText(selection.anchorOffset);
+    var anchor = sel.anchorNode;
+    if (anchor.nodeType === 3) {
+      var textNodeAfterSplit = anchor.splitText(sel.anchorOffset);
 
       var br = document.createElement('br');
       anchor.parentNode.insertBefore(br, textNodeAfterSplit);
@@ -56,17 +56,23 @@
         anchor.parentNode.insertBefore(br, textNodeAfterSplit);
 
       // move caret to beginning of next line
-      Caret.moveToBeginning(textNodeAfterSplit, selection);
+      Caret.moveToBeginning(textNodeAfterSplit, sel);
     } else {
-      console.log(selection);
+      var i = sel.anchorOffset - 1;
+      var nodeAfter = anchor.children[i];
+
+      anchor.insertBefore(document.createElement('br'), nodeAfter);
+
+      // move caret to beginning of next line
+      Caret.moveToBeginning(nodeAfter, sel);
     }
   };
 
   /**
    * @returns DIV node with class "break" that contains the given selection
    */
-  Block.prototype.getSelectedBreak = function getSelectedBreak(selection) {
-    var node = selection.anchorNode;
+  Block.prototype.getSelectedBreak = function getSelectedBreak(sel) {
+    var node = sel.anchorNode;
 
     if (node === null)
       return null;
@@ -81,17 +87,31 @@
   /**
    * @returns true, if the selection is at the beginning of
    */
-  Block.prototype.isAtBeginning = function isAtBeginning(selection) {
-    if (selection.anchorOffset !== 0)
+  Block.prototype.isAtBeginning = function isAtBeginning(sel) {
+    if (sel.anchorOffset !== 0)
       return false;
 
-    var node = selection.anchorNode;
+    var node = sel.anchorNode;
     if (node === null)
       return false;
     if (node.className === 'break' && this.content.isSameNode(node.parentNode))
       return true;
 
     return this.isAtBeginning(node.parentNode);
+  };
+
+  Block.isSelectionAfterBreak = function isSelectionAfterBreak(sel) {
+    var anchor = sel.anchorNode;
+
+    // TODO what to do at beginning of <b>? <br /> is inserted into <b>...
+    var prev = null;
+    if (anchor.nodeType === 3) { // text node
+      prev = anchor.previousSibling;
+      return prev && prev.nodeName === 'BR';
+    }
+
+    prev = anchor.children[sel.anchorOffset - 1];
+    return prev && prev.nodeName === 'BR';
   };
 
   /**
