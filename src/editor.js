@@ -143,15 +143,16 @@
     return rangy.getSelection();
   };
 
-  Editor.prototype.getSelectedBlock = function() {
-    var sel = rangy.getSelection();
-    var n = sel.anchorNode;
+  Editor.prototype.getSelectedBlock = function(selection) {
+    var n = selection.anchorNode;
 
     while (!n.classList || !n.classList.contains('block')) {
       n = n.parentNode;
     }
 
-    var i, len = this.blocks.length, block;
+    var i = 0;
+    var len = this.blocks.length;
+    var block = null;
     for (i = 0; i < len; i++) {
       block = this.blocks[i];
       if (block.node.isSameNode(n))
@@ -246,30 +247,38 @@
     return this;
   };
 
-  Editor.prototype.onkeydown = function(e) {
-    console.log(e.keyCode);
+  Editor.prototype.onkeydown =
+      function(e) {
+        console.log(e.keyCode);
 
-    if (e.keyCode === 13) { // return/enter key
-      var sel = rangy.getSelection();
-      var elem = sel.anchorNode;
+        if (e.keyCode === 13) { // return/enter key
+          var sel = rangy.getSelection();
+          var elem = sel.anchorNode;
 
-      if (elem.nodeType === 3) // text node? use parent!
-        elem = elem.parentNode;
+          if (elem.nodeType === 3) // text node? use parent!
+            elem = elem.parentNode;
 
-      if (!sel.isCollapsed)
-        throw new Error('not collapsed! TO BE HANDLED');
+          if (!sel.isCollapsed)
+            throw new Error('not collapsed! TO BE HANDLED');
 
-      prevent(e); // prevent default browser behaviour
+          prevent(e); // prevent default browser behaviour
 
-      // TODO check if the caret is right behind another break
-      // in that case insert a new block
-
-      // insert line break
-      var block = this.getSelectedBlock();
-      block.insertLineBreak(sel);
-    }
-    return this;
-  };
+          var block = this.getSelectedBlock(sel);
+          // TODO check if the caret is right behind another break
+          // in that case insert a new block
+          if (block.isAtBeginning(sel)
+              && (prev.length() === 0 || Block.isBreakEmpty(prev))) {
+            var brk = block.getSelectedBreak(sel);
+            if (Block.isBreakEmpty(brk))
+              block.removeBreak(sel);
+            this.insertBlockAfter(block);
+          } else {
+            // insert line break
+            block.insertLineBreak(sel);
+          }
+        }
+        return this;
+      };
 
   function isEmptyNode(node) {
     return node !== null && node.children && node.children.length === 1
@@ -329,4 +338,22 @@
     main.innerHTML = '<br />';
     return Editor.createBlock(main);
   };
+
+  Editor.prototype.insertBlockAfter = function insertBlockAfter(block) {
+
+    console.log('inserted')
+    // block.node
+  };
+
+  Editor.prototype.numberOfWords = function numberOfWords() {
+    var i = 0;
+    var total = 0;
+
+    for (i = 0; i < this.blocks.length; i++) {
+      var block = this.blocks[i];
+      total += block.numberOfWords();
+    }
+
+    return total;
+  }
 })();

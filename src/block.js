@@ -45,7 +45,7 @@
     if (typeof selection === 'undefined')
       throw new Error('no selection');
 
-    var brkBefore = Block.getBreakForChildNode(selection.anchorNode);
+    var brkBefore = this.getSelectedBreak(selection);
     var brkAfter = Editor.createBreak();
 
     function containsNode(a, b) {
@@ -79,7 +79,15 @@
             // split the text node, append it to nodeAfter
             textAfter = anchor.splitText(selection.anchorOffset);
             anchor.parentNode.removeChild(textAfter);
-            nodeAfter.appendChild(textAfter);
+
+            // insert <br /> into empty nodes to make them visible in every
+            // browser
+            if (textAfter.length === 0) {
+              textAfter = document.createElement('br');
+              nodeAfter.appendChild(textAfter);
+            } else {
+              nodeAfter.appendChild(textAfter);
+            }
           } else {
             before = node;
             after = document.createElement(node.nodeName);
@@ -121,30 +129,40 @@
     else
       brkBefore.parentNode.appendChild(brkAfter);
 
-    // move cursor to next line
-    var range = rangy.createRange();
-    range.setStart(textAfter, 0);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    // move caret to beginning of next line
+    Caret.moveToBeginning(textAfter, selection);
   };
 
   /**
-   * @returns DIV node with class "break" that contains the given node
+   * @returns DIV node with class "break" that contains the given selection
    */
-  Block.getBreakForChildNode = function getBreakForChildNode(node) {
+  Block.prototype.getSelectedBreak = function getSelectedBreak(selection) {
+    var node = selection.anchorNode;
+
     if (node === null)
       return null;
     if (node.className === 'break')
       return node;
 
-    return Block.getBreakForChildNode(node.parentNode);
+    return this.getSelectedBreak({
+      anchorNode : node.parentNode
+    });
   };
-  
-  Block.prototype.isAtBeginning = function isAtBeginning(node) {
+
+  /**
+   * @returns true, if the selection is at the beginning of
+   */
+  Block.prototype.isAtBeginning = function isAtBeginning(selection) {
+    if (selection.anchorOffset !== 0)
+      return false;
+
+    var node = selection.anchorNode;
     if (node === null)
       return false;
-    //if (node.className === 'break' && node.)
+    if (node.className === 'break' && this.content.isSameNode(node.parentNode))
+      return true;
+
+    return this.isAtBeginning(node.parentNode);
   };
 
   /**
@@ -207,4 +225,52 @@
     else
       this.node.classList.remove('focus');
   };
+
+  Block.isBreakEmpty = function isBreakEmpty(brk) {
+    if (!brk.hasChildNodes())
+      return true;
+    if (brk.innerText.length === 0)
+      return true;
+
+    return false;
+  };
+
+  Block.prototype.removeBreak = function removeBreak(brk) {
+    this.content.removeChild(brk);
+  };
+
+  Block.prototype.getPreviousBlock = function getPreviousBlock() {
+    var i = 0;
+    var blocks = this.editor.blocks;
+
+    for (i = 0; i < blocks.length; i++) {
+      if (blocks[i] === this) {
+        if (i === 0)
+          return null;
+        break;
+      }
+    }
+
+    return blocks[i];
+  };
+
+  Block.prototype.getNextBlock = function getNextBlock() {
+    var i = 0;
+    var blocks = this.editor.blocks;
+
+    for (i = 0; i < blocks.length; i++) {
+      if (blocks[i] === this)
+        break;
+    }
+
+    if (blocks.length > i + 1)
+      return blocks[i + 1];
+
+    return null;
+  };
+
+  Block.prototype.numberOfWords = function numberOfWords() {
+    var text = this.content.innerText.trim();
+    return text.split(/\s+/).length;
+  }
 })();
