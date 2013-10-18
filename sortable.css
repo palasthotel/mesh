@@ -52,7 +52,15 @@ h2:first-child {
 
 #mesh-content {
   line-height: 1.5;
+}
+
+#mesh-status {
+  background: #eee;
+  border-top: 1px solid #aaa;
+  padding: 4px;
+  margin-top: .5em;
   margin-bottom: 2em;
+  font-size: 0.7em;
 }
 
 #mesh-title {
