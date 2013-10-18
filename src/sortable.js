@@ -191,6 +191,8 @@
       $status.html(status);
     });
 
+    editor.emitEvent('change');
+
     return editor;
   }
 
