@@ -31,7 +31,7 @@
     var node = document.createElement('div');
     node.classList.add('block');
     var handle = '<div class="handle"></div>';
-    var content = '<div class="' + type + '"></div>';
+    var content = '<' + type + '></' + type + '>';
     var controls = '<div class="controls"><div class="remove"></div></div>';
     node.innerHTML = handle + content + controls;
 
@@ -45,92 +45,21 @@
     if (typeof selection === 'undefined')
       throw new Error('no selection');
 
-    var brkBefore = this.getSelectedBreak(selection);
-    var brkAfter = Editor.createBreak();
+    var anchor = selection.anchorNode;
+    if (anchor.nodeType === 3) { // text node
+      var textNodeAfterSplit = anchor.splitText(selection.anchorOffset);
 
-    function containsNode(a, b) {
-      if (Node && Node.prototype.contains)
-        return a.contains(b);
+      var br = document.createElement('br');
+      anchor.parentNode.insertBefore(br, textNodeAfterSplit);
 
-      return !!(a.compareDocumentPosition(b) & 16)
+      if (textNodeAfterSplit.length === 0)
+        anchor.parentNode.insertBefore(br, textNodeAfterSplit);
+
+      // move caret to beginning of next line
+      Caret.moveToBeginning(textNodeAfterSplit, selection);
+    } else {
+      console.log(selection);
     }
-
-    var textAfter = null;
-    // Recursively walk down the DOM tree and split the node at the selection
-    function splitNode(nodeBefore, nodeAfter, selection) {
-      var node = nodeBefore.firstChild;
-      var next = null;
-      var before = null;
-      var after = null;
-      var splitOccurred = false;
-      var splitHere = false;
-      var anchor = selection.anchorNode;
-
-      // Walk through all children of nodeBefore and check if they contain the
-      // anchor
-      while (node !== null) {
-        next = node.nextSibling;
-
-        // Do we need to split within the current node?
-        splitHere = containsNode(node, anchor);
-
-        if (splitHere) {
-          if (node.nodeType === 3) { // text node
-            // split the text node, append it to nodeAfter
-            textAfter = anchor.splitText(selection.anchorOffset);
-            anchor.parentNode.removeChild(textAfter);
-
-            // insert <br /> into empty nodes to make them visible in every
-            // browser
-            if (textAfter.length === 0) {
-              textAfter = document.createElement('br');
-              nodeAfter.appendChild(textAfter);
-            } else {
-              nodeAfter.appendChild(textAfter);
-            }
-          } else {
-            before = node;
-            after = document.createElement(node.nodeName);
-
-            // also copy the attributes
-            var attrs = before.attributes;
-            var len = attrs.length;
-            var attr = null;
-            for ( var i = 0; i < len; i++) {
-              attr = attrs[i];
-              if (!attr.specified)
-                continue;
-
-              after.setAttribute(attr.nodeName, attr.nodeValue);
-            }
-
-            splitNode(before, after, selection);
-
-            nodeAfter.insertBefore(after);
-          }
-
-          splitOccurred = true;
-        } else if (splitOccurred) {
-          // move that node to brkAfter
-          nodeBefore.removeChild(node);
-          nodeAfter.appendChild(node);
-        }
-
-        node = next;
-      }
-    }
-
-    splitNode(brkBefore, brkAfter, selection);
-
-    // append the newly created .break
-    var brkNext = brkBefore.nextSibling;
-    if (brkNext !== null)
-      brkBefore.parentNode.insertBefore(brkAfter, brkNext);
-    else
-      brkBefore.parentNode.appendChild(brkAfter);
-
-    // move caret to beginning of next line
-    Caret.moveToBeginning(textAfter, selection);
   };
 
   /**
@@ -209,11 +138,8 @@
     this.content.insertBefore(node, first);
   };
 
-  Block.prototype.appendBreak = function appendBreak(html) {
-    var brk = document.createElement('div');
-    brk.classList.add('break');
-    brk.innerHTML = html;
-    this.append(brk);
+  Block.prototype.setHTMLContent = function setHTMLContent(html) {
+    this.content.innerHTML = html;
   };
 
   /**

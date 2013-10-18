@@ -39,7 +39,7 @@
   // Event emitter
   Emitter(Editor.prototype);
 
-  Editor.prototype.setContents = function setContents(html) {
+  Editor.prototype.setContents = function setContent(html) {
     var editor = this;
     if (typeof html == 'string') {
       var c = document.createElement('div');
@@ -52,9 +52,7 @@
         var block = Block.create(editor, type);
 
         var html = node.innerHTML;
-        html.split(/<br ?\/?>/).forEach(function(part) {
-          block.appendBreak(part);
-        });
+        block.setHTMLContent(html);
 
         this.appendBlock(block);
       }
@@ -71,12 +69,12 @@
    * 
    * @return {String}
    */
-  Editor.prototype.contents = function() {
+  Editor.prototype.getContent = function() {
     return this.container.innerHTML;
   };
 
   /**
-   * Is editing enabled?
+   * Is editor enabled?
    * 
    * @return {Boolean}
    */

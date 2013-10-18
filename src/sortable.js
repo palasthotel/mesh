@@ -140,7 +140,7 @@
     function refreshRemove() {
       $editor.find('.block').each(function() {
         var block = $(this); // single block
-        block.find('.remove').bind('click', function() {
+        block.find('.remove').unbind().bind('click', function() {
           // fade out and then remove this node from dom
           block.fadeOut(function() {
             $(this).remove();
@@ -172,6 +172,10 @@
       axis : 'y',
       receive : function(e, ui) {
         refreshRemove();
+      },
+      stop : function() {
+        // TODO fix caret position
+        console.log(arguments, this);
       }
     });
 
