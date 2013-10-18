@@ -63,6 +63,10 @@ h2:first-child {
   border: none;
   font-size: 2em;
   outline: none;
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 #mesh-attributes {
@@ -130,6 +134,11 @@ h2:first-child {
   padding: .5em 2em .5em 1.5em;
   margin-top: 0;
   margin-bottom: 1px;
+  border: 1px solid #fff;
+}
+
+.block.ui-sortable-helper {
+  background: rgba(255, 255, 255, .8);
 }
 
 #mesh-content>:hover,#mesh-results>:hover {
