@@ -174,8 +174,7 @@
         refreshRemove();
       },
       stop : function() {
-        // TODO fix caret position
-        console.log(arguments, this);
+        rangy.getSelection().removeAllRanges();
       }
     });
 
@@ -183,6 +182,14 @@
 
     var $results = $('#mesh-results .block');
     $results.disableSelection();
+
+    var $status = $('#mesh-status');
+    editor.addEventListener('change', function() {
+      var wc = editor.getNumberOfWords();
+      var status = wc + ' word' + (wc === 1 ? '' : 's');
+      console.log(status);
+      $status.html(status);
+    });
 
     return editor;
   }
