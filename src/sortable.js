@@ -139,19 +139,6 @@
 
     var selectedElement = null;
 
-    function refreshRemove() {
-      $editor.find('.block').each(function() {
-        var block = $(this); // single block
-        block.find('.remove').unbind().bind('click', function() {
-          // fade out and then remove this node from dom
-          block.fadeOut(function() {
-            $(this).remove();
-          });
-        });
-      });
-    }
-    refreshRemove();
-
     // selection handler
     function onSelect(e) {
       if (selectedElement)
@@ -189,7 +176,6 @@
     editor.addEventListener('change', function updateStatusLine() {
       var wc = editor.getNumberOfWords();
       var status = wc + ' word' + (wc === 1 ? '' : 's');
-      console.log(status);
       $status.html(status);
     });
 

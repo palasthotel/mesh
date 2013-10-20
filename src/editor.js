@@ -312,6 +312,10 @@
     // block.node
   };
 
+  Editor.prototype.insertBlockAt = function insertBlockAt(i, block) {
+
+  };
+
   Editor.prototype.getNumberOfWords = function getNumberOfWords() {
     var i = 0;
     var total = 0;

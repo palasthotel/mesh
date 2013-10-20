@@ -22,6 +22,11 @@
     this.content = node.children[1]; // div.content
     this.controls = node.children[2]; // div.controls
     this.controls.contentEditable = false;
+
+    var block = this;
+    $(this.controls).find('.remove').unbind().bind('click', function() {
+      block.remove();
+    });
   }
 
   /**
@@ -31,7 +36,7 @@
     var node = document.createElement('div');
     node.classList.add('block');
     var handle = '<div class="handle"></div>';
-    var content = '<' + type + '></' + type + '>';
+    var content = '<' + type + '><br /></' + type + '>';
     var controls = '<div class="controls"><div class="remove"></div></div>';
     node.innerHTML = handle + content + controls;
 
@@ -236,5 +241,31 @@
 
   Block.prototype.getSource = function getSource() {
     return this.content.outerHTML;
+  }
+
+  Block.prototype.remove = function remove() {
+    var block = this;
+    var editor = this.editor;
+    var blocks = this.editor.blocks;
+
+    // fade out and then remove this node from dom
+    $(this.node).fadeOut(function() {
+      $(this).remove();
+
+      rangy.getSelection().removeAllRanges();
+
+      // remove block from editor.blocks
+      var i = blocks.indexOf(block);
+      if (i > -1) {
+        blocks.splice(i, 1);
+      }
+
+      if (blocks.length == 0) {
+        var newBlock = Block.create(editor, 'p');
+        editor.appendBlock(newBlock);
+      }
+
+      editor.emitEvent('change');
+    });
   }
 })();
