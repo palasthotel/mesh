@@ -315,12 +315,26 @@
   Editor.prototype.getNumberOfWords = function getNumberOfWords() {
     var i = 0;
     var total = 0;
+    var block = null;
 
     for (i = 0; i < this.blocks.length; i++) {
-      var block = this.blocks[i];
+      block = this.blocks[i];
       total += block.getNumberOfWords();
     }
 
     return total;
-  }
+  };
+
+  Editor.prototype.getSource = function getSource() {
+    var i = 0;
+    var source = [];
+    var block = null;
+
+    for (i = 0; i < this.blocks.length; i++) {
+      block = this.blocks[i];
+      source.push(block.getSource());
+    }
+
+    return source.join('\n');
+  };
 })();

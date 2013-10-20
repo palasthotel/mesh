@@ -17,8 +17,10 @@
 
     var editor = initEditor($editor);
     initTools($tools, $editor);
-    initSourceView($source, $editor);
+    initSourceView($source, editor);
     initSearch($searchQuery, $searchSubmit, $results);
+
+    editor.emitEvent('change');
   });
 
   var conf = {
@@ -184,29 +186,21 @@
     $results.disableSelection();
 
     var $status = $('#mesh-status');
-    editor.addEventListener('change', function() {
+    editor.addEventListener('change', function updateStatusLine() {
       var wc = editor.getNumberOfWords();
       var status = wc + ' word' + (wc === 1 ? '' : 's');
       console.log(status);
       $status.html(status);
     });
 
-    editor.emitEvent('change');
-
     return editor;
   }
 
-  function initSourceView($source, $editor) {
-    function listener() {
-      // TODO $source.html(escapeHTML(simplify($editor)));
-    }
-
-    $editor.bind('input', listener);
-    $editor.bind('DOMNodeInserted', listener);
-    $editor.bind('DOMNodeRemoved', listener);
-    $editor.bind('DOMCharacterDataModified', listener);
-
-    listener();
+  function initSourceView($source, editor) {
+    editor.addEventListener('change', function updateSourceView() {
+      var source = editor.getSource();
+      $source.html(escapeHTML(source));
+    });
   }
 
   function initSearch($searchQuery, $searchSubmit, $results) {

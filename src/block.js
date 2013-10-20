@@ -233,4 +233,8 @@
     var text = this.content.innerText.trim();
     return text.split(/\s+/).length;
   }
+
+  Block.prototype.getSource = function getSource() {
+    return this.content.outerHTML;
+  }
 })();
