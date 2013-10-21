@@ -17,8 +17,10 @@
 
     var editor = initEditor($editor);
     initTools($tools, $editor);
-    initSourceView($source, $editor);
+    initSourceView($source, editor);
     initSearch($searchQuery, $searchSubmit, $results);
+
+    editor.emitEvent('change');
   });
 
   var conf = {
@@ -137,19 +139,6 @@
 
     var selectedElement = null;
 
-    function refreshRemove() {
-      $editor.find('.block').each(function() {
-        var block = $(this); // single block
-        block.find('.remove').bind('click', function() {
-          // fade out and then remove this node from dom
-          block.fadeOut(function() {
-            $(this).remove();
-          });
-        });
-      });
-    }
-    refreshRemove();
-
     // selection handler
     function onSelect(e) {
       if (selectedElement)
@@ -167,33 +156,26 @@
 
     $(document).bind('mouseup keyup', onSelect);
 
-    $editor.sortable({
-      placeholder : 'placeholder', // css class .placeholder
-      axis : 'y',
-      receive : function(e, ui) {
-        refreshRemove();
-      }
-    });
-
     draggableResults();
 
     var $results = $('#mesh-results .block');
     $results.disableSelection();
 
+    var $status = $('#mesh-status');
+    editor.addEventListener('change', function updateStatusLine() {
+      var wc = editor.getNumberOfWords();
+      var status = wc + ' word' + (wc === 1 ? '' : 's');
+      $status.html(status);
+    });
+
     return editor;
   }
 
-  function initSourceView($source, $editor) {
-    function listener() {
-      // TODO $source.html(escapeHTML(simplify($editor)));
-    }
-
-    $editor.bind('input', listener);
-    $editor.bind('DOMNodeInserted', listener);
-    $editor.bind('DOMNodeRemoved', listener);
-    $editor.bind('DOMCharacterDataModified', listener);
-
-    listener();
+  function initSourceView($source, editor) {
+    editor.addEventListener('change', function updateSourceView() {
+      var source = editor.getSource();
+      $source.html(escapeHTML(source));
+    });
   }
 
   function initSearch($searchQuery, $searchSubmit, $results) {

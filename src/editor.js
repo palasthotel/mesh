@@ -18,11 +18,13 @@
    *                [historySize]
    */
   function Editor(elem, historyStack, historySize) {
-    var isSelf = this instanceof Editor;
-    if (!isSelf)
-      return new Editor(elem, historyStack);
+    if (!(this instanceof Editor))
+      return new Editor(elem, historyStack, historySize);
     if (!elem)
       throw new TypeError('expects an element');
+
+    var editor = this; // ref to self
+
     this.history = new History(historyStack || []);
     this.history.setMaximumEntries(historySize || 100);
     this.container = elem;
@@ -34,12 +36,24 @@
     for (i = 0; i < len; i++) {
       this.blocks.push(new Block(this, this.container.children[i]));
     }
+
+    $(this.container).sortable({
+      placeholder : 'placeholder', // css class .placeholder
+      axis : 'y',
+      receive : function(e, ui) {
+        editor.emitEvent('add-block');
+      },
+      stop : function() {
+        rangy.getSelection().removeAllRanges();
+        editor.emitEvent('sort');
+      }
+    });
   }
 
   // Event emitter
   Emitter(Editor.prototype);
 
-  Editor.prototype.setContents = function setContents(html) {
+  Editor.prototype.setContents = function setContent(html) {
     var editor = this;
     if (typeof html == 'string') {
       var c = document.createElement('div');
@@ -52,9 +66,7 @@
         var block = Block.create(editor, type);
 
         var html = node.innerHTML;
-        html.split(/<br ?\/?>/).forEach(function(part) {
-          block.appendBreak(part);
-        });
+        block.setHTMLContent(html);
 
         this.appendBlock(block);
       }
@@ -71,12 +83,12 @@
    * 
    * @return {String}
    */
-  Editor.prototype.contents = function() {
+  Editor.prototype.getContent = function() {
     return this.container.innerHTML;
   };
 
   /**
-   * Is editing enabled?
+   * Is editor enabled?
    * 
    * @return {Boolean}
    */
@@ -118,29 +130,6 @@
     }
 
     return this;
-  };
-
-  /**
-   * Get range.
-   * 
-   * TODO: x-browser
-   * 
-   * @return {Range}
-   */
-  Editor.prototype.range = function() {
-    return document.createRange();
-  };
-
-  /**
-   * Get selection.
-   * 
-   * TODO: x-browser
-   * 
-   * @return {Selection}
-   */
-
-  Editor.prototype.selection = function() {
-    return rangy.getSelection();
   };
 
   Editor.prototype.getSelectedBlock = function(selection) {
@@ -209,7 +198,7 @@
    *                cmd
    * @return {Boolean}
    */
-  Editor.prototype.state = function(cmd) {
+  Editor.prototype.getState = function(cmd) {
     var length = this.history.vals.length - 1;
     var stack = this.history;
 
@@ -241,44 +230,36 @@
    * @return {Editor}
    */
   Editor.prototype.onchange = function(e) {
-    this.history.add(this.contents());
+    this.history.add(this.getContent());
 
     this.emitEvent('change', e);
     return this;
   };
 
-  Editor.prototype.onkeydown =
-      function(e) {
-        console.log(e.keyCode);
+  Editor.prototype.onkeydown = function(e) {
+    console.log(e.keyCode);
 
-        if (e.keyCode === 13) { // return/enter key
-          var sel = rangy.getSelection();
-          var elem = sel.anchorNode;
+    if (e.keyCode === 13 || e.keyCode === 10) { // return/enter key
+      var sel = rangy.getSelection();
 
-          if (elem.nodeType === 3) // text node? use parent!
-            elem = elem.parentNode;
+      // TODO handle non-collapsed selections
+      if (!sel.isCollapsed)
+        throw new Error('not collapsed! TO BE HANDLED');
 
-          if (!sel.isCollapsed)
-            throw new Error('not collapsed! TO BE HANDLED');
+      prevent(e); // prevent default browser behaviour
 
-          prevent(e); // prevent default browser behaviour
-
-          var block = this.getSelectedBlock(sel);
-          // TODO check if the caret is right behind another break
-          // in that case insert a new block
-          if (block.isAtBeginning(sel)
-              && (prev.length() === 0 || Block.isBreakEmpty(prev))) {
-            var brk = block.getSelectedBreak(sel);
-            if (Block.isBreakEmpty(brk))
-              block.removeBreak(sel);
-            this.insertBlockAfter(block);
-          } else {
-            // insert line break
-            block.insertLineBreak(sel);
-          }
-        }
-        return this;
-      };
+      var block = this.getSelectedBlock(sel);
+      // If the caret is behind another block, insert a new block
+      if (Block.isSelectionAfterBreak(sel)) {
+        console.log('block');
+        block.insertBreak(sel);
+      } else { // otherwise insert a line break
+        // insert line break
+        block.insertBreak(sel);
+      }
+    }
+    return this;
+  };
 
   function isEmptyNode(node) {
     return node !== null && node.children && node.children.length === 1
@@ -345,15 +326,33 @@
     // block.node
   };
 
-  Editor.prototype.numberOfWords = function numberOfWords() {
+  Editor.prototype.insertBlockAt = function insertBlockAt(i, block) {
+
+  };
+
+  Editor.prototype.getNumberOfWords = function getNumberOfWords() {
     var i = 0;
     var total = 0;
+    var block = null;
 
     for (i = 0; i < this.blocks.length; i++) {
-      var block = this.blocks[i];
-      total += block.numberOfWords();
+      block = this.blocks[i];
+      total += block.getNumberOfWords();
     }
 
     return total;
-  }
+  };
+
+  Editor.prototype.getSource = function getSource() {
+    var i = 0;
+    var source = [];
+    var block = null;
+
+    for (i = 0; i < this.blocks.length; i++) {
+      block = this.blocks[i];
+      source.push(block.getSource());
+    }
+
+    return source.join('\n');
+  };
 })();

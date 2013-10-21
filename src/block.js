@@ -22,6 +22,11 @@
     this.content = node.children[1]; // div.content
     this.controls = node.children[2]; // div.controls
     this.controls.contentEditable = false;
+
+    var block = this;
+    $(this.controls).find('.remove').unbind().bind('click', function() {
+      block.remove();
+    });
   }
 
   /**
@@ -30,9 +35,16 @@
   Block.create = function create(editor, type) {
     var node = document.createElement('div');
     node.classList.add('block');
+
     var handle = '<div class="handle"></div>';
-    var content = '<div class="' + type + '"></div>';
+    var content = '';
+    if ([ 'p', 'ul', 'blockquote', 'h1', 'h2', 'h3' ].indexOf(type) > -1) {
+      content = '<' + type + '><br /></' + type + '>';
+    } else {
+      content = '<div class="' + type + '"><br /></div>';
+    }
     var controls = '<div class="controls"><div class="remove"></div></div>';
+
     node.innerHTML = handle + content + controls;
 
     return new Block(editor, node);
@@ -41,103 +53,65 @@
   /**
    * Insert a line break at the given selection.
    */
-  Block.prototype.insertLineBreak = function insertLineBreak(selection) {
-    if (typeof selection === 'undefined')
-      throw new Error('no selection');
+  Block.prototype.insertBreak =
+      function insertBreak(sel) {
+        if (typeof sel === 'undefined')
+          throw new Error('no selection');
 
-    var brkBefore = this.getSelectedBreak(selection);
-    var brkAfter = Editor.createBreak();
+        console.log(sel);
 
-    function containsNode(a, b) {
-      if (Node && Node.prototype.contains)
-        return a.contains(b);
+        var anchor = sel.anchorNode;
+        var br = document.createElement('br');
+        var grandpa = null;
 
-      return !!(a.compareDocumentPosition(b) & 16)
-    }
+        if (sel.anchorOffset === 0
+            && anchor.isSameNode(anchor.parentNode.firstChild)) {
+          // if the caret is at the beginning of the element, insert the <br>
+          // in front of the parent node
+          grandpa = anchor.parentNode.parentNode;
+          grandpa.insertBefore(br, anchor.parentNode);
 
-    var textAfter = null;
-    // Recursively walk down the DOM tree and split the node at the selection
-    function splitNode(nodeBefore, nodeAfter, selection) {
-      var node = nodeBefore.firstChild;
-      var next = null;
-      var before = null;
-      var after = null;
-      var splitOccurred = false;
-      var splitHere = false;
-      var anchor = selection.anchorNode;
+          console.log('1st');
+        } else if (sel.anchorOffset === anchor.length
+            && anchor.isSameNode(anchor.parentNode.lastChild)) {
+          // if the caret is at the end of the element, insert the <br> after
+          // the anchor
+          grandpa = anchor.parentNode.parentNode;
+          grandpa.appendChild(br);
+          grandpa.appendChild(document.createElement('br'));
 
-      // Walk through all children of nodeBefore and check if they contain the
-      // anchor
-      while (node !== null) {
-        next = node.nextSibling;
+          Caret.moveToEnding(grandpa, sel);
 
-        // Do we need to split within the current node?
-        splitHere = containsNode(node, anchor);
+          console.log('last');
+        } else if (anchor.nodeType === 3) {
+          // if the caret is in a text node, split it and insert the line break
+          // in between
+          var textNodeAfterSplit = anchor.splitText(sel.anchorOffset);
+          anchor.parentNode.insertBefore(br, textNodeAfterSplit);
 
-        if (splitHere) {
-          if (node.nodeType === 3) { // text node
-            // split the text node, append it to nodeAfter
-            textAfter = anchor.splitText(selection.anchorOffset);
-            anchor.parentNode.removeChild(textAfter);
+          // move caret to beginning of next line
+          Caret.moveToBeginning(textNodeAfterSplit, sel);
 
-            // insert <br /> into empty nodes to make them visible in every
-            // browser
-            if (textAfter.length === 0) {
-              textAfter = document.createElement('br');
-              nodeAfter.appendChild(textAfter);
-            } else {
-              nodeAfter.appendChild(textAfter);
-            }
-          } else {
-            before = node;
-            after = document.createElement(node.nodeName);
+          console.log('text');
+        } else {
+          // if we are in a normal node,
+          var i = sel.anchorOffset;
+          var nodeAfter = anchor.childNodes[i];
 
-            // also copy the attributes
-            var attrs = before.attributes;
-            var len = attrs.length;
-            var attr = null;
-            for ( var i = 0; i < len; i++) {
-              attr = attrs[i];
-              if (!attr.specified)
-                continue;
+          anchor.insertBefore(br, nodeAfter);
 
-              after.setAttribute(attr.nodeName, attr.nodeValue);
-            }
+          // move caret to beginning of next line
+          Caret.moveToBeginning(nodeAfter, sel);
 
-            splitNode(before, after, selection);
-
-            nodeAfter.insertBefore(after);
-          }
-
-          splitOccurred = true;
-        } else if (splitOccurred) {
-          // move that node to brkAfter
-          nodeBefore.removeChild(node);
-          nodeAfter.appendChild(node);
+          console.log('normal');
         }
-
-        node = next;
-      }
-    }
-
-    splitNode(brkBefore, brkAfter, selection);
-
-    // append the newly created .break
-    var brkNext = brkBefore.nextSibling;
-    if (brkNext !== null)
-      brkBefore.parentNode.insertBefore(brkAfter, brkNext);
-    else
-      brkBefore.parentNode.appendChild(brkAfter);
-
-    // move caret to beginning of next line
-    Caret.moveToBeginning(textAfter, selection);
-  };
+      };
 
   /**
    * @returns DIV node with class "break" that contains the given selection
    */
-  Block.prototype.getSelectedBreak = function getSelectedBreak(selection) {
-    var node = selection.anchorNode;
+  Block.prototype.getSelectedBreak = function getSelectedBreak(sel) {
+    var node = sel.anchorNode;
 
     if (node === null)
       return null;
@@ -152,17 +126,31 @@
   /**
    * @returns true, if the selection is at the beginning of
    */
-  Block.prototype.isAtBeginning = function isAtBeginning(selection) {
-    if (selection.anchorOffset !== 0)
+  Block.prototype.isAtBeginning = function isAtBeginning(sel) {
+    if (sel.anchorOffset !== 0)
       return false;
 
-    var node = selection.anchorNode;
+    var node = sel.anchorNode;
     if (node === null)
       return false;
     if (node.className === 'break' && this.content.isSameNode(node.parentNode))
       return true;
 
     return this.isAtBeginning(node.parentNode);
+  };
+
+  Block.isSelectionAfterBreak = function isSelectionAfterBreak(sel) {
+    var anchor = sel.anchorNode;
+
+    // TODO what to do at beginning of <b>? <br /> is inserted into <b>...
+    var prev = null;
+    if (anchor.nodeType === 3) { // text node
+      prev = anchor.previousSibling;
+      return prev && prev.nodeName === 'BR';
+    }
+
+    prev = anchor.children[sel.anchorOffset - 1];
+    return prev && prev.nodeName === 'BR';
   };
 
   /**
@@ -209,11 +197,8 @@
     this.content.insertBefore(node, first);
   };
 
-  Block.prototype.appendBreak = function appendBreak(html) {
-    var brk = document.createElement('div');
-    brk.classList.add('break');
-    brk.innerHTML = html;
-    this.append(brk);
+  Block.prototype.setHTMLContent = function setHTMLContent(html) {
+    this.content.innerHTML = html;
   };
 
   /**
@@ -224,19 +209,6 @@
       this.node.classList.add('focus');
     else
       this.node.classList.remove('focus');
-  };
-
-  Block.isBreakEmpty = function isBreakEmpty(brk) {
-    if (!brk.hasChildNodes())
-      return true;
-    if (brk.innerText.length === 0)
-      return true;
-
-    return false;
-  };
-
-  Block.prototype.removeBreak = function removeBreak(brk) {
-    this.content.removeChild(brk);
   };
 
   Block.prototype.getPreviousBlock = function getPreviousBlock() {
@@ -269,8 +241,44 @@
     return null;
   };
 
-  Block.prototype.numberOfWords = function numberOfWords() {
+  Block.prototype.getNumberOfWords = function getNumberOfWords() {
     var text = this.content.innerText.trim();
-    return text.split(/\s+/).length;
+    var words = text.split(/\s+/);
+    var wc = 0;
+    for ( var i = 0; i < words.length; i++) {
+      if (words[i].length > 0)
+        wc++;
+    }
+    return wc;
+  }
+
+  Block.prototype.getSource = function getSource() {
+    return this.content.outerHTML;
+  }
+
+  Block.prototype.remove = function remove() {
+    var block = this;
+    var editor = this.editor;
+    var blocks = this.editor.blocks;
+
+    // fade out and then remove this node from dom
+    $(this.node).fadeOut(function() {
+      $(this).remove();
+
+      rangy.getSelection().removeAllRanges();
+
+      // remove block from editor.blocks
+      var i = blocks.indexOf(block);
+      if (i > -1) {
+        blocks.splice(i, 1);
+      }
+
+      if (blocks.length == 0) {
+        var newBlock = Block.create(editor, 'p');
+        editor.appendBlock(newBlock);
+      }
+
+      editor.emitEvent('change');
+    });
   }
 })();
