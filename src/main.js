@@ -163,7 +163,7 @@
 
     var $status = $('#mesh-status');
     editor.addEventListener('change', function updateStatusLine() {
-      var wc = editor.getNumberOfWords();
+      var wc = editor.getWordCount();
       var status = wc + ' word' + (wc === 1 ? '' : 's');
       $status.html(status);
     });
@@ -173,8 +173,8 @@
 
   function initSourceView($source, editor) {
     editor.addEventListener('change', function updateSourceView() {
-      var source = editor.getSource();
-      $source.html(escapeHTML(source));
+      var html = editor.toHTML();
+      $source.html(escapeHTML(html));
     });
   }
 

@@ -275,7 +275,7 @@
     return null;
   };
 
-  Block.prototype.getNumberOfWords = function getNumberOfWords() {
+  Block.prototype.getWordCount = function getWordCount() {
     var text = this.content.innerText.trim();
     var words = text.split(/\s+/);
     var wc = 0;
@@ -286,9 +286,13 @@
     return wc;
   }
 
-  Block.prototype.getSource = function getSource() {
+  Block.prototype.toHTML = function toHTML() {
     return this.content.outerHTML;
-  }
+  };
+  
+  Block.prototype.toXML = function toXML() {
+    
+  };
 
   Block.prototype.remove = function remove() {
     var block = this;

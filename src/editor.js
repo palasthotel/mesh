@@ -330,27 +330,27 @@
 
   };
 
-  Editor.prototype.getNumberOfWords = function getNumberOfWords() {
+  Editor.prototype.getWordCount = function getWordCount() {
     var i = 0;
     var total = 0;
     var block = null;
 
     for (i = 0; i < this.blocks.length; i++) {
       block = this.blocks[i];
-      total += block.getNumberOfWords();
+      total += block.getWordCount();
     }
 
     return total;
   };
 
-  Editor.prototype.getSource = function getSource() {
+  Editor.prototype.toHTML = function toHTML() {
     var i = 0;
     var source = [];
     var block = null;
 
     for (i = 0; i < this.blocks.length; i++) {
       block = this.blocks[i];
-      source.push(block.getSource());
+      source.push(block.toHTML());
     }
 
     return source.join('\n');
