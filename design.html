@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+ <html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Design study</title>
+  <link rel="stylesheet" href="design.css" />
+</head>
+<body>
+
+<div id="container">
+  <div id="mesh-editor">
+    <div id="mesh-tools"></div>
+    <div id="mesh-content">
+      <div class="block"><div class="handle" unselectable="on" contenteditable="false"></div><div class="paragraph">Some sample text<br />New line</div><div class="controls" unselectable="on" contenteditable="false"><img class="remove" alt="remove" src="res/remove.png" /></div></div>
+      <div class="block"><div class="handle" unselectable="on" contenteditable="false"></div><div class="paragraph">And another paragraph</div><div class="controls" unselectable="on" contenteditable="false"><img class="remove" alt="remove" src="res/remove.png" /></div></div>
+      <div class="block"><div class="handle" unselectable="on" contenteditable="false"></div><div class="blockquote">A quote</div><div class="controls" unselectable="on" contenteditable="false"><img class="remove" alt="remove" src="res/remove.png" /></div></div>
+      <div class="block"><div class="handle" unselectable="on" contenteditable="false"></div><div class="codeblock">// and some code</div><div class="controls" unselectable="on" contenteditable="false"><img class="remove" alt="remove" src="res/remove.png" /></div></div>
+    </div>
+  </div>
+  <div id="mesh-picker">
+    <h2>Search:</h2>
+    <div>
+      <input type="radio" checked="checked" value="flickr" id="mesh-search-flickr" /><label for="mesh-search-flickr">Flickr</label>
+      <!--input type="radio" value="twitter" id="mesh-search-twitter" /><label for="mesh-search-twitter">Twitter</label-->
+    </div>
+    <div id="mesh-search"><input type="text" /></div>
+    <h2>Results:</h2>
+    <div id="mesh-results">
+      <div class="block"><div class="handle" unselectable="on" contenteditable="false"></div><div class="figure"><img alt="Lift Off- Best Viewed Large" title="Lift Off- Best Viewed Large" src="http://farm1.staticflickr.com/159/345009210_1f826cd5a1_n.jpg" /></div><div class="controls" unselectable="on" contenteditable="false"><img class="remove" alt="remove" src="res/remove.png" /></div></div>
+    </div>
+  </div>
+  <div id="mesh-attributes">
+    <h2>Attributes</h2>
+    <ul>
+      <li><input type="text" /><input type="text" /> x
+    </ul>
+    <button>Add attribute</button>
+  </div>
+  <div id="mesh-source">
+    <h2>Source:</h2>
+    <pre></pre>
+  </div>
+</div>
+ 
+</body>
+</html>
