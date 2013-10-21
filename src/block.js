@@ -35,9 +35,16 @@
   Block.create = function create(editor, type) {
     var node = document.createElement('div');
     node.classList.add('block');
+
     var handle = '<div class="handle"></div>';
-    var content = '<' + type + '><br /></' + type + '>';
+    var content = '';
+    if ([ 'p', 'ul', 'blockquote', 'h1', 'h2', 'h3' ].indexOf(type) > -1) {
+      content = '<' + type + '><br /></' + type + '>';
+    } else {
+      content = '<div class="' + type + '"><br /></div>';
+    }
     var controls = '<div class="controls"><div class="remove"></div></div>';
+
     node.innerHTML = handle + content + controls;
 
     return new Block(editor, node);
@@ -236,7 +243,13 @@
 
   Block.prototype.getNumberOfWords = function getNumberOfWords() {
     var text = this.content.innerText.trim();
-    return text.split(/\s+/).length;
+    var words = text.split(/\s+/);
+    var wc = 0;
+    for ( var i = 0; i < words.length; i++) {
+      if (words[i].length > 0)
+        wc++;
+    }
+    return wc;
   }
 
   Block.prototype.getSource = function getSource() {
