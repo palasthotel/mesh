@@ -33,6 +33,8 @@
     });
   }
 
+  var knownTypes = [ 'p', 'ul', 'blockquote', 'h1', 'h2', 'h3' ];
+
   /**
    * Creates a block of a given type. E.g. p, blockquote, etc.
    */
@@ -42,7 +44,7 @@
 
     var handle = '<div class="handle"></div>';
     var content = '';
-    if ([ 'p', 'ul', 'blockquote', 'h1', 'h2', 'h3' ].indexOf(type) > -1) {
+    if (knownTypes.indexOf(type) > -1) {
       content = '<' + type + '><br /></' + type + '>';
     } else {
       content = '<div class="' + type + '"><br /></div>';
@@ -84,6 +86,35 @@
    */
   Block.prototype.getControlsNode = function getControlsNode() {
     return this.controls;
+  };
+
+  /**
+   * Change the type.
+   */
+  Block.prototype.setType = function setType(type) {
+    if (type === this.getType())
+      return;
+
+    this.type = type;
+
+    var newContent = null;
+    if (knownTypes.indexOf(type) > -1) {
+      newContent = document.createElement(type);
+    } else {
+      newContent = document.createElement('div');
+      newContent.classList.add(type);
+    }
+
+    var child = null;
+    for ( var i = 0; i < this.content.children.length; i++) {
+      child = this.content.children[i];
+      newContent.appendChild(child);
+    }
+
+    this.node.removeChild(this.content);
+    this.content = newContent;
+
+    this.node.insertBefore(newContent, this.controls);
   };
 
   /**
