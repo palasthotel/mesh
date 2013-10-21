@@ -1,50 +1,182 @@
+body {
+  background: #eee;
+  font-family: helvetica, arial, sans-serif;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-weight: normal;
+}
+
+h2 {
+  font-size: 1.2em;
+}
+
+h2:first-child {
+  margin: 0 0 .5em;
+}
+
+#container {
+  background: #fff;
+  overflow: hidden;
+  width: 960px;
+  margin: 0 auto;
+  padding: 1em;
+}
+
 #mesh-editor {
-  width: 600px;
+  float: left;
+  width: 570px;
+}
+
+#mesh-picker {
+  border-left: 1px solid #eee;
+  float: left;
+  padding-left: 9px;
+  margin-left: 10px;
+  width: 370px;
+}
+
+#mesh-source {
+  float: left;
+  width: 100%;
+}
+
+#mesh-source pre {
+  line-height: 1.5;
+  font-family: monospace;
+  overflow-x: scroll;
+  margin: 0;
+  padding: 0 0 .5em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+#mesh-source h2 {
+  margin-top: 0;
+}
+
+#mesh-content {
+  line-height: 1.5;
+}
+
+#mesh-status {
+  background: #eee;
+  border-top: 1px solid #aaa;
+  padding: 4px;
+  margin-top: .5em;
+  margin-bottom: 2em;
+  font-size: 0.7em;
+}
+
+#mesh-title {
+  margin-bottom: .5em;
+}
+
+#mesh-title input {
+  border: none;
+  font-size: 2em;
+  outline: none;
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+#mesh-attributes {
+  margin-bottom: 1em;
+}
+
+#mesh-content {
+  border: 1px solid #ddd;
+  padding: .1em;
 }
 
 #mesh-content:focus {
   outline: none;
 }
 
-#mesh-content>* {
+#mesh-content .block,#mesh-results .block {
+  position: relative;
+}
+
+#mesh-content .handle,#mesh-results .handle {
+  background: url(res/metal.png);
+  cursor: move;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: .5em;
+  visibility: hidden;
+}
+
+#mesh-content>:hover>.handle,#mesh-results>:hover>.handle {
+  visibility: visible;
+}
+
+#mesh-content .controls,#mesh-results .controls {
+  padding: 1px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  visibility: hidden;
+}
+
+#mesh-content .controls .remove {
+  width: 14px;
+  height: 14px;
+  background-image: url('res/remove.png');
+}
+
+#mesh-content :hover .controls {
+  visibility: visible;
+}
+
+#mesh-content .controls div {
+  opacity: .6;
+  cursor: pointer;
+}
+
+#mesh-content .controls div:hover {
+  opacity: 1.0;
+}
+
+#mesh-content .controls div:active {
+  opacity: .8;
+}
+
+#mesh-content .block,#mesh-results .block {
   border: 1px solid #fff;
-  border-left: 10px solid #fff;
-  padding: 1em;
+  border-radius: 3px 3px 0 3px;
+  padding: .5em 2em .5em 1.5em;
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: 1px;
+  border: 1px solid #fff;
 }
 
-#mesh-content>*:hover {
-  border-color: #8a8;
+.block.ui-sortable-helper {
+  background: rgba(255, 255, 255, .8);
 }
 
-#mesh-content>*.focus,#mesh-content>*.focus:hover {
-  border-color: #575;
+#mesh-content>:hover,#mesh-results>:hover {
+  border-color: #aaa;
 }
 
-#mesh-content>.insert-here {
-  border: 1px dashed #cfc;
-  background: #fafffa;
+#mesh-content .focus,#mesh-content .focus:hover {
+  border-color: #ccc;
+}
+
+#mesh-content .placeholder {
+  border: 2px dashed #aaa;
+  border-radius: 5px;
+  background: #eee;
   padding: .5em;
   border-width: 3px;
+  margin: .5em;
 }
 
-#mesh-content blockquote,#mesh-content blockquote:hover {
-  color: #333;
-  padding-left: 2em;
-  margin-left: 0;
-  margin-right: 0;
-}
-
-#mesh-content blockquote p:first-child {
-  margin-top: 0;
-}
-
-#mesh-content blockquote p:last-child {
-  margin-bottom: 0;
-}
-
-#mesh-content [unselectable=on] {
+#mesh-content[unselectable=on] {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -52,10 +184,57 @@
   user-select: none;
 }
 
+#mesh-content blockquote {
+  border-left: 3px solid #999;
+  padding: .3em 1em;
+  margin: 0;
+}
+
+#mesh-content pre {
+  font-family: monospace;
+  margin: 0;
+}
+
+/* no margin between blocks */
+#mesh-content p {
+  margin: 0;
+}
+
+#mesh-content br::before {
+  color: #ddd;
+  content: ' ↩';
+  display: inline;
+}
+
+#mesh-content .break:last-child:after {
+  content: '';
+}
+
+#mesh-tools {
+  background: #ccc;
+  border: 1px outset #ddd;
+  border-radius: 5px;
+  margin-bottom: .5em;
+}
+
 #mesh-tools button {
   font-family: serif;
 }
 
-#mesh-source {
-  font-family: monospace;
+#mesh-results {
+  max-height: 600px;
+  overflow: auto;
+}
+
+#mesh-results .load-more {
+  cursor: pointer;
+  background: #bdf;
+  border: 1px solid #9bc;
+  border-radius: 3px;
+  padding: .2em;
+  text-align: center;
+}
+
+#mesh-results .load-more:active {
+  background: #ace;
 }

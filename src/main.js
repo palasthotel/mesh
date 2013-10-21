@@ -1,6 +1,27 @@
 (function(window) {
+  'use strict';
 
   var mesh = {};
+
+  /**
+   * Initial setup.
+   */
+  $(document).ready(function() {
+    var $editor = $('#mesh-content');
+    var $tools = $('#mesh-tools');
+    var $picker = $('#mesh-picker');
+    var $source = $('#mesh-source > pre');
+    var $results = $('#mesh-results');
+    var $searchQuery = $('#mesh-search-query');
+    var $searchSubmit = $('#mesh-search-submit');
+
+    var editor = initEditor($editor);
+    initTools($tools, $editor);
+    initSourceView($source, editor);
+    initSearch($searchQuery, $searchSubmit, $results);
+
+    editor.emitEvent('change');
+  });
 
   var conf = {
     tools : [ 'bold', 'italic', 'link' ],
@@ -9,10 +30,8 @@
     }
   };
 
-  var dragSrc = null;
-
   /**
-   * Sets the attribute "unselectable" for the `node`.
+   * Sets the attribute 'unselectable' for the `node`.
    * 
    * @param {DOMNode}
    *                node
@@ -29,114 +48,6 @@
       setSelectable(child, selectable);
       child = child.nextSibling;
     }
-  }
-
-  /**
-   * Determine if the mouse is in the upper half of the underlying element.
-   * 
-   * @param {JQueryMouseEvent}
-   *                e
-   * @returns {Boolean}
-   */
-  function isInUpperHalf(e) {
-    var y = e.offsetY || e.layerY - e.target.offsetTop;
-    return y < e.target.clientHeight >> 1;
-  }
-
-  function selectElementContents(el) {
-    if (window.getSelection && document.createRange) {
-      var sel = window.getSelection();
-      var range = document.createRange();
-      range.selectNodeContents(el);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    } else if (document.selection && document.body.createTextRange) {
-      var textRange = document.body.createTextRange();
-      textRange.moveToElementText(el);
-      textRange.select();
-    }
-  }
-
-  /**
-   * Make the node editable and draggable.
-   * 
-   * @param {DOMNode}
-   *                node
-   */
-  function makeEditable() {
-    var node = this;
-    var $node = $(this);
-
-    $node.bind('mousemove', function(e) {
-      var x = e.offsetX || e.layerX - e.target.offsetLeft;
-
-      if (x <= conf.controls.draggableBorderWidth) {
-        $(this).css('cursor', 'move');
-        this.draggable = true;
-        setSelectable($node[0], false);
-      } else {
-        $(this).css('cursor', 'inherit');
-        this.draggable = false;
-        setSelectable($node[0], true);
-      }
-    });
-
-    $node.bind('dragstart', function(e) {
-      dragSrc = this;
-
-      // selectElementContents(this);
-
-      if (e.originalEvent.dataTransfer)
-        e.originalEvent.dataTransfer.effectAllowed = 'move';
-
-      e.originalEvent.dataTransfer.setData('text/html', null);
-
-      this.contentEditable = 'false';
-    });
-
-    $node.bind('dragover', function(e) {
-      $('#mesh-content > div.insert-here').remove();
-
-      if (isInUpperHalf(e))
-        $(this).before('<div class="insert-here"></div>');
-      else
-        $(this).after('<div class="insert-here"></div>');
-
-      $('#mesh-content > div.insert-here').bind('dragover', function(e) {
-        e.preventDefault();
-        return false;
-      });
-
-      $('#mesh-content > div.insert-here').bind('drop', function(e) {
-        if (!dragSrc)
-          return;
-
-        $(this).replaceWith(dragSrc);
-        dragSrc.contentEditable = 'inherit';
-      });
-
-      e.preventDefault();
-      return false;
-    });
-
-    $node.bind('dragend', function(e) {
-      $('#mesh-content > div.insert-here').remove();
-    });
-
-    $node.bind('drop', function(e) {
-      if (!dragSrc || dragSrc === this)
-        return;
-
-      if (isInUpperHalf(e))
-        $(dragSrc).insertBefore(this);
-      else
-        $(dragSrc).insertAfter(this);
-      dragSrc.contentEditable = 'inherit';
-    });
-  }
-
-  function sanitizeContent(rootNode) {
-    // TODO sanitize the content div
   }
 
   function initTools(toolsDiv, editorDiv) {
@@ -166,7 +77,7 @@
 
     // select all of our buttons
     $('button[data-tag]').each(function() {
-      this.onclick = function(e) {
+      $(this).bind('click', function(e) {
         var tag = this.getAttribute('data-tag');
         switch (tag) {
         case 'createLink':
@@ -188,7 +99,27 @@
 
         // prevent default action (usually submitting the form)
         e.preventDefault();
-      };
+      });
+    });
+  }
+
+  function getSelectedElement() {
+    var selectedElement = rangy.getSelection().focusNode.parentNode;
+    while (selectedElement.parentNode
+        && selectedElement.parentNode.contentEditable != 'true') {
+      selectedElement = selectedElement.parentNode;
+    }
+    return selectedElement;
+  }
+
+  function draggableResults() {
+    var $results = $('#mesh-results .block');
+    $results.each(function() {
+      $(this).draggable({
+        connectToSortable : '#mesh-content',
+        helper : 'clone',
+        revert : 'invalid'
+      });
     });
   }
 
@@ -196,10 +127,19 @@
     if (!$editor)
       return;
 
-    $editor.attr('contenteditable', true);
+    // create editor
+    var editor = new Editor($editor[0]);
+
+    // make editor publicly accessible
+    window.editor = editor;
+
+    // set the editors contents
+    editor
+        .setContents('<p>Text with <b>some</b> <i>form<b>atting</b></i><br>A <a href="/">Link</a></p><blockquote>Quote</blockquote>');
 
     var selectedElement = null;
 
+    // selection handler
     function onSelect(e) {
       if (selectedElement)
         $(selectedElement).removeClass('focus');
@@ -208,51 +148,87 @@
       if (!selection || !selection.focusNode)
         return;
 
-      selectedElement = window.getSelection().focusNode.parentNode;
-      while (selectedElement.parentNode
-          && selectedElement.parentNode.contentEditable != 'true') {
-        selectedElement = selectedElement.parentNode;
-      }
+      // walk up the DOM until we get div#mesh-content
+      selectedElement = getSelectedElement();
+      // focus that element
       $(selectedElement).addClass('focus');
     }
 
     $(document).bind('mouseup keyup', onSelect);
 
-    $('#mesh-content > *').each(function() {
-      $(this).bind('keypress', function(e) {
-        e.preventDefault();
-        console.log(e);
-      });
+    draggableResults();
+
+    var $results = $('#mesh-results .block');
+    $results.disableSelection();
+
+    var $status = $('#mesh-status');
+    editor.addEventListener('change', function updateStatusLine() {
+      var wc = editor.getNumberOfWords();
+      var status = wc + ' word' + (wc === 1 ? '' : 's');
+      $status.html(status);
     });
 
-    $('#mesh-content > *').each(makeEditable);
+    return editor;
   }
 
-  function initSourceView($source, $editor) {
-    function listener() {
-      $source.html(escapeHTML($editor.html()));
+  function initSourceView($source, editor) {
+    editor.addEventListener('change', function updateSourceView() {
+      var source = editor.getSource();
+      $source.html(escapeHTML(source));
+    });
+  }
+
+  function initSearch($searchQuery, $searchSubmit, $results) {
+    var timeout = null;
+    $searchSubmit.bind('click', function(e) {
+      e.preventDefault();
+      $results.html('');
+      search($searchQuery.val(), 1);
+    });
+
+    function search(query, page, loadMore) {
+      flickr.search(query, {
+        page : page
+      }, function(err, result) {
+        if (err)
+          return; // TODO show warning
+
+        try {
+          var todo = result.photos.photo.length;
+          $(result.photos.photo).each(function() {
+            flickr.oembed(this, {}, function(err, data) {
+              console.log(loadMore);
+              if (loadMore) {
+                loadMore.remove();
+                loadMore = null;
+              }
+
+              if (err)
+                throw err;
+
+              $results.append(flickr.embedCode(data));
+
+              if (--todo === 0) {
+                draggableResults();
+
+                $results.append('<div class="load-more">Load more</div>');
+                var btn = $('#mesh-results .load-more');
+                btn.bind('click', function() {
+                  btn.html('...');
+                  btn.unbind();
+                  search(query, page + 1, btn);
+                });
+              }
+            });
+          });
+        } catch (ex) {
+          // TODO show warning: unexpected format
+          // exception
+        } finally {
+        }
+      });
     }
-
-    $editor.bind('input', listener);
-    $editor.bind('DOMNodeInserted', listener);
-    $editor.bind('DOMNodeRemoved', listener);
-    $editor.bind('DOMCharacterDataModified', listener);
-
-    listener();
   }
-
-  /**
-   * Initial setup.
-   */
-  $(document).ready(function() {
-    var $editor = $('#mesh-content');
-    var $tools = $('#mesh-tools');
-    var $source = $('#mesh-source > pre');
-
-    initTools($tools, $editor);
-    initEditor($editor);
-    initSourceView($source, $editor);
-  });
 
   window.mesh = mesh;
 
