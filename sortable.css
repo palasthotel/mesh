@@ -86,6 +86,11 @@ h2:first-child {
   margin-bottom: 1em;
 }
 
+#mesh-content {
+  border: 1px solid #ddd;
+  padding: .1em;
+}
+
 #mesh-content:focus {
   outline: none;
 }
@@ -209,7 +214,7 @@ h2:first-child {
   background: #ccc;
   border: 1px outset #ddd;
   border-radius: 5px;
-  margin-bottom: 1em;
+  margin-bottom: .5em;
 }
 
 #mesh-tools button {
