@@ -10,17 +10,21 @@
   /**
    * Block around a given node.
    */
-  function Block(editor, node) {
+  function Block(editor, elem) {
     if (!(this instanceof Block))
-      return new Block(editor, node);
+      return new Block(editor, elem);
 
     this.editor = editor; // refs to editor
-    this.node = node; // and node
+    this.node = elem; // and node
 
-    this.handle = node.children[0]; // div.handle
+    this.type = elem.nodeName.toLowerCase();
+    if (this.type === 'div')
+      this.type = elem.classList[0];
+
+    this.handle = elem.children[0]; // div.handle
     this.handle.contentEditable = false;
-    this.content = node.children[1]; // div.content
-    this.controls = node.children[2]; // div.controls
+    this.content = elem.children[1]; // div.content
+    this.controls = elem.children[2]; // div.controls
     this.controls.contentEditable = false;
 
     var block = this;
@@ -51,14 +55,44 @@
   };
 
   /**
+   * @returns {String}
+   */
+  Block.prototype.getType = function getType() {
+    return this.type;
+  };
+
+  /**
+   * @returns {Node}
+   */
+  Block.prototype.getBaseNode = function getBaseNode() {
+    return this.node;
+  };
+
+  Block.prototype.getHandleNode = function getHandleNode() {
+    return this.handle;
+  };
+
+  /**
+   * @returns {Node}
+   */
+  Block.prototype.getContentNode = function getContentNode() {
+    return this.content;
+  };
+
+  /**
+   * @returns {Node}
+   */
+  Block.prototype.getControlsNode = function getControlsNode() {
+    return this.controls;
+  };
+
+  /**
    * Insert a line break at the given selection.
    */
   Block.prototype.insertBreak =
       function insertBreak(sel) {
         if (typeof sel === 'undefined')
           throw new Error('no selection');
-
-        console.log(sel);
 
         var anchor = sel.anchorNode;
         var br = document.createElement('br');
