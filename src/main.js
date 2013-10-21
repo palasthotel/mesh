@@ -173,8 +173,8 @@
 
   function initSourceView($source, editor) {
     editor.addEventListener('change', function updateSourceView() {
-      var html = editor.toHTML();
-      $source.html(escapeHTML(html));
+      var xml = editor.toXML();
+      $source.html(escapeXML(xml));
     });
   }
 

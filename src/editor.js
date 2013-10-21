@@ -348,9 +348,22 @@
     var source = [];
     var block = null;
 
-    for (i = 0; i < this.blocks.length; i++) {
+    for (; i < this.blocks.length; i++) {
       block = this.blocks[i];
       source.push(block.toHTML());
+    }
+
+    return source.join('\n');
+  };
+
+  Editor.prototype.toXML = function toXML() {
+    var i = 0;
+    var source = [];
+    var block = null;
+
+    for (; i < this.blocks.length; i++) {
+      block = this.blocks[i];
+      source.push(block.toXML());
     }
 
     return source.join('\n');

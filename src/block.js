@@ -289,9 +289,26 @@
   Block.prototype.toHTML = function toHTML() {
     return this.content.outerHTML;
   };
-  
+
+  function nodeToXMLString(node) {
+    try {
+      // Gecko- and Webkit-based browsers (Firefox, Chrome), Opera.
+      return (new XMLSerializer()).serializeToString(node);
+    } catch (e) {
+      try {
+        // Internet Explorer.
+        return node.xml;
+      } catch (e) {
+        // Other browsers without XML Serializer
+        throw new Error('XMLSerializer not supported');
+      }
+    }
+
+    return false;
+  }
+
   Block.prototype.toXML = function toXML() {
-    
+    return nodeToXMLString(this.content);
   };
 
   Block.prototype.remove = function remove() {
