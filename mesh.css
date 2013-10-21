@@ -200,16 +200,6 @@ h2:first-child {
   margin: 0;
 }
 
-#mesh-content br::before {
-  color: #ddd;
-  content: ' ↩';
-  display: inline;
-}
-
-#mesh-content .break:last-child:after {
-  content: '';
-}
-
 #mesh-tools {
   background: #ccc;
   border: 1px outset #ddd;
