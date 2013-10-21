@@ -18,11 +18,13 @@
    *                [historySize]
    */
   function Editor(elem, historyStack, historySize) {
-    var isSelf = this instanceof Editor;
-    if (!isSelf)
-      return new Editor(elem, historyStack);
+    if (!(this instanceof Editor))
+      return new Editor(elem, historyStack, historySize);
     if (!elem)
       throw new TypeError('expects an element');
+
+    var editor = this; // ref to self
+
     this.history = new History(historyStack || []);
     this.history.setMaximumEntries(historySize || 100);
     this.container = elem;
@@ -34,6 +36,18 @@
     for (i = 0; i < len; i++) {
       this.blocks.push(new Block(this, this.container.children[i]));
     }
+
+    $(this.container).sortable({
+      placeholder : 'placeholder', // css class .placeholder
+      axis : 'y',
+      receive : function(e, ui) {
+        editor.emitEvent('add-block');
+      },
+      stop : function() {
+        rangy.getSelection().removeAllRanges();
+        editor.emitEvent('sort');
+      }
+    });
   }
 
   // Event emitter

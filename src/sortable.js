@@ -156,17 +156,6 @@
 
     $(document).bind('mouseup keyup', onSelect);
 
-    $editor.sortable({
-      placeholder : 'placeholder', // css class .placeholder
-      axis : 'y',
-      receive : function(e, ui) {
-        refreshRemove();
-      },
-      stop : function() {
-        rangy.getSelection().removeAllRanges();
-      }
-    });
-
     draggableResults();
 
     var $results = $('#mesh-results .block');
