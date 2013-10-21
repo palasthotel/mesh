@@ -41,8 +41,19 @@
    * @return {Emitter}
    */
   Emitter.prototype.addEventListener = function(event, fn) {
+    var events = event.split(' ');
+    var ev = '';
+
     this._callbacks = this._callbacks || {};
-    (this._callbacks[event] = this._callbacks[event] || []).push(fn);
+    for ( var i = 0; i < events.length; i++) {
+      ev = events[i];
+
+      if (typeof this._callbacks[ev] !== 'object')
+        this._callbacks[ev] = []
+
+      this._callbacks[ev].push(fn);
+    }
+
     return this;
   };
 
@@ -67,6 +78,7 @@
 
     fn._off = on;
     this.addEventListener(event, on);
+
     return this;
   };
 
@@ -88,21 +100,33 @@
       return this;
     }
 
-    // remove specific event
-    var callbacks = this._callbacks[event];
-    if (!callbacks)
-      return this;
+    var events = event.split(' ');
+    var ev = '';
+    var i = 0;
+    var j = -1;
+    var callbacks = null;
 
     // remove remove all handlers
     if (1 == arguments.length) {
-      delete this._callbacks[event];
+      for (i = 0; i < events.length; i++) {
+        ev = events[i];
+        delete this._callbacks[ev];
+      }
       return this;
     }
 
-    // remove specific handler
-    var i = indexOf(callbacks, fn._off || fn);
-    if (~i)
-      callbacks.splice(i, 1);
+    // remove specific event
+    for (i = 0; i < events.length; i++) {
+      callbacks = this._callbacks[event];
+      if (!callbacks)
+        return this;
+
+      // remove specific handler
+      j = indexOf(callbacks, fn._off || fn);
+      if (j > -1)
+        callbacks.splice(j, 1);
+    }
+
     return this;
   };
 
