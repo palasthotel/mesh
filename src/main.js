@@ -50,7 +50,7 @@
     }
   }
 
-  function initTools(toolsDiv, editorDiv) {
+  function initTools($toolsDiv, $editorDiv) {
     conf.tools = conf.tools || [];
 
     var button, tool;
@@ -72,11 +72,21 @@
       }
 
       // add the button to toolsDiv
-      toolsDiv.append(button);
+      $toolsDiv.append(button);
     }
 
+    var typeSelect = document.createElement('select');
+    typeSelect.innerHTML =
+        '<option value="p">Paragraph</option>'
+            + '<option value="blockquote">Quote</option>';
+    $toolsDiv[0].appendChild(typeSelect);
+    $(typeSelect).change(function() {
+      // TODO get selected block an change its type
+      console.log(this.value);
+    });
+
     // select all of our buttons
-    $('button[data-tag]').each(function() {
+    $toolsDiv.find('button[data-tag]').each(function() {
       $(this).bind('click', function(e) {
         var tag = this.getAttribute('data-tag');
         switch (tag) {

@@ -106,8 +106,8 @@
     }
 
     var child = null;
-    for ( var i = 0; i < this.content.children.length; i++) {
-      child = this.content.children[i];
+    for ( var i = 0; i < this.content.childNodes.length; i++) {
+      child = this.content.removeChild(this.content.childNodes.item(i));
       newContent.appendChild(child);
     }
 
