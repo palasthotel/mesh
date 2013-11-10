@@ -55,21 +55,22 @@
 
   Editor.prototype.setContents = function setContent(html) {
     var editor = this;
-    if (typeof html == 'string') {
-      var c = document.createElement('div');
-      c.innerHTML = html;
+    if (typeof html != 'string')
+      throw new Error('not a string');
 
-      var i, len = c.children.length;
-      for (i = 0; i < len; i++) {
-        var node = c.children[i];
-        var type = node.nodeName.toLowerCase();
-        var block = Block.create(editor, type);
+    var c = document.createElement('div');
+    c.innerHTML = html;
 
-        var html = node.innerHTML;
-        block.setHTMLContent(html);
+    var i, len = c.children.length;
+    for (i = 0; i < len; i++) {
+      var node = c.children[i];
+      var type = node.nodeName.toLowerCase();
+      var block = Block.create(editor, type);
 
-        this.appendBlock(block);
-      }
+      var html = node.innerHTML;
+      block.setHTMLContent(html);
+
+      this.appendBlock(block);
     }
   };
 
