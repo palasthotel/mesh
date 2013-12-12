@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <title>Sortable</title>
 <link rel="stylesheet" href="mesh.css" />
+<link href="res/fontawesome/css/font-awesome.css" rel="stylesheet" />
 <script src="jquery/jquery-1.4.2.js"></script>
 <script src="jquery/jquery.ui.core.js"></script>
 <script src="jquery/jquery.ui.widget.js"></script>
@@ -13,12 +14,14 @@
 <script src="src/rangy.js"></script>
 <script src="src/simplify.js"></script>
 <script src="src/escapeXML.js"></script>
+<script src="src/getNodeText.js"></script>
 <script src="src/oembed.js"></script>
 <script src="src/emitter.js"></script>
 <script src="src/indexof.js"></script>
 <script src="src/history.js"></script>
 <script src="src/block.js"></script>
 <script src="src/caret.js"></script>
+<script src="src/attributes.js"></script>
 <script src="src/editor.js"></script>
 <script src="src/content/flickr-photo-search.js"></script>
 <script src="src/main.js"></script>
@@ -40,6 +43,10 @@
       <div id="mesh-tools"></div>
       <div id="mesh-content"></div>
       <div id="mesh-status">0 words</div>
+      <div id="mesh-actions">
+        <button id="mesh-source-preview">Source preview</button>
+        <button id="mesh-save">Save (not implemented)</button>
+      </div>
       <div id="mesh-attributes"></div>
       <div id="mesh-source">
         <h2>Source:</h2>

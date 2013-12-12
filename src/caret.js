@@ -24,7 +24,6 @@
    * Moves the caret to the ending of the given node.
    */
   Caret.moveToEnding = function moveToEnding(node, sel) {
-    console.log('end?')
     var range = rangy.createRange();
     var pos = 0;
 

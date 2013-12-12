@@ -69,7 +69,6 @@
         type : 'GET',
         dataType : dataType,
         success : function(data, textStatus, jqXHR) {
-          console.log(arguments)
           callback(null, data);
         },
         error : function(jqXHR, textStatus, errorThrown) {

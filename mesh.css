@@ -37,16 +37,30 @@ h2:first-child {
 }
 
 #mesh-source {
-  float: left;
-  width: 100%;
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+#mesh-source > * {
+  background-color: white;
+  margin: 0 auto;
+  padding: 8px;
+  width: 570px;
+}
+
+#mesh-source > *:first-child {
+  margin-top: 50px;
 }
 
 #mesh-source pre {
   line-height: 1.5;
   font-family: monospace;
   overflow-x: scroll;
-  margin: 0;
-  padding: 0 0 .5em;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
@@ -63,9 +77,12 @@ h2:first-child {
   background: #eee;
   border-top: 1px solid #aaa;
   padding: 4px;
-  margin-top: .5em;
-  margin-bottom: 2em;
+  margin: .5em 0;
   font-size: 0.7em;
+}
+
+#mesh-save {
+  float: right;
 }
 
 #mesh-title {
@@ -110,6 +127,10 @@ h2:first-child {
   visibility: hidden;
 }
 
+#mesh-content .block ul, #mesh-content .block ol {
+  margin: 0;
+}
+
 #mesh-content>:hover>.handle,#mesh-results>:hover>.handle {
   visibility: visible;
 }
@@ -129,6 +150,12 @@ h2:first-child {
   background-image: url('res/remove.png');
 }
 
+#mesh-content .controls .attrs {
+  width: 14px;
+  height: 14px;
+  background-image: url('res/attrs.png');
+}
+
 #mesh-content :hover .controls {
   visibility: visible;
 }
@@ -136,6 +163,7 @@ h2:first-child {
 #mesh-content .controls div {
   opacity: .6;
   cursor: pointer;
+  margin-bottom: 1px;
 }
 
 #mesh-content .controls div:hover {
@@ -209,6 +237,49 @@ h2:first-child {
 
 #mesh-tools button {
   font-family: serif;
+}
+
+#mesh-tools button:focus {
+  outline: none;
+}
+
+#mesh-tools button.active {
+  border-style: inset;
+}
+
+#mesh-tools .fa {
+  font-size: 14px;
+}
+
+#mesh-attributes {
+  background: rgba(0, 0, 0, .6);
+  display: none;
+  position: fixed;
+  margin-bottom: 0;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#mesh-attributes table {
+  background: white;
+  width: 570px;
+  margin: 50px auto;
+}
+
+#mesh-attributes th {
+  font-weight: normal;
+  text-align: left;
+}
+
+#mesh-attributes table input {
+  font-family: monospace;
+  width: 99%;
+}
+
+#mesh-attributes table td:last-child {
+  text-align: right;
 }
 
 #mesh-results {

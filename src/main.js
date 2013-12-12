@@ -9,26 +9,30 @@
   $(document).ready(function() {
     var $editor = $('#mesh-content');
     var $tools = $('#mesh-tools');
+    var $attributes = $('#mesh-attributes');
     var $picker = $('#mesh-picker');
     var $source = $('#mesh-source > pre');
     var $results = $('#mesh-results');
     var $searchQuery = $('#mesh-search-query');
     var $searchSubmit = $('#mesh-search-submit');
 
-    var editor = initEditor($editor);
-    initTools($tools, $editor);
+    var attributes = initAttributes($attributes);
+    var editor = initEditor($editor, attributes);
+    initTools($tools, $editor, editor);
     initSourceView($source, editor);
     initSearch($searchQuery, $searchSubmit, $results);
 
     editor.emitEvent('change');
   });
 
-  var conf = {
-    tools : [ 'bold', 'italic', 'link' ],
-    controls : {
-      draggableBorderWidth : 10
-    }
-  };
+  var conf =
+      {
+        tools : [ 'bold', 'italic', 'link', 'p', 'quote', 'ul', 'ol', 'code',
+            'undo', 'redo' ],
+        controls : {
+          draggableBorderWidth : 10
+        }
+      };
 
   /**
    * Sets the attribute 'unselectable' for the `node`.
@@ -50,7 +54,7 @@
     }
   }
 
-  function initTools($toolsDiv, $editorDiv) {
+  function initTools($toolsDiv, $editorDiv, editor) {
     conf.tools = conf.tools || [];
 
     var button, tool;
@@ -58,14 +62,37 @@
       tool = conf.tools[i];
       switch (tool) {
       case 'bold':
-        button = '<button data-tag="bold"><strong>B</strong></button>';
+        button = '<button class="bold"><i class="fa fa-bold"></i></button>';
         break;
       case 'italic':
-        button = '<button data-tag="italic"><em>I</em></button>';
+        button = '<button class="italic"><i class="fa fa-italic"></i></button>';
         break;
       case 'link':
+        button = '<button class="link"><i class="fa fa-link"></i></button>';
+        break;
+      case 'p':
+        button = '<button class="p">¶</button>';
+        break;
+      case 'quote':
         button =
-            '<button data-tag="createLink"><a style="color: blue; text-decoration: underline">Link</a></button>';
+            '<button class="quote"><i class="fa fa-quote-left"></i></button>'
+        break;
+      case 'ul':
+        button = '<button class="ul"><i class="fa fa-list-ul"></i></button>';
+        break;
+      case 'ol':
+        button = '<button class="ol"><i class="fa fa-list-ol"></i></button>';
+        break;
+      case 'code':
+        button = '<button class="code"><i class="fa fa-code"></i></button>';
+        break;
+      case 'undo':
+        button =
+            '<button class="undo" disabled="disabled"><i class="fa fa-undo"></i></button>';
+        break;
+      case 'redo':
+        button =
+            '<button class="redo" disabled="disabled"><i class="fa fa-repeat"></i></button>';
         break;
       default:
         return; // skip adding a button, if the tool is unknown
@@ -75,25 +102,31 @@
       $toolsDiv.append(button);
     }
 
-    var typeSelect = document.createElement('select');
-    typeSelect.innerHTML =
-        '<option value="p">Paragraph</option>'
-            + '<option value="blockquote">Quote</option>';
-    $toolsDiv[0].appendChild(typeSelect);
-    $(typeSelect).change(function() {
-      // TODO get selected block an change its type
-      console.log(this.value);
-    });
-
     // select all of our buttons
-    $toolsDiv.find('button[data-tag]').each(function() {
+    $toolsDiv.find('button[class]').each(function() {
       $(this).bind('click', function(e) {
-        var tag = this.getAttribute('data-tag');
+        var tag = this.getAttribute('class');
         switch (tag) {
-        case 'createLink':
+        // add check if state is already set
+        case 'p':
+          editor.activeBlock.transformType('p');
+          break;
+        case 'quote':
+          editor.activeBlock.transformType('blockquote');
+          break;
+        case 'ul':
+          editor.activeBlock.transformType('ul');
+          break;
+        case 'ol':
+          editor.activeBlock.transformType('ol');
+          break;
+        case 'code':
+          editor.activeBlock.transformType('pre');
+          break;
+        case 'link':
           var url = prompt('Please specify the URL');
           if (url)
-            document.execCommand(tag, false, url);
+            document.execCommand('createLink', false, url);
           break;
         // case 'insertImage':
         // break;
@@ -105,7 +138,7 @@
         }
 
         // sanitize content
-        sanitizeContent();
+        // sanitizeContent();
 
         // prevent default action (usually submitting the form)
         e.preventDefault();
@@ -122,30 +155,22 @@
     return selectedElement;
   }
 
-  function draggableResults() {
-    var $results = $('#mesh-results .block');
-    $results.each(function() {
-      $(this).draggable({
-        connectToSortable : '#mesh-content',
-        helper : 'clone',
-        revert : 'invalid'
-      });
-    });
+  function initAttributes($attributes) {
+    var attributes = new Attributes($attributes[0]);
+
+    return attributes;
   }
 
-  function initEditor($editor) {
-    if (!$editor)
-      return;
-
+  function initEditor($editor, attributes) {
     // create editor
-    var editor = new Editor($editor[0]);
+    var editor = new Editor($editor[0], attributes);
 
     // make editor publicly accessible
     window.editor = editor;
 
     // set the editors contents
     editor
-        .setContents('<p>Text with <b>some</b> <i>form<b>atting</b></i><br>A <a href="/">Link</a></p><blockquote>Quote</blockquote>');
+        .setContent('<p>Text with <b>some</b> <i>form<b>atting</b></i><br>A <a href="/">Link</a></p><blockquote>Quote</blockquote><ul><li>element</li><li>element</li></ul><ol><li>element</li><li>element</li></ol><pre>//source code</pre>');
 
     var selectedElement = null;
 
@@ -166,8 +191,6 @@
 
     $(document).bind('mouseup keyup', onSelect);
 
-    draggableResults();
-
     var $results = $('#mesh-results .block');
     $results.disableSelection();
 
@@ -178,13 +201,45 @@
       $status.html(status);
     });
 
+    function setButtonState(btn) {
+      var s = editor.getState(btn);
+      var b = $('#mesh-tools').find('.' + btn);
+
+      if (s)
+        b.addClass('active');
+      else
+        b.removeClass('active');
+    }
+
+    editor.addEventListener('state', function(e) {
+      setButtonState('bold');
+      setButtonState('italic');
+      setButtonState('link');
+      setButtonState('p');
+      setButtonState('quote');
+      setButtonState('ul');
+      setButtonState('ol');
+      setButtonState('code');
+    });
+
+    attributes.addEventListener('change', function() {
+      editor.getActiveBlock().attributes = attributes.getAttributes();
+      editor.emitEvent('change');
+    });
+
     return editor;
   }
 
   function initSourceView($source, editor) {
-    editor.addEventListener('change', function updateSourceView() {
+    var $sourceView = $('#mesh-source');
+    $('#mesh-source-preview').bind('click', function() {
       var xml = editor.toXML();
       $source.html(escapeXML(xml));
+      $sourceView.fadeIn();
+    });
+
+    $sourceView.bind('click', function() {
+      $sourceView.fadeOut();
     });
   }
 
@@ -207,14 +262,15 @@
           var todo = result.photos.photo.length;
           $(result.photos.photo).each(function() {
             flickr.oembed(this, {}, function(err, data) {
-              console.log(loadMore);
               if (loadMore) {
                 loadMore.remove();
                 loadMore = null;
               }
 
-              if (err)
+              if (err) {
+                todo--;
                 throw err;
+              }
 
               $results.append(flickr.embedCode(data));
 
@@ -238,6 +294,18 @@
         }
       });
     }
+  }
+
+  function draggableResults() {
+    var $results = $('#mesh-results .block');
+    $results.each(function() {
+      $(this).draggable({
+        connectToSortable : '#mesh-content',
+        helper : 'clone',
+        revert : 'invalid',
+        containment : $('#container')
+      });
+    });
   }
 
   window.mesh = mesh;

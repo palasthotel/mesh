@@ -17,44 +17,101 @@
     this.editor = editor; // refs to editor
     this.node = elem; // and node
 
-    this.type = elem.nodeName.toLowerCase();
-    if (this.type === 'div')
-      this.type = elem.classList[0];
-
     this.handle = elem.children[0]; // div.handle
     this.handle.contentEditable = false;
     this.content = elem.children[1]; // div.content
     this.controls = elem.children[2]; // div.controls
     this.controls.contentEditable = false;
 
+    this.type = this.content.nodeName.toLowerCase();
+    if (this.type === 'div')
+      this.type = this.content.classList[0];
+
+    this.attributes = [];
+
     var block = this;
     $(this.controls).find('.remove').unbind().bind('click', function() {
       block.remove();
     });
+
+    $(this.controls).find('.attrs').unbind().bind('click', function() {
+      editor.editAttributes(block);
+    });
   }
 
-  var knownTypes = [ 'p', 'ul', 'blockquote', 'h1', 'h2', 'h3' ];
+  var knownTypes = [ 'p', 'ul', 'ol', 'blockquote', 'h1', 'h2', 'h3', 'pre' ];
 
   /**
    * Creates a block of a given type. E.g. p, blockquote, etc.
    */
-  Block.create = function create(editor, type) {
-    var node = document.createElement('div');
-    node.classList.add('block');
+  Block.create =
+      function create(editor, type) {
+        var node = document.createElement('div');
+        node.classList.add('block');
 
-    var handle = '<div class="handle"></div>';
-    var content = '';
-    if (knownTypes.indexOf(type) > -1) {
-      content = '<' + type + '><br /></' + type + '>';
-    } else {
-      content = '<div class="' + type + '"><br /></div>';
-    }
-    var controls = '<div class="controls"><div class="remove"></div></div>';
+        var handle = '<div class="handle"></div>';
+        var content = '';
+        if (knownTypes.indexOf(type) > -1) {
+          content = '<' + type + '><br /></' + type + '>';
+        } else {
+          content = '<div class="' + type + '"><br /></div>';
+        }
+        var controls =
+            '<div class="controls"><div class="remove"></div><div class="attrs"></div></div>';
 
-    node.innerHTML = handle + content + controls;
+        node.innerHTML = handle + content + controls;
 
-    return new Block(editor, node);
-  };
+        return new Block(editor, node);
+      };
+
+  Block.prototype.transformType =
+      function transformType(type) {
+        if (this.type === type)
+          return;
+
+        var i;
+        var innerHTML = '';
+        // if transforming from a list to non-list
+        if ((this.type === 'ul' || this.type === 'ol') && type !== 'ul'
+            && type !== 'ol') {
+          for (i = 0; i < this.content.children.length; i++) {
+            innerHTML += this.content.children[i].innerHTML;
+            if (i !== this.content.children.length - 1)
+              innerHTML += '<br />';
+          }
+        }
+        // if transforming from a non-list to a list
+        else if ((type === 'ul' || type === 'ol') && this.type !== 'ul'
+            && this.type !== 'ol') {
+          var lines = this.content.innerHTML.split(/<br ?\/?>/ig);
+          for (i = 0; i < lines.length; i++) {
+            innerHTML += '<li>' + lines[i] + '</li>';
+          }
+        } else {
+          innerHTML = this.content.innerHTML;
+        }
+
+        this.type = type;
+
+        var newNode = null;
+        if (knownTypes.indexOf(type) > -1)
+          newNode = document.createElement(type);
+        else {
+          newNode = document.createElement('div');
+          $(newNode).addClass(type);
+        }
+
+        newNode.innerHTML = innerHTML; // set contents
+
+        this.node.replaceChild(newNode, this.content);
+        this.content = newNode;
+
+        // set the caret
+        Caret.moveToBeginning(this.content, rangy.getSelection());
+
+        this.editor.emitEvent('state');
+        this.editor.emitEvent('change');
+      };
 
   /**
    * @returns {String}
@@ -129,8 +186,7 @@
         var br = document.createElement('br');
         var grandpa = null;
 
-        if (sel.anchorOffset === 0
-            && anchor.isSameNode(anchor.parentNode.firstChild)) {
+        if (sel.anchorOffset === 0 && anchor === anchor.parentNode.firstChild) {
           // if the caret is at the beginning of the element, insert the <br>
           // in front of the parent node
           grandpa = anchor.parentNode.parentNode;
@@ -138,7 +194,7 @@
 
           console.log('1st');
         } else if (sel.anchorOffset === anchor.length
-            && anchor.isSameNode(anchor.parentNode.lastChild)) {
+            && anchor === anchor.parentNode.lastChild) {
           // if the caret is at the end of the element, insert the <br> after
           // the anchor
           grandpa = anchor.parentNode.parentNode;
@@ -198,7 +254,7 @@
     var node = sel.anchorNode;
     if (node === null)
       return false;
-    if (node.className === 'break' && this.content.isSameNode(node.parentNode))
+    if (node.className === 'break' && this.content === node.parentNode)
       return true;
 
     return this.isAtBeginning(node.parentNode);
@@ -307,7 +363,7 @@
   };
 
   Block.prototype.getWordCount = function getWordCount() {
-    var text = this.content.innerText.trim();
+    var text = getNodeText(this.content).trim();
     var words = text.split(/\s+/);
     var wc = 0;
     for ( var i = 0; i < words.length; i++) {
@@ -318,7 +374,7 @@
   }
 
   Block.prototype.toHTML = function toHTML() {
-    return this.content.outerHTML;
+    return this.toXML();
   };
 
   function nodeToXMLString(node) {
@@ -339,7 +395,23 @@
   }
 
   Block.prototype.toXML = function toXML() {
-    return nodeToXMLString(this.content);
+    var str = '<' + this.content.nodeName.toLowerCase();
+    var i;
+
+    for (i = 0; i < this.attributes.length; i++) {
+      str += ' ';
+      str += escapeXML(this.attributes[i].key);
+      str += '="' + escapeXML(this.attributes[i].value) + '"';
+    }
+
+    str += '>';
+
+    for (i = 0; i < this.content.childNodes.length; i++) {
+      str += nodeToXMLString(this.content.childNodes[i]);
+    }
+
+    str += '</' + this.content.nodeName.toLowerCase() + '>';
+    return str;
   };
 
   Block.prototype.remove = function remove() {

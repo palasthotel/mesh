@@ -12,14 +12,16 @@
    * 
    * @param {Element}
    *                elem
+   * @param {Attributes}
+   *                attributes
    * @param {Array}
    *                [historyStack]
    * @param {Number}
    *                [historySize]
    */
-  function Editor(elem, historyStack, historySize) {
+  function Editor(elem, attributes, historyStack, historySize) {
     if (!(this instanceof Editor))
-      return new Editor(elem, historyStack, historySize);
+      return new Editor(elem, attributes, historyStack, historySize);
     if (!elem)
       throw new TypeError('expects an element');
 
@@ -27,10 +29,14 @@
 
     this.history = new History(historyStack || []);
     this.history.setMaximumEntries(historySize || 100);
+
     this.container = elem;
+    this.attributes = attributes;
+
     this.setEnabled(true);
 
     this.blocks = [];
+    this.activeBlock = null;
 
     var i, len = this.container.children.length;
     for (i = 0; i < len; i++) {
@@ -41,19 +47,29 @@
       placeholder : 'placeholder', // css class .placeholder
       axis : 'y',
       receive : function(e, ui) {
+        console.log(e, ui);
         editor.emitEvent('add-block');
       },
-      stop : function() {
+      stop : function(e) {
         rangy.getSelection().removeAllRanges();
+        editor.updateBlocks();
         editor.emitEvent('sort');
       }
+    });
+
+    // update active block
+    $(this.container).bind('click keydown', function() {
+      var sel = rangy.getSelection();
+      var block = editor.getSelectedBlock(sel);
+      if (block !== null)
+        editor.activeBlock = block;
     });
   }
 
   // Event emitter
   Emitter(Editor.prototype);
 
-  Editor.prototype.setContents = function setContent(html) {
+  Editor.prototype.setContent = function setContent(html) {
     var editor = this;
     if (typeof html != 'string')
       throw new Error('not a string');
@@ -133,6 +149,10 @@
     return this;
   };
 
+  Editor.prototype.getActiveBlock = function() {
+    return this.activeBlock;
+  };
+
   Editor.prototype.getSelectedBlock = function(selection) {
     var n = selection.anchorNode;
 
@@ -145,7 +165,7 @@
     var block = null;
     for (i = 0; i < len; i++) {
       block = this.blocks[i];
-      if (block.node.isSameNode(n))
+      if (block.node === n)
         return block;
     }
 
@@ -192,6 +212,16 @@
     return this;
   };
 
+  function isChildOf(node, ancestorName) {
+    if (!node)
+      return false;
+    if (node.nodeType === 1 && node.nodeName === ancestorName)
+      return true;
+    if (!node.parentNode)
+      return false;
+    return isChildOf(node.parentNode, ancestorName);
+  }
+
   /**
    * Query `cmd` state.
    * 
@@ -200,6 +230,21 @@
    * @return {Boolean}
    */
   Editor.prototype.getState = function(cmd) {
+    var node = rangy.getSelection().anchorNode;
+    if (cmd === 'link') {
+      return isChildOf(node, 'A');
+    } else if (cmd === 'p') {
+      return isChildOf(node, 'P');
+    } else if (cmd === 'quote') {
+      return isChildOf(node, 'BLOCKQUOTE');
+    } else if (cmd === 'ul') {
+      return isChildOf(node, 'UL');
+    } else if (cmd === 'ol') {
+      return isChildOf(node, 'OL');
+    } else if (cmd === 'code') {
+      return isChildOf(node, 'PRE');
+    }
+
     var length = this.history.vals.length - 1;
     var stack = this.history;
 
@@ -270,12 +315,12 @@
   function isNthChild(node, n) {
     var siblings = node.parentNode.children;
     var nth = siblings[n - 1];
-    return node.isSameNode(nth);
+    return node === nth;
   }
 
   function isLastChild(node) {
     var siblings = node.parentNode.children;
-    return siblings[siblings.length - 1].isSameNode(node);
+    return siblings[siblings.length - 1] === node;
   }
 
   function prevent(e) {
@@ -329,6 +374,30 @@
 
   Editor.prototype.insertBlockAt = function insertBlockAt(i, block) {
 
+  };
+
+  Editor.prototype.updateBlocks = function updateBlocks() {
+    var i, j;
+    var block = null;
+
+    var bs = this.blocks.slice();
+
+    for (i = 0; i < bs.length; i++) {
+      block = bs[i];
+
+      for (j = 0; j < bs.length; j++) {
+        if (block.node === this.container.children[j]) {
+          this.blocks[j] = block;
+          break;
+        }
+      }
+    }
+  };
+
+  Editor.prototype.editAttributes = function editAttributes(block) {
+    this.activeBlock = block;
+    this.attributes.setAttributes(block.attributes);
+    this.attributes.setVisible(true);
   };
 
   Editor.prototype.getWordCount = function getWordCount() {

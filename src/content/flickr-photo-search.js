@@ -62,9 +62,6 @@ jsonFlickrApi.callback = function() {
         return [ '<div class="block"><div class="handle" ',
             'unselectable="on" contenteditable="false">',
             '</div><div class="figure"><img alt="', data.title, '" title="',
-            data.title, '" src="', data.url, '" ',
-            '/></div><div class="controls" unselectable="on"',
-            'contenteditable="false"><img class="remove" ',
-            'alt="remove" src="res/remove.png" /></div></div>' ].join('');
+            data.title, '" src="', data.url, '" ', '/></div></div>' ].join('');
       };
 })(jQuery, flickr, oembed);
