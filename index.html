@@ -11,20 +11,7 @@
 <script src="jquery/jquery.ui.mouse.js"></script>
 <script src="jquery/jquery.ui.draggable.js"></script>
 <script src="jquery/jquery.ui.sortable.js"></script>
-<script src="src/rangy.js"></script>
-<script src="src/simplify.js"></script>
-<script src="src/escapeXML.js"></script>
-<script src="src/getNodeText.js"></script>
-<script src="src/oembed.js"></script>
-<script src="src/emitter.js"></script>
-<script src="src/indexof.js"></script>
-<script src="src/history.js"></script>
-<script src="src/block.js"></script>
-<script src="src/caret.js"></script>
-<script src="src/attributes.js"></script>
-<script src="src/editor.js"></script>
-<script src="src/content/flickr-photo-search.js"></script>
-<script src="src/main.js"></script>
+<script src="mesh.js"></script>
 <script>
   $(document).ready(function() {
     $("#mesh-content").sortable({
@@ -41,7 +28,7 @@
         <input type="text" name="title" placeholder="Title" />
       </form>
       <div id="mesh-tools"></div>
-      <div id="mesh-content"></div>
+      <textarea id="mesh-content"></textarea>
       <div id="mesh-status">0 words</div>
       <div id="mesh-actions">
         <button id="mesh-source-preview">Source preview</button>
