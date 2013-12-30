@@ -1,6 +1,6 @@
 import ed = require('./editor');
-import dom = require('./dom/index');
-import dnd = require('./dom/dnd');
+import dom = require('./dom');
+import dnd = require('./dnd');
 import util = require('./util');
 import config = require('./config');
 

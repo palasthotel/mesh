@@ -1,9 +1,10 @@
 import config = require('./config');
 import Configuration = config.Configuration;
 import consts = require('./consts');
-import dom = require('./dom/index');
+import dom = require('./dom');
 import editor = require('./editor');
 import Editor = editor.Editor;
+import events = require('./events');
 import exceptions = require('./exceptions');
 import util = require('./util');
 
