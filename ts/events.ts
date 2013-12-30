@@ -44,7 +44,7 @@ export class EventEmitter {
   /**
    * Adds a listener to the event emitter.
    */
-  public addListener(type: string, listener: (Event) => void): void {
+  public on(type: string, listener: (Event) => void): void {
     if (!this.listeners[type]) {
       var ls = { ls: [], gc: 0 }; // listeners and garbage count
       this.listeners[type] = ls;
@@ -57,7 +57,7 @@ export class EventEmitter {
    * Adds an event listener to the event emitter.
    */
   public addEventListener(type: string, listener: EventListener): void {
-    this.addListener(type, listener.update);
+    this.on(type, listener.update);
   }
 
   /**

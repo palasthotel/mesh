@@ -5,7 +5,7 @@ export function requires(condition: boolean, msg: string): void {
     throw new exceptions.IllegalArgumentException(msg);
 }
 
-export function extend(some: {}, other: {}): {} {
+export function extend(some: any, other: any): any {
   var result = {};
 
   for (var prop in some) {
@@ -17,4 +17,8 @@ export function extend(some: {}, other: {}): {} {
   }
 
   return result;
+}
+
+export function forEach<T>(xs: any, action: (x: T) => void): void {
+  [].forEach.call(xs, action);
 }

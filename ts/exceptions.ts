@@ -2,13 +2,13 @@
  * Default exception.
  */
 export class Exception {
-  public name = "Exception";
+  public name = 'Exception';
 
   constructor(public message: string) {
   }
 
   public toString(): string {
-    return this.name + ": " + this.message;
+    return this.name + ': ' + this.message;
   }
 }
 
@@ -18,7 +18,7 @@ export class Exception {
 export class NoSuchElementException extends Exception {
   constructor(message: string) {
     super(message);
-    this.name = "NoSuchElementException";
+    this.name = 'NoSuchElementException';
   }
 }
 
@@ -28,6 +28,13 @@ export class NoSuchElementException extends Exception {
 export class IllegalArgumentException extends Exception {
   constructor(message: string) {
     super(message);
-    this.name = "IllegalArgumentException";
+    this.name = 'IllegalArgumentException';
+  }
+}
+
+export class InvalidConfigurationException extends Exception {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidConfigurationException';
   }
 }
