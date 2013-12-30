@@ -5,21 +5,7 @@
 <title>Sortable</title>
 <link rel="stylesheet" href="mesh.css" />
 <link href="res/fontawesome/css/font-awesome.css" rel="stylesheet" />
-<script src="jquery/jquery-1.4.2.js"></script>
-<script src="jquery/jquery.ui.core.js"></script>
-<script src="jquery/jquery.ui.widget.js"></script>
-<script src="jquery/jquery.ui.mouse.js"></script>
-<script src="jquery/jquery.ui.draggable.js"></script>
-<script src="jquery/jquery.ui.sortable.js"></script>
 <script src="mesh.js"></script>
-<script>
-  $(document).ready(function() {
-    $("#mesh-content").sortable({
-      handle : '.handle',
-      revert : true
-    });
-  });
-</script>
 </head>
 <body>
   <div id="container">
@@ -28,7 +14,20 @@
         <input type="text" name="title" placeholder="Title" />
       </form>
       <div id="mesh-tools"></div>
-      <textarea id="mesh-content"></textarea>
+      <textarea id="mesh-content">
+&lt;p&gt;Text with &lt;b&gt;some&lt;/b&gt; &lt;i&gt;form&lt;b&gt;atting&lt;/b&gt;&lt;/i&gt;&lt;br&gt;
+A &lt;a href=&quot;/&quot;&gt;Link&lt;/a&gt;&lt;/p&gt;
+&lt;blockquote&gt;Quote&lt;/blockquote&gt;
+&lt;ul&gt;
+  &lt;li&gt;element&lt;/li&gt;
+  &lt;li&gt;element&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+  &lt;li&gt;element&lt;/li&gt;
+  &lt;li&gt;element&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;//source code&lt;/pre&gt;
+      </textarea>
       <div id="mesh-status">0 words</div>
       <div id="mesh-actions">
         <button id="mesh-source-preview">Source preview</button>
@@ -56,6 +55,5 @@
       <div id="mesh-results"></div>
     </div>
   </div>
-
 </body>
 </html>
