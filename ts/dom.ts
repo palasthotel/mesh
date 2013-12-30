@@ -1,4 +1,5 @@
 import consts = require('./consts');
+import events = require('./events');
 
 /**
  * DOM ready.
@@ -22,6 +23,10 @@ export function isElement(node: Node): boolean {
  */
 export function isTextNode(node: Node): boolean {
   return node.nodeType === consts.NODE_TYPES.TEXT;
+}
+
+export function hasType(elem: HTMLElement, type: string): boolean {
+  return elem.nodeName === type;
 }
 
 /**
@@ -65,4 +70,20 @@ export function removeClass(elem: HTMLElement, className: string): void {
 
   if (oldClasses.length > newClasses.length)
     elem.className = newClasses.join(' ');
+}
+
+export function observeElement(elem: HTMLElement, eventNames: Array<string>,
+  callback: (Event) => void): events.Cancellable {
+
+  for (var i = 0; i < eventNames.length; i++) {
+    elem.addEventListener(eventNames[i], callback);
+  }
+
+  return {
+    cancel: () => {
+      for (var i = 0; i < eventNames.length; i++) {
+        elem.removeEventListener(eventNames[i], callback);
+      }
+    }
+  };
 }

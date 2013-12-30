@@ -44,7 +44,7 @@ export class EventEmitter {
   /**
    * Adds a listener to the event emitter.
    */
-  public on(type: string, listener: (Event) => void): void {
+  public addListener(type: string, listener: (Event) => void): void {
     if (!this.listeners[type]) {
       var ls = { ls: [], gc: 0 }; // listeners and garbage count
       this.listeners[type] = ls;
@@ -57,7 +57,7 @@ export class EventEmitter {
    * Adds an event listener to the event emitter.
    */
   public addEventListener(type: string, listener: EventListener): void {
-    this.on(type, listener.update);
+    this.addListener(type, listener.update);
   }
 
   /**
@@ -111,4 +111,8 @@ export class EventEmitter {
 
     this.listeners[type] = newLS;
   }
+}
+
+export interface Cancellable {
+  cancel(): void;
 }
