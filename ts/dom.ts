@@ -72,6 +72,9 @@ export function removeClass(elem: HTMLElement, className: string): void {
     elem.className = newClasses.join(' ');
 }
 
+/**
+ * Adds an event listener to an HTML element for several event types.
+ */
 export function observeElement(elem: HTMLElement, eventNames: Array<string>,
   callback: (Event) => void): events.Cancellable {
 
