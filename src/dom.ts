@@ -90,3 +90,7 @@ export function observeElement(elem: HTMLElement, eventNames: Array<string>,
     }
   };
 }
+
+export function replaceNode(a: Node, b: Node): void {
+  a.parentNode.replaceChild(b, a);
+}
