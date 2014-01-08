@@ -30,14 +30,20 @@ export class EventEmitter {
    */
   public emit(type: string): void {
     var event = new Event(this, type);
-    var ls = this.listeners[type];
-    var len = ls.length;
+    var listenersForType = this.listeners[type];
 
+    // ignore if nobody is listening
+    if (typeof listenersForType === 'undefined')
+      return;
+
+    var len = listenersForType.length;
+
+    // inform the listeners
     for (var i = 0; i < len; i++) {
-      if (ls[i] === null)
+      if (listenersForType[i] === null)
         continue;
 
-      ls[i](event);
+      listenersForType[i](event);
     }
   }
 
@@ -89,8 +95,11 @@ export class EventEmitter {
   /**
    * Removes all listeners from the event emitter.
    */
-  public removeAllListeners(type: string = null) {
-
+  public removeAllListeners(type: string = null): void {
+    if (type === null)
+      this.listeners = {};
+    else
+      this.listeners[type] = null;
   }
 
   /**
