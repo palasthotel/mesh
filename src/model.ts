@@ -1,5 +1,6 @@
 import consts = require('./consts');
 import dom = require('./dom');
+import ed = require('./editor');
 import events = require('./events');
 import util = require('./util');
 import dataStore = require('./dataStore');
@@ -16,7 +17,8 @@ export class Document extends events.EventEmitter {
     var docFragment = document.createDocumentFragment();
 
     // add handler and controls for every child
-    util.forEach(helper.children, (child: HTMLElement) => {
+    while (helper.children.length > 0) {
+      var child = <HTMLElement> helper.children[0];
       var blockElement = dom.createElement('div', 'block');
       var blockFragment = document.createDocumentFragment();
       var handle = dom.createElement('div', 'handle');
@@ -32,9 +34,9 @@ export class Document extends events.EventEmitter {
       new Block(blockElement, this);
 
       docFragment.appendChild(blockElement);
-    });
+    }
 
-    elem.appendChild(docFragment);
+    this.elem.appendChild(docFragment);
   }
 
   length(): number {
@@ -101,7 +103,11 @@ export class Block extends events.EventEmitter {
       this.emit('change');
     });
 
-    dataRef.draggable = dnd.makeDraggable(elem, this.handle);
+    dnd.makeDraggable(elem, this.handle);
+    dnd.makeDroppable(elem, (droppable) => {
+      // if we are in #mesh-content
+      return this.doc.elem.id === 'mesh-content';
+    });
   }
 
   toHTML(): string {
