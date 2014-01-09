@@ -12,6 +12,15 @@ export function ready(callback: () => void): void {
 }
 
 /**
+ * Creates an HTMLElement that already has a class.
+ */
+export function createElement(tagName: string, className: string): HTMLElement {
+  var element = document.createElement(tagName);
+  addClass(element, className);
+  return element;
+}
+
+/**
  * Checks, whether a node is an element.
  */
 export function isElement(node: Node): boolean {
@@ -75,18 +84,20 @@ export function removeClass(elem: HTMLElement, className: string): void {
 /**
  * Adds an event listener to an HTML element for several event types.
  */
-export function observeElement(elem: HTMLElement, eventNames: Array<string>,
+export function addEventListener(elem: HTMLElement, eventName: string,
   callback: (Event) => void): events.Cancellable {
 
-  for (var i = 0; i < eventNames.length; i++) {
-    elem.addEventListener(eventNames[i], callback);
-  }
+  if (elem.addEventListener)
+    elem.addEventListener(eventName, callback, false);
+  else // IE <= 8
+    elem.attachEvent('on' + eventName, callback);
 
   return {
     cancel: () => {
-      for (var i = 0; i < eventNames.length; i++) {
-        elem.removeEventListener(eventNames[i], callback);
-      }
+      if (elem.removeEventListener)
+        elem.removeEventListener(eventName, callback);
+      else // IE <= 8
+        elem.detachEvent('on' + eventName, callback);
     }
   };
 }
