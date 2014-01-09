@@ -1,5 +1,6 @@
 import consts = require('./consts');
 import events = require('./events');
+import util = require('./util');
 
 /**
  * DOM ready.
@@ -104,4 +105,33 @@ export function addEventListener(elem: HTMLElement, eventName: string,
 
 export function replaceNode(a: Node, b: Node): void {
   a.parentNode.replaceChild(b, a);
+}
+
+export function elementToXML(elem: HTMLElement): string {
+  var tagName = elem.tagName.toLowerCase();
+  var result = '<' + tagName;
+
+  // add attributes
+  util.forEach(elem.attributes, (attr: Attr) => {
+    result += ' ' + attr.name + '="' + attr.value;
+  });
+
+  if (elem.childNodes.length > 0) {
+    result += '>';
+
+    // add childNodes
+    util.forEach(elem.childNodes, (node: Node) => {
+      if (node instanceof HTMLElement) {
+        result += elementToXML(<HTMLElement> node);
+      } else {
+        result += node.textContent;
+      }
+    });
+
+    result += '</' + tagName + '>';
+  } else {
+    result += ' />';
+  }
+
+  return result;
 }
