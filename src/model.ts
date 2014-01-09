@@ -4,7 +4,7 @@ import util = require('./util');
 import dataStore = require('./dataStore');
 
 export class Document extends events.EventEmitter {
-  constructor(private elem: HTMLElement, content: string = '') {
+  constructor(public elem: HTMLElement, content: string = '') {
     super();
 
     var helper = document.createElement('div');
