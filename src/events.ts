@@ -1,3 +1,5 @@
+import util = require('./util');
+
 /**
  * Event.
  */
@@ -30,15 +32,13 @@ export class EventEmitter {
     if (typeof listenersForType === 'undefined')
       return;
 
-    var len = listenersForType.length;
+    console.log(listenersForType.length);
 
     // inform the listeners
-    for (var i = 0; i < len; i++) {
-      if (!listenersForType[i])
-        continue;
-
-      listenersForType[i](event);
-    }
+    util.forEach(listenersForType, (listener: (e: Event) => void) => {
+      if (listener)
+        listener(event);
+    });
   }
 
   /**
