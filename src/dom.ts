@@ -117,30 +117,33 @@ export function replaceNode(a: Node, b: Node): void {
   a.parentNode.replaceChild(b, a);
 }
 
-export function elementToXML(elem: HTMLElement): string {
-  var tagName = elem.tagName.toLowerCase();
-  var result = '<' + tagName;
+export function nodeToXML(node: Node): string {
+  var result: string;
 
-  // add attributes
-  util.forEach(elem.attributes, (attr: Attr) => {
-    result += ' ' + attr.name + '="' + attr.value;
-  });
+  if (node instanceof HTMLElement) {
+    var elem = <HTMLElement> node;
+    var tagName = elem.tagName.toLowerCase();
+    result = '<' + tagName;
 
-  if (elem.childNodes.length > 0) {
-    result += '>';
-
-    // add childNodes
-    util.forEach(elem.childNodes, (node: Node) => {
-      if (node instanceof HTMLElement) {
-        result += elementToXML(<HTMLElement> node);
-      } else {
-        result += node.textContent;
-      }
+    // add attributes
+    util.forEach(node.attributes, (attr: Attr) => {
+      result += ' ' + attr.name + '="' + attr.value;
     });
 
-    result += '</' + tagName + '>';
+    if (node.childNodes.length > 0) {
+      result += '>';
+
+      // add childNodes
+      util.forEach(elem.childNodes, (node: Node) => {
+        result += nodeToXML(node);
+      });
+
+      result += '</' + tagName + '>';
+    } else {
+      result += ' />';
+    }
   } else {
-    result += ' />';
+    result = node.textContent;
   }
 
   return result;
