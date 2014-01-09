@@ -16,10 +16,3 @@ export var NODE_TYPES = {
   ELEMENT: 1,
   TEXT: 3
 };
-
-/**
- * Commonly used node names.
- */
-export var NODE_NAMES = {
-  TEXTAREA: 'TEXTAREA'
-};
