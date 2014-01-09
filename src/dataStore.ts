@@ -1,14 +1,12 @@
 /**
  * Stores arbitrary data along with any HTMLElement.
  */
-(<any> document).meshDataStore = {};
 
 export function get(elem: HTMLElement): any {
-  var data = (<any> document).meshDataStore[elem];
-
-  if (typeof data == 'undefined') {
+  var data: any = (<any> elem).meshData;
+  if (typeof data === 'undefined') {
     data = {};
-    (<any> document).meshDataStore[elem] = data;
+    (<any> elem).meshData = data;
   }
 
   return data;
