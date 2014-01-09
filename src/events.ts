@@ -14,16 +14,10 @@ export interface EventListener {
 }
 
 /**
- * Maximum number of "garbage" listeners.
- */
-var maxGC = 20;
-
-/**
  * Event emitter.
  */
 export class EventEmitter {
   private listeners: {} = {};
-  private gc: {} = {};
 
   /**
    * Emits an event.
@@ -40,7 +34,7 @@ export class EventEmitter {
 
     // inform the listeners
     for (var i = 0; i < len; i++) {
-      if (listenersForType[i] === null)
+      if (!listenersForType[i])
         continue;
 
       listenersForType[i](event);
@@ -51,12 +45,11 @@ export class EventEmitter {
    * Adds a listener to the event emitter.
    */
   public addListener(type: string, listener: (Event) => void): void {
-    if (!this.listeners[type]) {
-      var ls = { ls: [], gc: 0 }; // listeners and garbage count
-      this.listeners[type] = ls;
+    if (typeof this.listeners[type] === 'undefined') {
+      this.listeners[type] = [];
     }
 
-    this.listeners[type].ls.push(listener);
+    this.listeners[type].push(listener);
   }
 
   /**
@@ -76,13 +69,9 @@ export class EventEmitter {
     // iterate over the list of listeners and replace the 
     for (var i = 0; i < len; i++) {
       if (ls.ls[i] === listener) {
-        ls.ls[i] = null;
-        ls.gc++;
+        delete ls.ls[i];
       }
     }
-
-    if (ls.gc > maxGC)
-      this.runGarbageCollector(type);
   }
 
   /**
@@ -99,26 +88,7 @@ export class EventEmitter {
     if (type === null)
       this.listeners = {};
     else
-      this.listeners[type] = null;
-  }
-
-  /**
-   * Garbage collect listeners.
-   */
-  private runGarbageCollector(type: string): void {
-    var ls = this.listeners[type];
-    var len = ls.ls.length;
-
-    // new garbage collected listeners array
-    var newLS = { ls: new Array(len - ls.gc), gc: 0 };
-
-    // walk old listeners, add listener to newLS if not null
-    for (var i = 0, j = 0; i < len; i++) {
-      if (ls.ls[i] !== null)
-        newLS.ls[j++] = ls.ls[i];
-    }
-
-    this.listeners[type] = newLS;
+      delete this.listeners[type];
   }
 }
 
