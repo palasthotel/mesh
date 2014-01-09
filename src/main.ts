@@ -4,21 +4,19 @@ import dnd = require('./dnd');
 import util = require('./util');
 import config = require('./config');
 
-var conf: config.Configuration = util.extend(config.DEFAULT, {
+export function init(conf: any, cb: (err: Error, editor: ed.Editor) => void) {
+  var thisConf = util.extend(config.DEFAULT, config);
 
-});
+  dom.ready(() => {
+    var elem = document.getElementById('mesh-content');
+    var editor = new ed.Editor(elem, thisConf);
 
-/**
- * When the DOM is ready, 
- */
-dom.ready(() => {
-  var elem = document.getElementById('mesh-content');
-  var editor = new ed.Editor(elem, conf);
+    var status = document.getElementById('mesh-status');
+    editor.addListener('change', () => {
+      status.innerHTML = editor.elem.textContent.split(/\s+/).length + ' words';
+    });
 
-  console.log('configuration', conf);
-
-  var draggable = document.querySelectorAll('li');
-  util.forEach<HTMLElement>(draggable, (el) => {
-    dnd.draggable(el, {});
+    // callback with editor instance
+    cb(null, editor);
   });
-});
+}
