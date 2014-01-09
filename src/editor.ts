@@ -4,7 +4,6 @@ import exceptions = require('./exceptions');
 import util = require('./util');
 import consts = require('./consts');
 import config = require('./config');
-import Configuration = config.Configuration;
 import dom = require('./dom');
 import model = require('./model');
 import dataStore = require('./dataStore');
@@ -15,12 +14,12 @@ import dataStore = require('./dataStore');
 export class Editor extends events.EventEmitter {
   elem: HTMLElement;
   undo: undo.UndoStack<string>;
-  conf: Configuration;
+  conf: config.Configuration;
 
   // IMPORTANT this attribute can be null!
   doc: model.Document = null;
 
-  constructor(container: HTMLElement, conf: Configuration) {
+  constructor(container: HTMLElement, conf: config.Configuration) {
     super();
 
     util.requires(container.nodeName === 'TEXTAREA',
