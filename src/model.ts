@@ -1,60 +1,55 @@
+import dom = require('./dom');
 import events = require('./events');
+import util = require('./util');
+import dataStore = require('./dataStore');
 
 export class Document extends events.EventEmitter {
-  private blocks: Array<Block>;
-
-  constructor() {
+  constructor(private elem: HTMLElement, content: string = '') {
     super();
 
-    this.blocks = [];
+    var helper = document.createElement('div');
+    helper.innerHTML = content;
+
+    util.forEach(helper.children, (child) => {
+      if (child instanceof HTMLElement) {
+        // only append HTMLElements; ignore others
+        var blockElement = dom.createElement('div', 'block');
+        var handle = dom.createElement('div', 'handle');
+        var controls = dom.createElement('div', 'controls');
+
+        blockElement.appendChild(handle);
+        blockElement.appendChild(<HTMLElement> child);
+        blockElement.appendChild(controls);
+      }
+    });
   }
 
-  get(i: number) {
-    return this.blocks[i];
+  getBlock(i: number): Block {
+    return dataStore.get(<HTMLElement> this.elem.children[0]).block;
   }
 
-  set(i: number, block: Block) {
-    this.blocks[i] = block;
-    this.emit('change');
+  insertBlockAt(i: number, newBlock: Block): void {
+    this.elem.insertBefore(newBlock.elem, this.elem.children[i]);
   }
 
-  append(block: Block): void {
-    this.blocks.push(block);
-    this.emit('change');
+  removeBlock(i: number): void {
+    this.elem.removeChild(this.elem.children[i]);
+  }
+
+  replaceBlock(i: number, newBlock: Block): void {
+    this.elem.replaceChild(newBlock.elem, this.elem.children[i]);
   }
 
   toHTML(): string {
     return '';
   }
-
-  static fromElement(elem: HTMLElement): Document {
-    var doc = new Document();
-
-    var cs = elem.children;
-    for (var i = 0; i < cs.length; i++) {
-      var c = cs[i];
-      // only append HTMLElements; ignore other elements
-      if (c instanceof HTMLElement) {
-        doc.append(new Block(<HTMLElement> c));
-      }
-    }
-
-    return doc;
-  }
-
-  static fromHTML(html: string): Document {
-    var elem = document.createElement('div');
-    return Document.fromElement(elem);
-  }
 }
 
 export class Block extends events.EventEmitter {
-  private elem: HTMLElement;
-
-  constructor(elem: HTMLElement) {
+  constructor(public elem: HTMLElement) {
     super();
 
-    this.elem = elem;
+    dataStore.get(elem).block = this;
 
     var changeEventListener = (ev: Event) => {
       this.emit('change');
