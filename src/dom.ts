@@ -83,6 +83,16 @@ export function removeClass(elem: HTMLElement, className: string): void {
 }
 
 /**
+ * Returns the first class of an element.
+ */
+export function getFirstClass(elem: HTMLElement): string {
+  if (elem.classList)
+    return elem.classList[0];
+
+  return elem.className.split(' ')[0];
+}
+
+/**
  * Adds an event listener to an HTML element for several event types.
  */
 export function addEventListener(elem: HTMLElement, eventName: string,
