@@ -11,10 +11,20 @@ export function init(conf: any, cb: (err: Error, editor: ed.Editor) => void) {
     var editor = new ed.Editor(elem, thisConf);
 
     var status = document.getElementById('mesh-status');
+    var delayedWordCountID: number;
     editor.getDocument().addListener('change', () => {
-      // word count
-      status.innerHTML = editor.getContent() .replace(/<.+?>/g, ' ')
-        .replace(/\s+/g, ' ').trim().split(/\s+/).length + ' words';
+      if (typeof delayedWordCountID !== 'undefined')
+        clearTimeout(delayedWordCountID);
+
+      delayedWordCountID = setTimeout(() => {
+        // word count
+        console.log(status.innerHTML = editor.getContent()
+          .replace(/<\/?(span|i|b|u|em|strong)>/g, '').replace(/<.+?>/g, ' ')
+          .replace(/\s+/g, ' ').trim());
+        status.innerHTML = editor.getContent()
+          .replace(/<\/?(span|i|b|u|em|strong)>/g, '').replace(/<.+?>/g, ' ')
+          .replace(/\s+/g, ' ').trim().split(/\s+/).length + ' words';
+      }, thisConf.statusDelay);
     });
 
     // callback with editor instance
