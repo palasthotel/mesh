@@ -1,6 +1,5 @@
 import ed = require('./editor');
 import dom = require('./dom');
-import dnd = require('./dnd');
 import util = require('./util');
 import config = require('./config');
 
@@ -12,8 +11,10 @@ export function init(conf: any, cb: (err: Error, editor: ed.Editor) => void) {
     var editor = new ed.Editor(elem, thisConf);
 
     var status = document.getElementById('mesh-status');
-    editor.addListener('change', () => {
-      status.innerHTML = editor.elem.textContent.split(/\s+/).length + ' words';
+    editor.getDocument().addListener('change', () => {
+      // word count
+      status.innerHTML = editor.getContent() .replace(/<.+?>/g, ' ')
+        .replace(/\s+/g, ' ').trim().split(/\s+/).length + ' words';
     });
 
     // callback with editor instance
