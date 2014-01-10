@@ -18,9 +18,6 @@ export function init(conf: any, cb: (err: Error, editor: ed.Editor) => void) {
 
       delayedWordCountID = setTimeout(() => {
         // word count
-        console.log(status.innerHTML = editor.getContent()
-          .replace(/<\/?(span|i|b|u|em|strong)>/g, '').replace(/<.+?>/g, ' ')
-          .replace(/\s+/g, ' ').trim());
         status.innerHTML = editor.getContent()
           .replace(/<\/?(span|i|b|u|em|strong)>/g, '').replace(/<.+?>/g, ' ')
           .replace(/\s+/g, ' ').trim().split(/\s+/).length + ' words';
