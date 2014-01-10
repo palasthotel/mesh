@@ -7,19 +7,20 @@ import config = require('./config');
 import dom = require('./dom');
 import model = require('./model');
 import dataStore = require('./dataStore');
+import plugin = require('./plugins/plugin');
 
 /**
  * Modular HTML5 WYSIWYG Editor (Controller).
  */
 export class Editor extends events.EventEmitter {
-  elem: HTMLElement;
-  undo: undo.UndoStack<string>;
-  conf: config.Configuration;
+  public elem: HTMLElement;
+  public undo: undo.UndoStack<string>;
 
   // IMPORTANT this attribute can be null!
   doc: model.Document = null;
 
-  constructor(container: HTMLElement, conf: config.Configuration) {
+  constructor(container: HTMLElement, plugins: Array<plugin.Plugin>,
+    public conf: config.Configuration) {
     super();
 
     util.requires(container.nodeName === 'TEXTAREA',
@@ -56,15 +57,23 @@ export class Editor extends events.EventEmitter {
     // save a ref to this editor
     dataStore.get(this.elem).editor = this;
 
+    var delayedUndoID: number;
     // on every change of the content, push a new state to the undo stack
-    this.addListener('change', () => {
-      var content = this.getContent();
-      this.undo.pushState(content);
+    this.doc.addListener('change', () => {
+      delayedUndoID = setTimeout(() => {
+        var content = this.getContent();
+        this.undo.pushState(content);
+      }, conf.undoDelay);
+    });
+
+    // install plugins
+    util.forEach(plugins, (p: plugin.Plugin) => {
+      p.installPlugin(this);
     });
 
     // emit change event after a short delay
     setTimeout(() => {
-      this.emit('change');
+      this.doc.emit('change');
     }, 0);
   }
 
@@ -73,10 +82,8 @@ export class Editor extends events.EventEmitter {
       // straight forward
       this.elem.textContent = content;
     } else {
-      this.setDocument(new model.Document(this.elem, content));
+      this.setDocument(new model.Document(this.elem, content, this.conf));
     }
-
-    this.emit('change');
   }
 
   setDocument(doc: model.Document): void {
