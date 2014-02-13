@@ -70,7 +70,12 @@ h2:first-child {
 }
 
 #mesh-content {
+  box-sizing: border-box;
+  border: 1px solid #ddd;
   line-height: 1.5;
+  padding: .1em;
+  width: 100%;
+  min-height: 10em;
 }
 
 #mesh-status {
@@ -101,11 +106,6 @@ h2:first-child {
 
 #mesh-attributes {
   margin-bottom: 1em;
-}
-
-#mesh-content {
-  border: 1px solid #ddd;
-  padding: .1em;
 }
 
 #mesh-content:focus {

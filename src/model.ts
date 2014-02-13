@@ -1,13 +1,15 @@
+import config = require('./config');
 import consts = require('./consts');
 import dom = require('./dom');
 import ed = require('./editor');
 import events = require('./events');
 import util = require('./util');
 import dataStore = require('./dataStore');
-import dnd = require('./dnd');
+import sortable = require('./sortable');
 
 export class Document extends events.EventEmitter {
-  constructor(public elem: HTMLElement, content: string = '') {
+  constructor(public elem: HTMLElement, content: string,
+    conf: config.Configuration) {
     super();
 
     // helper div, will be discarded later on
@@ -37,6 +39,8 @@ export class Document extends events.EventEmitter {
     }
 
     this.elem.appendChild(docFragment);
+
+    sortable.makeSortable(this, {});
   }
 
   length(): number {
@@ -101,12 +105,6 @@ export class Block extends events.EventEmitter {
     // listen on keydown events
     dom.addEventListener(elem, 'keydown', (ev: Event) => {
       this.emit('change');
-    });
-
-    dnd.makeDraggable(elem, this.handle);
-    dnd.makeDroppable(elem, (droppable) => {
-      // if we are in #mesh-content
-      return this.doc.elem.id === 'mesh-content';
     });
   }
 

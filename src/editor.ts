@@ -13,17 +13,17 @@ import plugin = require('./plugins/plugin');
  * Modular HTML5 WYSIWYG Editor (Controller).
  */
 export class Editor extends events.EventEmitter {
-  public elem: HTMLElement;
+  public content: HTMLElement;
   public undo: undo.UndoStack<string>;
 
   // IMPORTANT this attribute can be null!
   doc: model.Document = null;
 
-  constructor(container: HTMLElement, plugins: Array<plugin.Plugin>,
-    public conf: config.Configuration) {
+  constructor(content: HTMLElement, public toolbar: HTMLElement,
+    plugins: Array<plugin.Plugin>, public buttons: Array<plugin.Button> public conf: config.Configuration) {
     super();
 
-    util.requires(container.nodeName === 'TEXTAREA',
+    util.requires(content.nodeName === 'TEXTAREA',
       'not a textarea');
 
     this.conf = conf;
@@ -32,22 +32,23 @@ export class Editor extends events.EventEmitter {
     // set the view according to configuration
     if (conf.defaultView === 'textarea') {
       // use the textarea as-is
-      this.elem = container;
+      this.content = content;
+      // hide toolbar
+      this.toolbar.style.display = 'none';
     } else if (conf.defaultView === 'contenteditable') {
       // use the id of the textarea as the new id of the container
-      var id = container.id;
-      this.elem = document.createElement('div');
-      this.elem.id = id;
+      var id = content.id;
+      this.content = document.createElement('div');
+      this.content.id = id;
 
       // decode the existing content of the textarea
-      var content = util.xmlDecode(container.textContent);
-      this.setContent(content);
+      this.setContent(util.xmlDecode(content.textContent));
 
       // replace the container node
-      dom.replaceNode(container, this.elem);
+      dom.replaceNode(content, this.content);
 
       // make content editable
-      this.elem.contentEditable = 'true';
+      this.content.contentEditable = 'true';
     } else {
       // unknown case
       throw new exceptions.InvalidConfigurationException('no such view: "'
@@ -55,7 +56,7 @@ export class Editor extends events.EventEmitter {
     }
 
     // save a ref to this editor
-    dataStore.get(this.elem).editor = this;
+    dataStore.get(this.content).editor = this;
 
     var delayedUndoID: number;
     // on every change of the content, push a new state to the undo stack
@@ -78,11 +79,11 @@ export class Editor extends events.EventEmitter {
   }
 
   setContent(content: string): void {
-    if (dom.hasType(this.elem, 'TEXTAREA')) {
+    if (dom.hasType(this.content, 'TEXTAREA')) {
       // straight forward
-      this.elem.textContent = content;
+      this.content.textContent = content;
     } else {
-      this.setDocument(new model.Document(this.elem, content, this.conf));
+      this.setDocument(new model.Document(this.content, content, this.conf));
     }
   }
 
@@ -95,10 +96,10 @@ export class Editor extends events.EventEmitter {
   }
 
   getContent(): string {
-    if (dom.hasType(this.elem, 'TEXTAREA')) {
-      return this.elem.textContent;
+    if (dom.hasType(this.content, 'TEXTAREA')) {
+      return this.content.textContent;
     } else {
-      return this.elem.innerHTML;
+      return this.content.innerHTML;
     }
   }
 }

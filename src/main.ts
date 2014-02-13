@@ -9,10 +9,12 @@ export function init(conf: any, plugins: Array<plugin.Plugin>,
   var thisConf = util.extend(config.DEFAULT, config);
 
   dom.ready(() => {
-    var elem = document.getElementById('mesh-content');
-    var editor = new ed.Editor(elem, plugins, thisConf);
-
+    var content = document.getElementById('mesh-content');
+    var toolbar = document.getElementById('mesh-toolbar');
     var status = document.getElementById('mesh-status');
+
+    var editor = new ed.Editor(content, toolbar, plugins, thisConf);
+
     var delayedWordCountID: number;
     editor.getDocument().addListener('change', () => {
       if (typeof delayedWordCountID !== 'undefined')

@@ -40,6 +40,19 @@ export function hasType(elem: HTMLElement, type: string): boolean {
 }
 
 /**
+ * Checks, whether a node is the child of another node.
+ */
+export function isChildOf(node: Node, ancestor: Node): boolean {
+  if (node.parentNode === null) {
+    return false;
+  } else if (node.parentNode.isSameNode(ancestor)) {
+    return true;
+  } else {
+    return isChildOf(node.parentNode, ancestor);
+  }
+}
+
+/**
  * Adds a class to an element.
  */
 export function addClass(elem: HTMLElement, className: string): void {
