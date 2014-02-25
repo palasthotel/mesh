@@ -7,4 +7,6 @@ release:
 	browserify src/main.js | uglifyjs > mesh.min.js
 
 docs:
-	yuidoc .
+	rm -r ../mesh-docs/api/current
+	mkdir -p ../mesh-docs/api/current
+	jsdoc -c jsdoc.json
