@@ -9,6 +9,8 @@
 
   /**
    * Block around a given node.
+   * 
+   * @class Block
    */
   function Block(editor, elem) {
     if (!(this instanceof Block))
