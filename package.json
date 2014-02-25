@@ -12,12 +12,13 @@
   },
   "main": "src/main.js",
   "devDependencies": {
-    "browserify": "*"
+    "browserify": "*",
+    "yuidocjs": "*"
   },
   "author": "Paul Vorbach <paul@vorba.ch> (http://paul.vorba.ch/)",
   "scripts": {
-    "release": "browserify src/main.js | uglifyjs > mesh.min.js",
-    "debug": "browserify --debug src/main.js > mesh.js",
-    "test": "browserify --debug test/main.js > mesh-test.js"
+    "release": "make release",
+    "debug": "make debug",
+    "docs": "make docs"
   }
 }
