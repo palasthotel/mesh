@@ -4,7 +4,9 @@ debug:
 	browserify --debug src/main.js > mesh.js
 
 release:
-	browserify src/main.js | uglifyjs > mesh.min.js
+	browserify src/main.js > tmp.js
+	java -jar ../compiler.jar --js tmp.js --js_output_file mesh.js
+	rm tmp.js
 
 docs:
 	rm -r ../mesh-docs/api/current
