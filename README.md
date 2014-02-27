@@ -7,6 +7,9 @@ A HTML5 content-editable and jQuery text-editor
 ## Prerequisites
 
  1. Install [Node.js](http://nodejs.org/). This usually includes NPM.
+
+    (Node.js is only used for **building** the code. All code is merged into one
+    file.)
  2. Check out this repository:
 
     ~~~
