@@ -49,9 +49,9 @@ exports.createObject = Object.create || function(proto) {
  *   this._b = b;
  * }
  * 
- * oo.extends(SubClass, SuperClass);
+ * oo.extend(SubClass, SuperClass);
  */
-exports.extends = function(SubClass, SuperClass) {
+exports.extend = function(SubClass, SuperClass) {
   SubClass.prototype = exports.createObject(SuperClass.prototype);
   SubClass.prototype.constructor = SubClass;
 };
