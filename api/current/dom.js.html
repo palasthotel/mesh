@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: dom.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: dom.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Utility functions used to interact with the DOM.
+ * 
+ * @module dom
+ * 
+ * @author Paul Vorbach
+ * @since 0.0.1
+ */
+
+var events = require('events');
+var util = require('./util.js');
+
+/**
+ * Called when the DOM is ready.
+ * 
+ * @callback OnReadyCallback
+ */
+
+/**
+ * Calls `cb` (without arguments) when the DOM is ready.
+ * 
+ * @param {OnReadyCallback} cb - callback
+ * 
+ * @since 0.0.1
+ */
+exports.onReady = function(cb) {
+  if (/in/.test(document.readyState)) {
+    setTimeout(ready, 9, cb);
+  } else {
+    cb();
+  }
+};
+
+/**
+ * Creates an `HTMLElement` with an optional class.
+ * 
+ * @param {String} tagName - tag name of the element
+ * @param {String} [className] - class that the element should have
+ * 
+ * @returns {HTMLElement} created element
+ * 
+ * @since 0.0.1
+ */
+exports.createElement = function(tagName, className) {
+  var elem = document.createElement(tagName);
+
+  if (className) {
+    addClass(element, className);
+  }
+
+  return elem;
+};
+
+/**
+ * Checks, whether the given `Node` is an `Element`.
+ * 
+ * @param {Node} node
+ * 
+ * @returns {Boolean}
+ * 
+ * @since 0.0.1
+ */
+exports.isElement = function(node) {
+  return node.nodeType === 1;
+};
+
+/**
+ * Checks, whether a given `Node` is a text node.
+ * 
+ * @param {Node} node
+ * 
+ * @returns {Boolean}
+ * 
+ * @since 0.0.1
+ */
+exports.isTextNode = function(node) {
+  return node.nodeType === 3;
+}
+
+/**
+ * Checks, whether a given `HTMLElement` has got the given "type".
+ * 
+ * @example For an `&lt;a>` element, the call `hasType(elem, 'a')` will return
+ *          `true`.
+ * 
+ * @param {HTMLElement} elem
+ * @param {String} type
+ * 
+ * @returns {Boolean}
+ * 
+ * @since 0.0.1
+ */
+exports.hasType = function(elem, type) {
+  return elem.nodeName === type;
+};
+
+/**
+ * Adds a class to an element.
+ * 
+ * @param {HTMLElement} elem
+ * @param {String} className - class name
+ * 
+ * @since 0.0.1
+ */
+exports.addClass = function(elem, className) {
+  if (elem.classList)
+    return elem.classList.add(className);
+
+  if (hasClass(elem, className))
+    return;
+
+  elem.className += ' ' + className;
+};
+
+/**
+ * Checks, whether an element has a given class.
+ * 
+ * @param {HTMLElement} elem
+ * @param {String} className - class name
+ * 
+ * @returns {Boolean}
+ * 
+ * @since 0.0.1
+ */
+exports.hasClass = function(elem, className) {
+  if (elem.classList)
+    return elem.classList.contains(className);
+
+  var classes = elem.className.split(/\s+/);
+  return classes.indexOf(className) > -1;
+};
+
+/**
+ * Removes a class from an element.
+ * 
+ * @param {HTMLElement} elem
+ * @param {String} className - class name
+ * 
+ * @since 0.0.1
+ */
+exports.removeClass = function(elem, className) {
+  if (elem.classList)
+    return elem.classList.remove(className);
+
+  var oldClasses = elem.className.split(/\s+/);
+  var newClasses = [];
+  for (var i = 0; i &lt; oldClasses.length; i++) {
+    var old = oldClasses[i];
+    if (old !== className)
+      newClasses.push(old);
+  }
+
+  if (oldClasses.length > newClasses.length)
+    elem.className = newClasses.join(' ');
+};
+
+/**
+ * Returns the first class of an element.
+ * 
+ * @param {HTMLElement} elem
+ * 
+ * @returns {String}
+ * 
+ * @since 0.0.1
+ */
+exports.getFirstClass = function(elem) {
+  if (elem.classList)
+    return elem.classList[0];
+
+  return elem.className.split(' ')[0];
+};
+
+/**
+ * Replaces `a` with `b`.
+ * 
+ * @param {Node} a
+ * @param {Node} b
+ * 
+ * @since 0.0.1
+ */
+exports.replaceNode = function(a, b) {
+  a.parentNode.replaceChild(b, a);
+};
+
+/**
+ * Turns `node` into an XML string.
+ * 
+ * @param {Node} node
+ * 
+ * @returns {String} - string representation of the given node
+ * 
+ * @since 0.0.1
+ */
+exports.nodeToXML = function(node) {
+  var result;
+
+  if (node instanceof HTMLElement) {
+    var tagName = node.tagName.toLowerCase();
+    result = '&lt;' + tagName;
+
+    // add attributes
+    util.forEach(node.attributes, function(attr) {
+      result += ' ' + attr.name + '="' + attr.value;
+    });
+
+    if (node.childNodes.length > 0) {
+      result += '>';
+
+      // add childNodes
+      util.forEach(elem.childNodes, function(node) {
+        result += nodeToXML(node);
+      });
+
+      result += '&lt;/' + tagName + '>';
+    } else {
+      result += ' />';
+    }
+  } else {
+    result = node.textContent;
+  }
+
+  return result;
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dataStore.html">dataStore</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-main.html">main</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-Block.html">Block</a></li><li><a href="module-model-Document.html">Document</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#indexOf">indexOf</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:14 GMT+0100 (Mitteleuropäische Zeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

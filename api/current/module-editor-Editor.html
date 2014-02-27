@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Global</title>
+    <title>JSDoc: Class: Editor</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">Class: Editor</h1>
     
     
 
@@ -27,8 +27,12 @@
     
 <header>
     <h2>
+        <span class="ancestors"><a href="module-editor.html">editor</a>~</span>
     
+    Editor
     </h2>
+    
+        <div class="class-description"><p>Editor</p></div>
     
 </header>  
 
@@ -38,60 +42,8 @@
     
     
         
-        
-        
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-        
-        
-    
-    </div>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        <h3 class="subsection-title">Methods</h3>
-        
-        <dl>
-            
 <dt>
-    <h4 class="name" id="ContentPlugin"><span class="type-signature"></span>ContentPlugin<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Editor"><span class="type-signature"></span>new Editor<span class="signature">(container, conf)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -99,76 +51,7 @@
     
     
     <div class="description">
-        <p>Specification for content plugins.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="content-plugin.js.html">content/content-plugin.js</a>, <a href="content-plugin.js.html#line5">line 5</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="indexOf"><span class="type-signature"></span>indexOf<span class="signature">(arr, obj)</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Get index of <code>obj</code> in <code>arr</code>.</p>
+        <p>Modular HTML5 WYSIWYG Editor.</p>
     </div>
     
 
@@ -202,10 +85,15 @@
 	
         <tr>
             
-                <td class="name"><code>arr</code></td>
+                <td class="name"><code>container</code></td>
             
             
             <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
             
             </td>
             
@@ -213,17 +101,22 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last"><p>surrounding element</p></td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>obj</code></td>
+                <td class="name"><code>conf</code></td>
             
             
             <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
             
             </td>
             
@@ -231,12 +124,108 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last"><p>configuration</p></td>
         </tr>
 	
 	
 	</tbody>
 </table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>0.0.1</dd>
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+    
+    </div>
+    
+    
+        <h3 class="subsection-title">Extends</h3>
+        
+        <ul>
+            <li>EventEmitter</li>
+        </ul>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        <h3 class="subsection-title">Methods</h3>
+        
+        <dl>
+            
+<dt>
+    <h4 class="name" id="getContent"><span class="type-signature"></span>getContent<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Get the editor's contents.</p>
+    </div>
+    
+
+    
+    
+    
+    
     
     
     
@@ -262,7 +251,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="indexof.js.html">indexof.js</a>, <a href="indexof.js.html#line11">line 11</a>
+        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line119">line 119</a>
     </li></ul></dd>
     
     
@@ -288,21 +277,27 @@
             
 
 
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
         
     
     
 </dd>
 
-        </dl>
-    
-    
-    
-        <h3 class="subsection-title">Type Definitions</h3>
         
-        <dl>
-                
+            
 <dt>
-    <h4 class="name" id="Action"><span class="type-signature"></span>Action<span class="signature">(t)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getDocument"><span class="type-signature"></span>getDocument<span class="signature">()</span><span class="type-signature"> &rarr; {Document}</span></h4>
     
     
 </dt>
@@ -310,7 +305,7 @@
     
     
     <div class="description">
-        <p>Apply an action to <code>arg</code>.</p>
+        <p>Get the editor's document.</p>
     </div>
     
 
@@ -318,54 +313,6 @@
     
     
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>t</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">T</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
     
     
     
@@ -391,7 +338,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util.js.html">util.js</a>, <a href="util.js.html#line83">line 83</a>
+        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line141">line 141</a>
     </li></ul></dd>
     
     
@@ -412,14 +359,32 @@
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Document</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
 </dd>
 
+        
             
-                
 <dt>
-    <h4 class="name" id="Filter"><span class="type-signature"></span>Filter<span class="signature">(t)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    <h4 class="name" id="isView"><span class="type-signature"></span>isView<span class="signature">(viewType)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
     
     
 </dt>
@@ -427,7 +392,7 @@
     
     
     <div class="description">
-        <p>Decides, if <code>t</code> is accepted or not.</p>
+        <p>Checks, whether the view of this editor is the given <code>viewType</code>.</p>
     </div>
     
 
@@ -461,13 +426,13 @@
 	
         <tr>
             
-                <td class="name"><code>t</code></td>
+                <td class="name"><code>viewType</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">T</span>
+<span class="param-type">String</span>
 
 
             
@@ -477,7 +442,8 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last"><p>view type of interest, either <code>'textarea'</code> or
+               <code>'contenteditable'</code></p></td>
         </tr>
 	
 	
@@ -508,7 +474,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util.js.html">util.js</a>, <a href="util.js.html#line130">line 130</a>
+        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line88">line 88</a>
     </li></ul></dd>
     
     
@@ -551,10 +517,10 @@
     
 </dd>
 
+        
             
-                
 <dt>
-    <h4 class="name" id="InitCallback"><span class="type-signature"></span>InitCallback<span class="signature">(error, editor)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setContent"><span class="type-signature"></span>setContent<span class="signature">(content)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -562,7 +528,7 @@
     
     
     <div class="description">
-        <p>Called when the editor is initialized.</p>
+        <p>Set the editor's contents.</p>
     </div>
     
 
@@ -596,13 +562,13 @@
 	
         <tr>
             
-                <td class="name"><code>error</code></td>
+                <td class="name"><code>content</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">Error</span>
+<span class="param-type">String</span>
 
 
             
@@ -612,30 +578,7 @@
             
             
             
-            <td class="description last"></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>editor</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Editor</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"></td>
+            <td class="description last"><p>HTML string</p></td>
         </tr>
 	
 	
@@ -666,7 +609,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line13">line 13</a>
+        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line103">line 103</a>
     </li></ul></dd>
     
     
@@ -691,10 +634,10 @@
     
 </dd>
 
+        
             
-                
 <dt>
-    <h4 class="name" id="Mapper"><span class="type-signature"></span>Mapper<span class="signature">(t)</span><span class="type-signature"> &rarr; {S}</span></h4>
+    <h4 class="name" id="setDocument"><span class="type-signature"></span>setDocument<span class="signature">(doc)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -702,7 +645,7 @@
     
     
     <div class="description">
-        <p>Maps <code>T</code> to <code>S</code>.</p>
+        <p>Set the editor's document.</p>
     </div>
     
 
@@ -736,13 +679,13 @@
 	
         <tr>
             
-                <td class="name"><code>t</code></td>
+                <td class="name"><code>doc</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">T</span>
+<span class="param-type">Document</span>
 
 
             
@@ -752,7 +695,7 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last"><p>document</p></td>
         </tr>
 	
 	
@@ -783,94 +726,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util.js.html">util.js</a>, <a href="util.js.html#line103">line 103</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">S</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-            
-                
-<dt>
-    <h4 class="name" id="OnReadyCallback"><span class="type-signature"></span>OnReadyCallback<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Called when the DOM is ready.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="dom.js.html">dom.js</a>, <a href="dom.js.html#line13">line 13</a>
+        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line132">line 132</a>
     </li></ul></dd>
     
     
@@ -895,7 +751,9 @@
     
 </dd>
 
-            </dl>
+        </dl>
+    
+    
     
     
     
@@ -915,7 +773,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:14 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:15 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>

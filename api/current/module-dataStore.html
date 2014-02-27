@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: main</title>
+    <title>JSDoc: Module: dataStore</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Module: main</h1>
+    <h1 class="page-title">Module: dataStore</h1>
     
     
 
@@ -27,7 +27,7 @@
     
 <header>
     <h2>
-    main
+    dataStore
     </h2>
     
 </header>  
@@ -38,7 +38,7 @@
     
     
         
-            <div class="description"><p>Main module and entry point to Mesh.</p></div>
+            <div class="description"><p>Data Store.</p></div>
         
         
         
@@ -47,6 +47,9 @@
         
     
     
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>0.0.1</dd>
     
 
     
@@ -71,7 +74,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line1">line 1</a>
+        <a href="dataStore.js.html">dataStore.js</a>, <a href="dataStore.js.html#line1">line 1</a>
     </li></ul></dd>
     
     
@@ -105,7 +108,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="init"><span class="type-signature">&lt;static> </span>init<span class="signature">(conf, cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="get"><span class="type-signature">&lt;static> </span>get<span class="signature">(elem)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -113,7 +116,7 @@
     
     
     <div class="description">
-        <p>Initialize the editor.</p>
+        <p>Get a reference to the stored data object for <code>elem</code>.</p>
     </div>
     
 
@@ -147,13 +150,13 @@
 	
         <tr>
             
-                <td class="name"><code>conf</code></td>
+                <td class="name"><code>elem</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">HTMLElement</span>
 
 
             
@@ -163,30 +166,7 @@
             
             
             
-            <td class="description last"><p>configuration object</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>cb</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#InitCallback">InitCallback</a></span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"><p>initialization callback</p></td>
+            <td class="description last"><p>html element</p></td>
         </tr>
 	
 	
@@ -200,9 +180,6 @@
         
     
     
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>0.0.1</dd>
     
 
     
@@ -220,7 +197,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line30">line 30</a>
+        <a href="dataStore.js.html">dataStore.js</a>, <a href="dataStore.js.html#line25">line 25</a>
     </li></ul></dd>
     
     
@@ -242,6 +219,16 @@
     
     
     
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>var dataStore = require('./dataStore.js');
+
+var elem = document.getElementById('elem');
+
+var data = dataStore.get(elem);
+data.foo = 'bar';</code></pre>
+
     
 </dd>
 

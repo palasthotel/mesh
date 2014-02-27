@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: indexof.js</title>
+    <title>JSDoc: Source: dataStore.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: indexof.js</h1>
+    <h1 class="page-title">Source: dataStore.js</h1>
     
     
 
@@ -25,25 +25,38 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>if (typeof module == 'object')
-  module.indexOf = indexOf;
+            <pre class="prettyprint source linenums"><code>/**
+ * Data Store.
+ * 
+ * @module dataStore
+ * 
+ * @author Paul Vorbach
+ * @since 0.0.1
+ */
 
 /**
- * Get index of `obj` in `arr`.
+ * Get a reference to the stored data object for `elem`.
  * 
- * @param arr
- * @param obj
- * @returns
+ * @example
+ * 
+ * var dataStore = require('./dataStore.js');
+ * 
+ * var elem = document.getElementById('elem');
+ * 
+ * var data = dataStore.get(elem);
+ * data.foo = 'bar';
+ * 
+ * 
+ * @param {HTMLElement} elem - html element
  */
-function indexOf(arr, obj) {
-  if (arr.indexOf)
-    return arr.indexOf(obj);
-
-  for ( var i = 0; i &lt; arr.length; i++) {
-    if (arr[i] === obj)
-      return i;
+exports.get = function(elem) {
+  var data = elem.meshData;
+  if (typeof data === 'undefined') {
+    data = {};
+    elem.meshData = data;
   }
-  return -1;
+
+  return data;
 };
 </code></pre>
         </article>

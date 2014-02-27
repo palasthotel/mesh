@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: indexof.js</title>
+    <title>JSDoc: Source: exceptions.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: indexof.js</h1>
+    <h1 class="page-title">Source: exceptions.js</h1>
     
     
 
@@ -25,26 +25,81 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>if (typeof module == 'object')
-  module.indexOf = indexOf;
+            <pre class="prettyprint source linenums"><code>/**
+ * Commonly used exception classes.
+ * 
+ * @module exceptions
+ * 
+ * @since 0.0.1
+ * @author Paul Vorbach
+ */
+
+var oo = require('./oo.js');
 
 /**
- * Get index of `obj` in `arr`.
+ * Standard exception.
  * 
- * @param arr
- * @param obj
- * @returns
+ * @class Exception
+ * @constructor
+ * 
+ * @param {String} message - error message
+ * 
+ * @since 0.0.1
  */
-function indexOf(arr, obj) {
-  if (arr.indexOf)
-    return arr.indexOf(obj);
-
-  for ( var i = 0; i &lt; arr.length; i++) {
-    if (arr[i] === obj)
-      return i;
-  }
-  return -1;
+exports.Exception = function Exception(message) {
+  Error.call(this, message);
 };
+
+exports.Exception.prototype.name = 'Exception';
+
+exports.Exception.prototype.toString = function() {
+  return this.name + ': ' + this.message;
+};
+
+/**
+ * No such element.
+ * 
+ * Usually caused by trying to access an out-of-bounds index or a
+ * property/method that doesn't exist.
+ * 
+ * @class NoSuchElementException
+ * @constructor
+ * 
+ * @param {String} message - error message
+ * 
+ * @extends Exception
+ * 
+ * @since 0.0.1
+ */
+exports.NoSuchElementException = function NoSuchElementException(message) {
+  Exception.call(this, message);
+};
+
+exports.NoSuchElementException.prototype.name = 'NoSuchElementException';
+
+oo.extend(exports.NoSuchElementException, exports.Exception);
+
+/**
+ * Illegal argument.
+ * 
+ * Index out of bounds.
+ * 
+ * @class IllegalArgumentException
+ * @constructor
+ * 
+ * @param {String} message - error message
+ * 
+ * @extends Exception
+ * 
+ * @since 0.0.1
+ */
+exports.IllegalArgumentException = function IllegalArgumentException(message) {
+  Exception.call(this, message);
+};
+
+exports.IllegalArgumentException.prototype.name = 'IllegalArgumentException';
+
+oo.extend(exports.IllegalArgumentException, exports.Exception);
 </code></pre>
         </article>
     </section>

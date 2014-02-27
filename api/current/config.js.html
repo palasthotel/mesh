@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: indexof.js</title>
+    <title>JSDoc: Source: config.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: indexof.js</h1>
+    <h1 class="page-title">Source: config.js</h1>
     
     
 
@@ -25,25 +25,29 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>if (typeof module == 'object')
-  module.indexOf = indexOf;
+            <pre class="prettyprint source linenums"><code>/**
+ * Configuration related.
+ * 
+ * @module config
+ */
 
 /**
- * Get index of `obj` in `arr`.
+ * Default configuration.
  * 
- * @param arr
- * @param obj
- * @returns
+ *     DEFAULT = {
+ *       undoSize : 50,
+ *       undoDelay : 700,
+ *       statusDelay : 1000,
+ *       defaultView : 'contenteditable'
+ *     }
+ * 
+ * @type {Object}
  */
-function indexOf(arr, obj) {
-  if (arr.indexOf)
-    return arr.indexOf(obj);
-
-  for ( var i = 0; i &lt; arr.length; i++) {
-    if (arr[i] === obj)
-      return i;
-  }
-  return -1;
+exports.DEFAULT = {
+  undoSize : 50,
+  undoDelay : 700,
+  statusDelay : 1000,
+  defaultView : 'contenteditable'
 };
 </code></pre>
         </article>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: indexof.js</title>
+    <title>JSDoc: Source: main.js</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Source: indexof.js</h1>
+    <h1 class="page-title">Source: main.js</h1>
     
     
 
@@ -25,25 +25,56 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>if (typeof module == 'object')
-  module.indexOf = indexOf;
+            <pre class="prettyprint source linenums"><code>/**
+ * Main module and entry point to Mesh.
+ * 
+ * @module main
+ * @author Paul Vorbach
+ */
+
+var editor = require('./editor.js');
+var dom = require('./dom.js');
+var util = require('./util.js');
+var config = require('./config.js');
 
 /**
- * Get index of `obj` in `arr`.
+ * Called when the editor is initialized.
  * 
- * @param arr
- * @param obj
- * @returns
+ * @callback InitCallback
+ * @param {Error} error
+ * @param {Editor} editor
+ * 
  */
-function indexOf(arr, obj) {
-  if (arr.indexOf)
-    return arr.indexOf(obj);
 
-  for ( var i = 0; i &lt; arr.length; i++) {
-    if (arr[i] === obj)
-      return i;
-  }
-  return -1;
+/**
+ * Initialize the editor.
+ * 
+ * @param {Object} conf - configuration object
+ * @param {InitCallback} cb - initialization callback
+ * 
+ * @since 0.0.1
+ */
+exports.init = function init(conf, cb) {
+  // extend default configuration with given conf
+  var thisConf = util.extend(config.DEFAULT, conf);
+
+  // when the dom is ready, set up the editor
+  dom.onReady(function() {
+    try {
+      var elem = document.getElementById(thisConf.contentID);
+      var ed = new editor.Editor(elem, thisConf);
+
+      var status = document.getElementById(thisConf.statusID);
+      ed.addListener('change', function() {
+        status.innerHTML = ed.elem.textContent.split(/\s+/).length + ' words';
+      });
+
+      // return editor instance
+      cb(null, ed);
+    } catch (err) {
+      cb(err);
+    }
+  });
 };
 </code></pre>
         </article>
