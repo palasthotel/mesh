@@ -7,7 +7,7 @@
  * @since 0.0.1
  */
 
-var events = require('./events.js');
+var events = require('events');
 var util = require('./util.js');
 
 /**
