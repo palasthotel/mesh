@@ -7,7 +7,6 @@
 
 var editor = require('./editor.js');
 var dom = require('./dom.js');
-var dnd = require('./dnd.js');
 var util = require('./util.js');
 var config = require('./config.js');
 
