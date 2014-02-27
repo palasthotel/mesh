@@ -50,7 +50,7 @@ exports.NoSuchElementException = function NoSuchElementException(message) {
 
 exports.NoSuchElementException.prototype.name = 'NoSuchElementException';
 
-oo.extends(exports.NoSuchElementException, exports.Exception);
+oo.extend(exports.NoSuchElementException, exports.Exception);
 
 /**
  * Illegal argument.
@@ -72,4 +72,4 @@ exports.IllegalArgumentException = function IllegalArgumentException(message) {
 
 exports.IllegalArgumentException.prototype.name = 'IllegalArgumentException';
 
-oo.extends(exports.IllegalArgumentException, exports.Exception);
+oo.extend(exports.IllegalArgumentException, exports.Exception);
