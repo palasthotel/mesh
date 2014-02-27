@@ -15,7 +15,8 @@ exports.UndoStack = UndoStack;
  * @constructor
  * 
  * @param {Number} [size=50] - number of elements the stack can store
- * @param {T[]} [stack=[]] - pre-filled stack as an Array
+ * @param {T[]} [stack=[]] - pre-filled stack as an Array. This can be used to
+ *                regain a previously persisted `UndoStack`.
  */
 function UndoStack(size, stack) {
   if (typeof size === "undefined") {
