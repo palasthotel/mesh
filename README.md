@@ -59,3 +59,16 @@ Then open <http://localhost:8080/> in your browser.
 A (likely outdated) version of the documentation can be found here:
 <http://palasthotel.github.io/mesh/api/current/>.
 
+
+## Final directory structure
+
+Here's the directory structure you should have if you followed the instructions
+above.
+
+~~~
+path/to/parent/
+|
+|-- mesh/         -- contains this Git repository
+|-- mesh-docs/    -- contains the docs
+\-- compiler.jar  -- closure compiler
+~~~
