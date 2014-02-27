@@ -1,0 +1,7 @@
+.project
+node_modules
+bak.src
+bower_components
+mesh.js
+out
+tmp.js
