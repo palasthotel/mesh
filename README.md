@@ -16,7 +16,8 @@ A HTML5 content-editable and jQuery text-editor
     git clone git://github.com/palasthotel/mesh.git
     ~~~
  3. `cd mesh`
- 5. `npm install -g browserify jsdoc`
+ 5. `npm install -g browserify jsdoc` or if necessary `sudo npm install -g
+    browserify jsdoc`
 
 
 ## Build
