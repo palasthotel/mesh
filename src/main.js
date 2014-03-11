@@ -1,7 +1,3 @@
-/*!
- * (c) 2013-2014 Palasthotel - Gesellschaft für digitale Pracht mbH
- */
-
 /**
  * Main module and entry point to Mesh.
  * 
@@ -9,6 +5,8 @@
  * @author Paul Vorbach
  */
 
+// $/jQuery is not imported by browserify, but instead is used as a global
+// variable
 var editor = require('./editor.js');
 var dom = require('./dom.js');
 var util = require('./util.js');
@@ -36,7 +34,7 @@ exports.init = function init(conf, cb) {
   var thisConf = util.extend(config.DEFAULT, conf);
 
   // when the dom is ready, set up the editor
-  dom.onReady(function() {
+  $(document).ready(function() {
     try {
       var elem = document.getElementById(thisConf.contentID);
       var ed = new editor.Editor(elem, thisConf);
