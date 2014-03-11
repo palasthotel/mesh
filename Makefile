@@ -1,10 +1,10 @@
 all: debug docs
 
 debug:
-	browserify --debug src/main.js > mesh.js
+	browserify --debug -r ./src/main.js:mesh > mesh.js
 
 release:
-	browserify src/main.js > tmp.js
+	browserify -r ./src/main.js:mesh > tmp.js
 	java -jar ../compiler.jar --js tmp.js --js_output_file mesh.js
 
 docs:
