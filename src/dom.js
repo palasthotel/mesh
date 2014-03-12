@@ -220,4 +220,8 @@ exports.nodeToXML = function(node) {
   }
 
   return result;
-}
+};
+
+exports.addEventListener = function(element, event, callback) {
+  element.addEventListener(event, callback);
+};
