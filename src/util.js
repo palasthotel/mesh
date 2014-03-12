@@ -97,7 +97,10 @@ exports.xmlDecode =
  * @since 0.0.1
  */
 exports.forEach = function(ts, action) {
-  [].forEach.call(ts, action);
+  if (ts instanceof Array)
+    [].forEach.call(ts, action);
+  else
+    exports.forEach([].slice.call(ts), action);
 }
 
 /**
@@ -146,7 +149,7 @@ exports.map = function(ts, mapper) {
  * 
  * @since 0.0.1
  */
-exports.map = function(ts, filter) {
+exports.filter = function(ts, filter) {
   var result = new Array();
   var t = null;
   for (var i = 0; i < ts.length; i++) {
