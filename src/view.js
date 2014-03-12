@@ -98,6 +98,7 @@ ContentEditableView.prototype.updateView = function() {
     var blockElem = dom.createElement('div', 'block');
     var blockFrgmt = document.createDocumentFragment();
     var handle = dom.createElement('div', 'handle');
+    handle.contentEditable = false;
     var controls = dom.createElement('div', 'controls');
 
     blockFrgmt.appendChild(handle);
@@ -113,4 +114,10 @@ ContentEditableView.prototype.updateView = function() {
   });
 
   this.getElement().appendChild(docFrgmt);
-}
+
+  $(this.getElement()).sortable({
+    handle : '.handle',
+    placeholder : 'placeholder',
+    axis: 'y'
+  });
+};
