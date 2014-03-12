@@ -45,7 +45,7 @@ exports.createElement = function(tagName, className) {
   var elem = document.createElement(tagName);
 
   if (className) {
-    addClass(element, className);
+    addClass(elem, className);
   }
 
   return elem;
