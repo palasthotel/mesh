@@ -8,14 +8,11 @@
  */
 
 var events = require('events');
-var consts = require('./consts.js');
 var dom = require('./dom.js');
 var util = require('./util.js');
-var dataStore = require('./dataStore.js');
-var dnd = require('./dnd.js');
 var oo = require('./oo.js');
 
-exports.Document = Document;
+exports.DocumentModel = DocumentModel;
 
 /**
  * HTML Document.
@@ -23,85 +20,69 @@ exports.Document = Document;
  * @class Document
  * @constructor
  * 
- * @param {HTMLElement} elem - surrounding element
  * @param {String} content - content of the document
+ * @param {Boolean} [escaped=false] - is the given `content` XML escaped?
  * 
  * @extends EventEmitter
  * 
  * @since 0.0.1
  */
-function Document(elem, content) {
-  EventEmitter.call(this);
+function DocumentModel(content, escaped) {
+  events.EventEmitter.call(this);
 
-  // helper div, will be discarded later on
-  var helper = document.createElement('div');
-  helper.innerHTML = content;
+  this.doc = document.createElement('div');
 
-  var docFragment = document.createDocumentFragment();
-
-  // add handler and controls for every child
-  util.forEach(helper.children, function(child) {
-    var blockElement = dom.createElement('div', 'block');
-    var blockFragment = document.createDocumentFragment();
-    var handle = dom.createElement('div', 'handle');
-    var controls = dom.createElement('div', 'controls');
-
-    blockFragment.appendChild(handle);
-    blockFragment.appendChild(child);
-    blockFragment.appendChild(controls);
-
-    blockElement.appendChild(blockFragment);
-
-    // create new block
-    new Block(blockElement, this);
-
-    docFragment.appendChild(blockElement);
-  });
-
-  elem.appendChild(docFragment);
+  if (escaped) {
+    this.doc.innerHTML = util.xmlDecode(content);
+  } else {
+    this.doc.innerHTML = content;
+  }
+  
+  console.log(this.doc);
 }
 
-oo.extend(Document, events.EventEmitter);
+// inheritance
+oo.extend(DocumentModel, events.EventEmitter);
 
-Document.prototype.length = function() {
-  return this.elem.children.length;
+DocumentModel.prototype.length = function() {
+  return this.doc.children.length;
 };
 
-Document.prototype.getBlock = function(i) {
-  return dataStore.get(this.elem.children[i]).block;
+DocumentModel.prototype.get = function(i) {
+  return this.doc.children[i];
 };
 
-Document.prototype.insertBlockAt = function(i, newBlock) {
-  this.elem.insertBefore(newBlock.elem, this.elem.children[i]);
+DocumentModel.prototype.insertAt = function(i, newBlock) {
+  this.doc.insertBefore(newBlock.elem, this.doc.children[i]);
 
   this.emit('change');
-  this.emit('addblock');
 };
 
-Document.prototype.removeBlock = function(i) {
-  this.elem.removeChild(this.elem.children[i]);
+DocumentModel.prototype.remove = function(child) {
+  this.doc.removeChild(child);
 
   this.emit('change');
-  this.emit('removeblock');
 };
 
 /**
  * Replaces the block at index i by another one.
  */
-Document.prototype.replaceBlock = function(i, newBlock) {
-  dom.replaceNode(newBlock.elem, this.elem.children[i]);
+DocumentModel.prototype.replace = function(oldChild, newChild) {
+  dom.replaceNode(oldChild, newChild);
 
   this.emit('change');
 };
 
-Document.prototype.toHTML = function() {
+DocumentModel.prototype.toXML = function() {
   var result = '';
   var length = this.length();
   for (var i = 0; i < length; i++) {
-    result += this.getBlock(i).toHTML() + '\n';
+    result += dom.nodeToXML(this.get(i));
   }
   return result;
 };
+
+// BLOCK
 
 exports.Block = Block;
 
@@ -121,7 +102,7 @@ exports.Block = Block;
 function Block(elem, doc) {
   events.EventEmitter.call(this);
 
-  this.elem = elem;
+  this.doc = elem;
   this.doc = doc;
 
   var dataRef = dataStore.get(elem);
@@ -139,7 +120,7 @@ function Block(elem, doc) {
     this.emit('change');
   });
 
-  dataRef.draggable = dnd.makeDraggable(elem, this.handle);
+  // dataRef.draggable = dnd.makeDraggable(elem, this.handle);
 };
 
 oo.extend(Block, events.EventEmitter);
