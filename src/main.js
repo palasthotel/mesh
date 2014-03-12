@@ -24,20 +24,20 @@ var config = require('./config.js');
 /**
  * Initialize the editor.
  * 
+ * @param {HTMLElement} textarea - `<textarea>`
  * @param {Object} conf - configuration object
  * @param {InitCallback} cb - initialization callback
  * 
  * @since 0.0.1
  */
-exports.init = function init(conf, cb) {
+exports.init = function init(textarea, conf, cb) {
   // extend default configuration with given conf
   var thisConf = util.extend(config.DEFAULT, conf);
 
   // when the dom is ready, set up the editor
   $(document).ready(function() {
     try {
-      var elem = document.getElementById(thisConf.contentID);
-      var ed = new editor.Editor(elem, thisConf);
+      var ed = new editor.Editor(textarea, thisConf);
 
       var status = document.getElementById(thisConf.statusID);
       ed.addListener('change', function() {

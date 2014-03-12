@@ -8,23 +8,22 @@
 </head>
 <body>
   <div id="container">
-    <div id="mesh-editor" class="col-1">
-      <form id="mesh-title">
+    <form id="mesh-editor" class="col-1">
+      <div id="mesh-title">
         <input type="text" name="title" placeholder="Title" />
-      </form>
+      </div>
       <div id="mesh-tools"></div>
-      <div id="mesh-content"></div>
-      <div id="mesh-status">0 words</div>
+      <textarea class="mesh-content">
+&lt;p&gt;Text with &lt;b&gt;some&lt;/b&gt; &lt;i&gt;form&lt;b&gt;atting&lt;/b&gt;&lt;/i&gt;&lt;br&gt;
+A &lt;a href=&quot;/&quot;&gt;Link&lt;/a&gt;&lt;/p&gt;
+&lt;blockquote&gt;Quote&lt;/blockquote&gt;</textarea>
+      <div id="mesh-status"></div>
       <div id="mesh-actions">
         <button id="mesh-source-preview">Source preview</button>
         <button id="mesh-save">Save (not implemented)</button>
       </div>
       <div id="mesh-attributes"></div>
-      <div id="mesh-source">
-        <h2>Source:</h2>
-        <pre></pre>
-      </div>
-    </div>
+    </form>
     <div id="mesh-picker" class="col-2">
       <h2>Search:</h2>
       <form id="mesh-search">
@@ -54,12 +53,19 @@
 
     // set configuration here
     var conf = {
-
+      defaultView : 'contenteditable'
     };
 
-    // initialize app
-    mesh.init(conf, function() {
+    var textarea = $('textarea.mesh-content')[0];
 
+    // initialize app
+    mesh.init(textarea, conf, function(err, ed) {
+      if (err) {
+        console.log('Initialization failed.')
+        throw err;
+      }
+
+      console.log(ed)
     });
   </script>
 </body>
