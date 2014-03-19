@@ -225,3 +225,14 @@ exports.nodeToXML = function(node) {
 exports.addEventListener = function(element, event, callback) {
   element.addEventListener(event, callback);
 };
+
+exports.containsNode = function(ancestor, child) {
+  while (child.parentNode != null) {
+    if (child.parentNode === ancestor)
+      return true;
+
+    child = child.parentNode;
+  }
+
+  return false;
+};

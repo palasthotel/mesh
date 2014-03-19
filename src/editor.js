@@ -22,22 +22,23 @@ exports.Editor = Editor;
  * @class Editor
  * @constructor
  * 
- * @param {HTMLElement|String} container - surrounding element or id of the
- *                surrounding element
+ * @param {HTMLElement|String} textarea - textarea or id of a textarea
  * @param {Object} conf - configuration object
  * 
  * @extends EventEmitter
  * 
  * @since 0.0.1
  */
-function Editor(container, conf) {
+function Editor(textarea, conf) {
   events.EventEmitter.call(this);
 
-  if (typeof container === 'string') {
-    container = document.getElementById(container);
+  if (typeof textarea === 'string') {
+    textarea = document.getElementById(textarea);
   }
 
-  util.requires(dom.hasType(container, 'TEXTAREA'), 'not a <textarea>');
+  util.requires(dom.hasType(textarea, 'TEXTAREA'), 'not a <textarea>');
+
+  this.textarea = textarea;
 
   this.conf = conf;
   // undoStack
@@ -46,10 +47,9 @@ function Editor(container, conf) {
   // set the view according to configuration
   if (conf.defaultView === 'textarea') {
     // use the textarea as-is
-    this.view = new view.TextareaView(container);
+    this.setView(new view.TextareaView(textarea, conf));
   } else if (conf.defaultView === 'contenteditable') {
-    this.view = new view.ContentEditableView($(container).val());
-    dom.replaceNode(container, this.view.getElement());
+    this.setView(new view.ContentEditableView($(textarea).val(), conf));
   } else {
     // unknown case
     throw new exceptions.InvalidConfigurationException('no such view: "'
@@ -58,3 +58,16 @@ function Editor(container, conf) {
 };
 
 oo.extend(Editor, events.EventEmitter);
+
+Editor.prototype.setView = function(v) {
+  this.view = v;
+
+  // replace textarea
+  if (v instanceof view.ContentEditableView) {
+    dom.replaceNode(this.textarea, this.view.getElement());
+  }
+};
+
+Editor.prototype.getView = function() {
+  return this.view;
+};

@@ -7,12 +7,8 @@
 /**
  * Default configuration.
  * 
- *     DEFAULT = {
- *       undoSize : 50,
- *       undoDelay : 700,
- *       statusDelay : 1000,
- *       defaultView : 'contenteditable'
- *     }
+ * DEFAULT = { undoSize : 50, undoDelay : 700, statusDelay : 1000, defaultView :
+ * 'contenteditable' }
  * 
  * @type {Object}
  */

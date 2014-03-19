@@ -30,45 +30,37 @@ exports.DocumentModel = DocumentModel;
 function DocumentModel(content, escaped) {
   events.EventEmitter.call(this);
 
-  this.doc = document.createElement('div');
+  var blocks = this.blocks = [];
+  var blocksDiv = document.createElement('div');
 
   if (escaped) {
-    this.doc.innerHTML = util.xmlDecode(content);
+    blocksDiv.innerHTML = util.xmlDecode(content);
   } else {
-    this.doc.innerHTML = content;
+    blocksDiv.innerHTML = content;
   }
-  
-  console.log(this.doc);
+
+  util.forEach(blocksDiv.children, function(child) {
+    blocks.push(new Block(child));
+  });
 }
 
 // inheritance
 oo.extend(DocumentModel, events.EventEmitter);
 
 DocumentModel.prototype.length = function() {
-  return this.doc.children.length;
+  return this.blocks.length;
 };
 
 DocumentModel.prototype.get = function(i) {
-  return this.doc.children[i];
+  return this.blocks[i];
 };
 
-DocumentModel.prototype.insertAt = function(i, newBlock) {
-  this.doc.insertBefore(newBlock.elem, this.doc.children[i]);
-
-  this.emit('change');
+DocumentModel.prototype.set = function(i, block) {
+  this.blocks[i] = block;
 };
 
-DocumentModel.prototype.remove = function(child) {
-  this.doc.removeChild(child);
-
-  this.emit('change');
-};
-
-/**
- * Replaces the block at index i by another one.
- */
-DocumentModel.prototype.replace = function(oldChild, newChild) {
-  dom.replaceNode(oldChild, newChild);
+DocumentModel.prototype.remove = function(i) {
+  delete this.blocks[i];
 
   this.emit('change');
 };
@@ -99,33 +91,25 @@ exports.Block = Block;
  * 
  * @since 0.0.1
  */
-function Block(elem, doc) {
+function Block(elem) {
   events.EventEmitter.call(this);
 
-  this.doc = elem;
-  this.doc = doc;
-
-  var dataRef = dataStore.get(elem);
-  dataRef.block = this;
-
-  this.handle = elem.children[0];
-  this.content = elem.children[1];
-  this.controls = elem.children[2];
-
-  this.handle.contentEditable = 'false';
-  this.controls.contentEditable = 'false';
-
-  // listen on keydown events
-  dom.addEventListener(elem, 'keydown', function(ev) {
-    this.emit('change');
-  });
-
-  // dataRef.draggable = dnd.makeDraggable(elem, this.handle);
+  this.elem = elem;
 };
 
 oo.extend(Block, events.EventEmitter);
 
-Block.prototype.toHTML = function() {
+Block.prototype.getElement = function() {
+  return this.elem;
+};
+
+Block.prototype.setElement = function(elem) {
+  this.elem = elem;
+
+  this.emit('change');
+};
+
+Block.prototype.toXML = function() {
   var result = '';
   var content = this.content;
 
@@ -144,4 +128,15 @@ Block.prototype.toHTML = function() {
   result += '</' + tagName + '>';
 
   return result;
+};
+
+exports.BlockSelectionModel = BlockSelectionModel;
+
+function BlockSelectionModel() {
+  this.firstBlock = null;
+  this.lastBlock = null;
+}
+
+BlockSelectionModel.prototype.isEmpty = function() {
+  return this.firstBlock === null || this.lastBlock === null;
 };

@@ -69,10 +69,6 @@ h2:first-child {
   margin-top: 0;
 }
 
-.mesh-content {
-  line-height: 1.5;
-}
-
 #mesh-status {
   background: #eee;
   border-top: 1px solid #aaa;
@@ -105,13 +101,13 @@ h2:first-child {
 
 .mesh-content {
   border: 1px solid #ddd;
-  padding: .1em;
-
+  padding: 1px;
   width: 100%;
   min-width: 100%;
   max-width: 100%;
   min-height: 30em;
-
+  line-height: 1.5;
+  position: relative;
   -ms-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -o-box-sizing: border-box;
@@ -123,19 +119,13 @@ h2:first-child {
   outline: none;
 }
 
-.mesh-content .block,#mesh-results .block {
-  position: relative;
-}
-
-.mesh-content .handle,#mesh-results .handle {
-  background: url(res/metal.png);
+.mesh-block-handle {
+  background: url("res/metal.png");
   cursor: move;
   position: absolute;
   left: 0;
-  top: 0;
-  bottom: 0;
-  width: .5em;
-  visibility: hidden;
+  width: 10px;
+  /*visibility: hidden;*/
 }
 
 .mesh-content .block ul,.mesh-content .block ol {
@@ -223,19 +213,24 @@ h2:first-child {
   user-select: none;
 }
 
-.mesh-content blockquote {
-  border-left: 3px solid #999;
-  padding: .3em 1em;
+/* no margin between blocks */
+.mesh-content>.selected {
+  background: #fafafa;
+}
+
+.mesh-content p {
   margin: 0;
+  padding: 1em 16px;
+}
+
+.mesh-content blockquote {
+  color: #555;
+  margin: 0;
+  padding: 1em 1em 1em 2em;
 }
 
 .mesh-content pre {
   font-family: monospace;
-  margin: 0;
-}
-
-/* no margin between blocks */
-.mesh-content p {
   margin: 0;
 }
 
