@@ -123,17 +123,16 @@ h2:first-child {
   background: url("res/metal.png");
   cursor: move;
   position: absolute;
-  left: 0;
+  left: -12px;
+  top: 0;
+  height: 0;
   width: 10px;
-  /*visibility: hidden;*/
-}
 
-.mesh-content .block ul,.mesh-content .block ol {
-  margin: 0;
-}
-
-.mesh-content>:hover>.handle,#mesh-results>:hover>.handle {
-  visibility: visible;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .mesh-content .controls,#mesh-results .controls {
@@ -205,7 +204,7 @@ h2:first-child {
   margin: .5em;
 }
 
-.mesh-content[unselectable=on] {
+[unselectable=on] {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -215,7 +214,7 @@ h2:first-child {
 
 /* no margin between blocks */
 .mesh-content>.selected {
-  background: #fafafa;
+  background: #f5f5f5;
 }
 
 .mesh-content p {
