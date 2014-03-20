@@ -35,7 +35,8 @@ exports.onReady = function(cb) {
  * Creates an `HTMLElement` with an optional class.
  * 
  * @param {String} tagName - tag name of the element
- * @param {String} [className] - class that the element should have
+ * @param {String} [className] - class that the element should have (may be
+ *                space seperated list of classes)
  * 
  * @returns {HTMLElement} created element
  * 
@@ -45,7 +46,10 @@ exports.createElement = function(tagName, className) {
   var elem = document.createElement(tagName);
 
   if (className) {
-    exports.addClass(elem, className);
+    var classes = className.split(' ');
+    for (var i = 0; i < classes.length; i++) {
+      exports.addClass(elem, classes[i]);
+    }
   }
 
   return elem;
