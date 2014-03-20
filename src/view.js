@@ -2,6 +2,7 @@
  * @module view
  */
 
+var events = require('events');
 var model = require('./model.js');
 var dom = require('./dom.js');
 var oo = require('./oo.js');
@@ -20,6 +21,8 @@ exports.EditorView = EditorView;
 function EditorView() {
   this.model = null;
 }
+
+oo.extend(EditorView, events.EventEmitter);
 
 EditorView.prototype.setModel = function(model) {
   this.model = model;
@@ -67,9 +70,11 @@ exports.ContentEditableView = ContentEditableView;
 function ContentEditableView(content, conf, escaped) {
   EditorView.call(this);
 
+  this.selectionModel = null;
   this.conf = conf;
 
   this.setModel(new model.DocumentModel(content, escaped));
+  this.setSelectionModel(new model.BlockSelectionModel(null, null));
 
   this.elem = dom.createElement('div');
 
@@ -79,22 +84,51 @@ function ContentEditableView(content, conf, escaped) {
 
   this.updateView();
 
-  var blockHandle = dom.createElement('div', 'mesh-block-handle');
+  var blockHandle = dom.createElement('div', 'mesh-block-handle no-content');
   blockHandle.contentEditable = false;
-  $(blockHandle).css({
-    'position' : 'absolute',
-    'left' : '-12px'
+
+  var view = this;
+
+  this.dragging = false;
+
+  var handleStartY;
+  var dragStartY;
+
+  $(blockHandle).bind('mousedown', function(e) {
+    var selModel = view.getSelectionModel();
+    if (selModel.isEmpty()) {
+      return;
+    }
+    view.dragging = true;
+
+    // make editor unselectable
+    // view.getElement().setAttribute('unselectable', 'on');
+
+    dragStartY = e.pageY;
+    handleStartY = blockHandle.offsetTop;
   });
 
-  $(blockHandle).bind('mousedown', function() {
+  $(blockHandle).bind('mousemove', function(e) {
+    if (!view.dragging) {
+      return;
+    }
 
+    $(blockHandle).css('top', handleStartY + e.pageY - dragStartY);
+    
+    
+  });
+
+  $(blockHandle).bind('mouseup', function(e) {
+    if (!view.dragging) {
+      return;
+    }
+
+    view.dragging = false;
   });
 
   this.elem.appendChild(blockHandle);
 
-  var view = this;
-
-  $(this.getElement()).bind('mouseup keyup', function(e) {
+  $(this.getElement()).bind('click keyup', function(e) {
     if (e.type === 'keyup' && e.keyCode < 33 && e.keyCode > 40) {
       // when the pressed key was not a selection key, return
       // selection keys are the arrow keys, home and end
@@ -106,9 +140,6 @@ function ContentEditableView(content, conf, escaped) {
 
     // only single selection is supported, so this is ok
     var range = selection.getRangeAt(0);
-
-    console.log(selection);
-    console.log(range);
 
     var m = view.getModel();
     var size = m.length();
@@ -149,8 +180,12 @@ function ContentEditableView(content, conf, escaped) {
       $(blockHandle).animate({
         'top' : handleTop,
         'height' : handleHeight
+      }, {
+        queue : false
       });
     }
+
+    view.setSelectionModel(new model.BlockSelectionModel(first, last));
   });
 }
 
@@ -174,4 +209,14 @@ ContentEditableView.prototype.updateView = function() {
   }
 
   this.getElement().appendChild(docFrgmt);
+};
+
+ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
+  this.selectionModel = selectionModel;
+
+  this.emit('selection');
+};
+
+ContentEditableView.prototype.getSelectionModel = function() {
+  return this.selectionModel;
 };
