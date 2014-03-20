@@ -132,11 +132,19 @@ Block.prototype.toXML = function() {
 
 exports.BlockSelectionModel = BlockSelectionModel;
 
-function BlockSelectionModel() {
-  this.firstBlock = null;
-  this.lastBlock = null;
+function BlockSelectionModel(first, last) {
+  this.firstBlock = first;
+  this.lastBlock = last;
 }
 
 BlockSelectionModel.prototype.isEmpty = function() {
   return this.firstBlock === null || this.lastBlock === null;
+};
+
+BlockSelectionModel.prototype.getFirst = function() {
+  return this.firstBlock;
+};
+
+BlockSelectionModel.prototype.getLast = function() {
+  return this.lastBlock;
 };
