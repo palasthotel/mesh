@@ -20,7 +20,7 @@ exports.DocumentModel = DocumentModel;
  * @class Document
  * @constructor
  * 
- * @param {String} content - content of the document
+ * @param {String} [content] - content of the document
  * @param {Boolean} [escaped=false] - is the given `content` XML escaped?
  * 
  * @extends EventEmitter
@@ -31,8 +31,12 @@ function DocumentModel(content, escaped) {
   events.EventEmitter.call(this);
 
   var blocks = this.blocks = [];
-  var blocksDiv = document.createElement('div');
 
+  if (typeof content == 'undefined' || content === null) {
+    return; // if there's no content, leave blocks empty
+  }
+
+  var blocksDiv = document.createElement('div');
   if (escaped) {
     blocksDiv.innerHTML = util.xmlDecode(content);
   } else {
@@ -43,9 +47,6 @@ function DocumentModel(content, escaped) {
     blocks.push(new BlockModel(child));
   });
 }
-
-// inheritance
-oo.extend(DocumentModel, events.EventEmitter);
 
 DocumentModel.prototype.length = function() {
   return this.blocks.length;
@@ -59,10 +60,20 @@ DocumentModel.prototype.set = function(i, block) {
   this.blocks[i] = block;
 };
 
-DocumentModel.prototype.remove = function(i) {
-  delete this.blocks[i];
+DocumentModel.prototype.append = function(block) {
+  this.blocks.push(block);
+};
 
-  this.emit('change');
+DocumentModel.prototype.remove = function(i) {
+  var newBlocks = [];
+
+  for (var j = 0; j < this.blocks.length; j++) {
+    if (j != i) {
+      newBlocks.push(this.blocks[j]);
+    }
+  }
+
+  this.blocks = newBlocks;
 };
 
 DocumentModel.prototype.toXML = function() {
@@ -95,6 +106,10 @@ function BlockModel(elem) {
   events.EventEmitter.call(this);
 
   this.elem = elem;
+
+  if (elem.innerHTML == '') {
+    elem.innerHTML = '<br/>';
+  }
 };
 
 oo.extend(BlockModel, events.EventEmitter);
