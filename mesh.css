@@ -101,18 +101,12 @@ h2:first-child {
 
 .mesh-content {
   border: 1px solid #ddd;
-  padding: 1px;
   width: 100%;
+  margin-bottom: 1em;
   min-width: 100%;
   max-width: 100%;
   min-height: 30em;
   line-height: 1.5;
-  position: relative;
-  -ms-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -o-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
 }
 
 .mesh-content:focus {
@@ -162,9 +156,8 @@ h2:first-child {
   border: 1px solid #fff;
   padding-left: 12px;
   padding-right: 12px;
-  margin-top: 0;
-  margin-bottom: 1px;
-  border: 1px solid #fff;
+  margin: 1px;
+  border: 1px solid transparent;
 }
 
 .mesh-block.ui-sortable-helper {
@@ -212,8 +205,9 @@ h2:first-child {
 
 .mesh-content blockquote {
   color: #555;
-  margin: 0;
-  padding: 1em 1em 1em 2em;
+  margin: .5em 0 .5em 1em;
+  padding: .5em 1em .5em 1em;
+  border-left: 2px solid #ddd;
 }
 
 .mesh-content pre {
