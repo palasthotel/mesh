@@ -105,7 +105,6 @@ h2:first-child {
   margin-bottom: 1em;
   min-width: 100%;
   max-width: 100%;
-  min-height: 30em;
   line-height: 1.5;
 }
 
@@ -113,43 +112,47 @@ h2:first-child {
   outline: none;
 }
 
-.mesh-content .controls,#mesh-results .controls {
-  padding: 1px;
+.mesh-controls {
   position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  visibility: hidden;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  display: none;
 }
 
-.mesh-content .controls .remove {
+.mesh-controls>div {
+  background-repeat: no-repeat;
+  cursor: pointer;
+  padding-bottom: 1px;
   width: 14px;
   height: 14px;
-  background-image: url('res/remove.png');
-}
-
-.mesh-content .controls .attrs {
+  cursor: pointer;
+  padding-bottom: 1px;
   width: 14px;
   height: 14px;
-  background-image: url('res/attrs.png');
-}
-
-.mesh-content :hover .controls {
-  visibility: visible;
-}
-
-.mesh-content .controls div {
   opacity: .6;
   cursor: pointer;
   margin-bottom: 1px;
 }
 
-.mesh-content .controls div:hover {
+.mesh-controls>div:hover {
   opacity: 1.0;
 }
 
-.mesh-content .controls div:active {
+.mesh-controls>div:active {
   opacity: .8;
+}
+
+.mesh-remove {
+  background-image: url('res/remove.png');
+}
+
+.mesh-attrs {
+  background-image: url('res/attrs.png');
+}
+
+.mesh-block:hover .mesh-controls {
+  display: block;
 }
 
 .mesh-block {
@@ -164,11 +167,11 @@ h2:first-child {
   background: rgba(255, 255, 255, .8);
 }
 
-.mesh-block:hover .mesh-handle {
+.mesh-block:hover .mesh-handle,.mesh-block.ui-sortable-helper .mesh-handle {
   display: block;
 }
 
-.mesh-block:hover {
+.mesh-block:hover,.mesh-block.ui-sortable-helper {
   border-color: #aaa;
 }
 
@@ -180,7 +183,7 @@ h2:first-child {
   background: #f5f5f5;
   border: 1px solid #eee;
   padding: 1em;
-  margin: 1em 1px;
+  margin: 1em 1em;
 }
 
 .mesh-block {
