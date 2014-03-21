@@ -145,16 +145,16 @@ BlockModel.prototype.toXML = function() {
   return result;
 };
 
-exports.BlockSelectionModel = BlockSelectionModel;
+exports.SelectionModel = SelectionModel;
 
-function BlockSelectionModel(selected) {
+function SelectionModel(selected) {
   this.selected = selected;
 }
 
-BlockSelectionModel.prototype.isEmpty = function() {
+SelectionModel.prototype.isEmpty = function() {
   return this.selected === null;
 };
 
-BlockSelectionModel.prototype.getSelectedBlock = function() {
+SelectionModel.prototype.getSelectedBlock = function() {
   return this.selected;
 };
