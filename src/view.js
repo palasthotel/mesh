@@ -76,7 +76,7 @@ function ContentEditableView(content, conf, escaped) {
   this.setModel(new model.DocumentModel(content, escaped));
 
   // initialize with empty selection model
-  this.setSelectionModel(new model.BlockSelectionModel(null, null));
+  this.setSelectionModel(new model.BlockSelectionModel(null));
 
   this.elem = dom.createElement('div');
 
@@ -93,10 +93,14 @@ function ContentEditableView(content, conf, escaped) {
     handle : '.mesh-handle',
     placeholder : 'mesh-placeholder',
     stop : function stopSort() {
+      // remove selection when the document is sorted
       rangy.getSelection().removeAllRanges();
       view.updateModel();
     }
   });
+
+  this.getModel().append(new model.BlockModel(dom.createElement('p')));
+  this.updateView();
 
   // Update the selection model on click and keyup
   $(this.elem).bind('click keyup', function selectionChange(e) {
@@ -122,10 +126,12 @@ function ContentEditableView(content, conf, escaped) {
     for (var i = 0; i < size; i++) {
       var blockElem = m.get(i).getElement();
 
+      $(blockElem.parentNode).removeClass('focus');
+
       if (dom.containsNode(blockElem, range.startContainer)) {
         // remember first block
         selected = blockElem;
-        break;
+        $(blockElem.parentNode).addClass('focus');
       }
     }
 
@@ -143,32 +149,38 @@ ContentEditableView.prototype.getElement = function() {
   return this.elem;
 };
 
+/**
+ * This method gets called whenever the model changed and the changes shall be
+ * applied to the view accordingly.
+ */
 ContentEditableView.prototype.updateView = function() {
   var m = this.getModel();
   var docFrgmt = document.createDocumentFragment();
 
+  $(this.getElement()).find('.mesh-block').remove();
+
   // build the view
   var size = m.length();
   for (var i = 0; i < size; i++) {
-    var block = dom.createElement('div', 'mesh-block');
+    var blockView = new BlockView(m.get(i), this);
 
-    // content
-    var blockContent = m.get(i).getElement();
-    block.appendChild(blockContent);
-
-    // handle
-    var blockHandle = dom.createElement('div', 'mesh-handle');
-    blockHandle.contentEditable = false;
-    $(blockHandle).disableSelection();
-    block.appendChild(blockHandle);
-
-    // controls
-    block.appendChild(dom.createElement('div', 'mesh-controls'));
-
-    docFrgmt.appendChild(block);
+    docFrgmt.appendChild(blockView.getElement());
   }
 
   this.getElement().appendChild(docFrgmt);
+};
+
+/**
+ * This method gets called whenever the view changed and the changes shall be
+ * applied to the model accordingly.
+ */
+ContentEditableView.prototype.updateModel = function() {
+  var docModel = new model.DocumentModel();
+  $(this.getElement()).find('.mesh-block').each(function() {
+    docModel.append(this.children[0]);
+  });
+
+  this.emit('change');
 };
 
 ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
@@ -179,4 +191,63 @@ ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
 
 ContentEditableView.prototype.getSelectionModel = function() {
   return this.selectionModel;
+};
+
+// BLOCK VIEW
+
+exports.BlockView = BlockView;
+
+function BlockView(blockModel, documentView) {
+  var wrapper = dom.createElement('div', 'mesh-block');
+
+  // content
+  var content = blockModel.getElement();
+
+  // drag handle
+  var handle = dom.createElement('div', 'mesh-handle');
+  handle.contentEditable = false;
+  $(handle).disableSelection();
+
+  // block controls
+  var controls = dom.createElement('div', 'mesh-controls');
+  controls.contentEditable = false;
+  $(controls).disableSelection();
+
+  // remove button
+  var remove = dom.createElement('div', 'mesh-remove');
+  $(remove).click(function onRemoveBlock() {
+    $(wrapper).fadeOut(400, function() {
+      $(wrapper).remove();
+
+      documentView.updateModel();
+
+      rangy.getSelection().removeAllRanges();
+
+      if (documentView.getModel().length() == 0) {
+        // if there is no other content, add an empty paragraph
+        var p = document.createElement('p');
+        documentView.getModel().append(new model.BlockModel(p));
+        documentView.updateView();
+      }
+    });
+  });
+
+  // attribute editor button
+  var attrs = dom.createElement('div', 'mesh-attrs');
+  $(attrs).click(function onEditBlockAttributes() {
+    // TODO show attribute editor
+  });
+
+  controls.appendChild(remove);
+  controls.appendChild(attrs);
+
+  wrapper.appendChild(content);
+  wrapper.appendChild(handle);
+  wrapper.appendChild(controls);
+
+  this.elem = wrapper;
+}
+
+BlockView.prototype.getElement = function() {
+  return this.elem;
 };
