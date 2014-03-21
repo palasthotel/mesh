@@ -76,7 +76,7 @@ function ContentEditableView(content, conf, escaped) {
   this.setModel(new model.DocumentModel(content, escaped));
 
   // initialize with empty selection model
-  this.setSelectionModel(new model.BlockSelectionModel(null));
+  this.setSelectionModel(new model.SelectionModel(null));
 
   this.elem = dom.createElement('div');
 
@@ -94,13 +94,10 @@ function ContentEditableView(content, conf, escaped) {
     placeholder : 'mesh-placeholder',
     stop : function stopSort() {
       // remove selection when the document is sorted
-      rangy.getSelection().removeAllRanges();
+      view.deselectAll();
       view.updateModel();
     }
   });
-
-  this.getModel().append(new model.BlockModel(dom.createElement('p')));
-  this.updateView();
 
   // Update the selection model on click and keyup
   $(this.elem).bind('click keyup', function selectionChange(e) {
@@ -135,7 +132,7 @@ function ContentEditableView(content, conf, escaped) {
       }
     }
 
-    view.setSelectionModel(new model.BlockSelectionModel(selected));
+    view.setSelectionModel(new model.SelectionModel(selected));
   });
 }
 
@@ -191,6 +188,15 @@ ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
 
 ContentEditableView.prototype.getSelectionModel = function() {
   return this.selectionModel;
+};
+
+/**
+ * Deselect every
+ */
+ContentEditableView.prototype.deselectAll = function() {
+  rangy.getSelection().removeAllRanges();
+  this.setSelectionModel(new model.SelectionModel(null));
+  $(this.getElement()).find('.mesh-block').removeClass('focus');
 };
 
 // BLOCK VIEW
