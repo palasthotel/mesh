@@ -40,7 +40,7 @@ function DocumentModel(content, escaped) {
   }
 
   util.forEach(blocksDiv.children, function(child) {
-    blocks.push(new Block(child));
+    blocks.push(new BlockModel(child));
   });
 }
 
@@ -76,7 +76,7 @@ DocumentModel.prototype.toXML = function() {
 
 // BLOCK
 
-exports.Block = Block;
+exports.BlockModel = BlockModel;
 
 /**
  * Document Block (e.g. paragraph, figure, ...).
@@ -91,25 +91,25 @@ exports.Block = Block;
  * 
  * @since 0.0.1
  */
-function Block(elem) {
+function BlockModel(elem) {
   events.EventEmitter.call(this);
 
   this.elem = elem;
 };
 
-oo.extend(Block, events.EventEmitter);
+oo.extend(BlockModel, events.EventEmitter);
 
-Block.prototype.getElement = function() {
+BlockModel.prototype.getElement = function() {
   return this.elem;
 };
 
-Block.prototype.setElement = function(elem) {
+BlockModel.prototype.setElement = function(elem) {
   this.elem = elem;
 
   this.emit('change');
 };
 
-Block.prototype.toXML = function() {
+BlockModel.prototype.toXML = function() {
   var result = '';
   var content = this.content;
 
@@ -132,19 +132,14 @@ Block.prototype.toXML = function() {
 
 exports.BlockSelectionModel = BlockSelectionModel;
 
-function BlockSelectionModel(first, last) {
-  this.firstBlock = first;
-  this.lastBlock = last;
+function BlockSelectionModel(selected) {
+  this.selected = selected;
 }
 
 BlockSelectionModel.prototype.isEmpty = function() {
-  return this.firstBlock === null || this.lastBlock === null;
+  return this.selected === null;
 };
 
-BlockSelectionModel.prototype.getFirst = function() {
-  return this.firstBlock;
-};
-
-BlockSelectionModel.prototype.getLast = function() {
-  return this.lastBlock;
+BlockSelectionModel.prototype.getSelectedBlock = function() {
+  return this.selected;
 };
