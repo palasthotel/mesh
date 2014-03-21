@@ -86,49 +86,15 @@ function ContentEditableView(content, conf, escaped) {
 
   var blockHandle = dom.createElement('div', 'mesh-block-handle no-content');
   blockHandle.contentEditable = false;
+  $(blockHandle).disableSelection(); // make unselectable
 
   var view = this;
 
-  this.dragging = false;
-
-  var handleStartY;
-  var dragStartY;
-
-  $(blockHandle).bind('mousedown', function(e) {
-    var selModel = view.getSelectionModel();
-    if (selModel.isEmpty()) {
-      return;
-    }
-    view.dragging = true;
-
-    // make editor unselectable
-    // view.getElement().setAttribute('unselectable', 'on');
-
-    dragStartY = e.pageY;
-    handleStartY = blockHandle.offsetTop;
+  $(this.elem).sortable({
+    handle : '.mesh-block-handle'
   });
 
-  $(blockHandle).bind('mousemove', function(e) {
-    if (!view.dragging) {
-      return;
-    }
-
-    $(blockHandle).css('top', handleStartY + e.pageY - dragStartY);
-    
-    
-  });
-
-  $(blockHandle).bind('mouseup', function(e) {
-    if (!view.dragging) {
-      return;
-    }
-
-    view.dragging = false;
-  });
-
-  this.elem.appendChild(blockHandle);
-
-  $(this.getElement()).bind('click keyup', function(e) {
+  $(this.elem).bind('click keyup', function selectionChange(e) {
     if (e.type === 'keyup' && e.keyCode < 33 && e.keyCode > 40) {
       // when the pressed key was not a selection key, return
       // selection keys are the arrow keys, home and end
@@ -156,12 +122,6 @@ function ContentEditableView(content, conf, escaped) {
         first = blockElem;
       }
 
-      if (first !== null && last === null) {
-        $(blockElem).addClass('selected');
-      } else {
-        $(blockElem).removeClass('selected');
-      }
-
       // if we didn't find the first block yet, skip to next block
       if (first === null) {
         continue;
@@ -174,18 +134,23 @@ function ContentEditableView(content, conf, escaped) {
     }
 
     // set size and position of the block handle
-    if (first && last) {
-      var handleTop = first.offsetTop;
-      var handleHeight = last.offsetTop + last.offsetHeight - first.offsetTop;
-      $(blockHandle).animate({
-        'top' : handleTop,
-        'height' : handleHeight
-      }, {
-        queue : false
-      });
+    if (!first || !last) {
+      return;
+    }
+
+    // unwrap old selection
+    var selModel = view.getSelectionModel();
+    if (!selModel.isEmpty()) {
+      $(dom.allBetween(selModel.getFirst(), selModel.getLast())).unwrap();
     }
 
     view.setSelectionModel(new model.BlockSelectionModel(first, last));
+
+    // wrap selected blocks
+    var wrapper = dom.createElement('div', 'selection-wrapper');
+    $(dom.allBetween(first, last)).wrapAll(wrapper);
+
+    // wrapper.appendChild(blockHandle);
   });
 }
 
