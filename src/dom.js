@@ -226,10 +226,6 @@ exports.nodeToXML = function(node) {
   return result;
 };
 
-exports.addEventListener = function(element, event, callback) {
-  element.addEventListener(event, callback);
-};
-
 exports.containsNode = function(ancestor, child) {
   while (child.parentNode != null) {
     if (child.parentNode === ancestor)
@@ -239,4 +235,40 @@ exports.containsNode = function(ancestor, child) {
   }
 
   return false;
+};
+
+/**
+ * Selects all elements between `start` and `end`.
+ * 
+ * If `end` is not found, this function will return all elements until there is
+ * no next element.
+ * 
+ * @param {HTMLElement} start
+ * @param {HTMLElement} end
+ * 
+ * @returns {Array<HTMLElement>}
+ */
+exports.allBetween = function(start, end) {
+  if (start === null || end === null) {
+    return [];
+  }
+
+  var result = [ start ];
+
+  if (start.isSameNode(end)) {
+    return result;
+  }
+
+  var next = start.nextSibling;
+  while (next !== null) {
+    result.push(next);
+
+    if (end.isSameNode(next)) {
+      break;
+    }
+
+    next = next.nextSibling;
+  }
+
+  return result;
 };
