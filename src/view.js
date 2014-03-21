@@ -70,30 +70,35 @@ exports.ContentEditableView = ContentEditableView;
 function ContentEditableView(content, conf, escaped) {
   EditorView.call(this);
 
-  this.selectionModel = null;
   this.conf = conf;
 
+  // create and set document model
   this.setModel(new model.DocumentModel(content, escaped));
+
+  // initialize with empty selection model
   this.setSelectionModel(new model.BlockSelectionModel(null, null));
 
   this.elem = dom.createElement('div');
 
   // set contenteditable
-  $(this.elem).attr('contenteditable', true);
+  this.elem.contentEditable = true;
+
   $(this.elem).addClass('mesh-content');
 
   this.updateView();
-
-  var blockHandle = dom.createElement('div', 'mesh-block-handle no-content');
-  blockHandle.contentEditable = false;
-  $(blockHandle).disableSelection(); // make unselectable
-
   var view = this;
 
   $(this.elem).sortable({
-    handle : '.mesh-block-handle'
+    axis : 'y',
+    handle : '.mesh-handle',
+    placeholder : 'mesh-placeholder',
+    stop : function stopSort() {
+      rangy.getSelection().removeAllRanges();
+      view.updateModel();
+    }
   });
 
+  // Update the selection model on click and keyup
   $(this.elem).bind('click keyup', function selectionChange(e) {
     if (e.type === 'keyup' && e.keyCode < 33 && e.keyCode > 40) {
       // when the pressed key was not a selection key, return
@@ -138,19 +143,7 @@ function ContentEditableView(content, conf, escaped) {
       return;
     }
 
-    // unwrap old selection
-    var selModel = view.getSelectionModel();
-    if (!selModel.isEmpty()) {
-      $(dom.allBetween(selModel.getFirst(), selModel.getLast())).unwrap();
-    }
-
     view.setSelectionModel(new model.BlockSelectionModel(first, last));
-
-    // wrap selected blocks
-    var wrapper = dom.createElement('div', 'selection-wrapper');
-    $(dom.allBetween(first, last)).wrapAll(wrapper);
-
-    // wrapper.appendChild(blockHandle);
   });
 }
 
@@ -168,9 +161,25 @@ ContentEditableView.prototype.updateView = function() {
   var m = this.getModel();
   var docFrgmt = document.createDocumentFragment();
 
+  // build the view
   var size = m.length();
   for (var i = 0; i < size; i++) {
-    docFrgmt.appendChild(m.get(i).getElement());
+    var block = dom.createElement('div', 'mesh-block');
+
+    // content
+    var blockContent = m.get(i).getElement();
+    block.appendChild(blockContent);
+
+    // handle
+    var blockHandle = dom.createElement('div', 'mesh-handle');
+    blockHandle.contentEditable = false;
+    $(blockHandle).disableSelection();
+    block.appendChild(blockHandle);
+
+    // controls
+    block.appendChild(dom.createElement('div', 'mesh-controls'));
+
+    docFrgmt.appendChild(block);
   }
 
   this.getElement().appendChild(docFrgmt);
