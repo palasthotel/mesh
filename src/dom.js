@@ -10,6 +10,8 @@
 var events = require('events');
 var util = require('./util.js');
 
+var dom = module.exports;
+
 /**
  * Called when the DOM is ready.
  * 
@@ -23,7 +25,7 @@ var util = require('./util.js');
  * 
  * @since 0.0.1
  */
-exports.onReady = function(cb) {
+dom.onReady = function(cb) {
   if (/in/.test(document.readyState)) {
     setTimeout(ready, 9, cb);
   } else {
@@ -42,13 +44,13 @@ exports.onReady = function(cb) {
  * 
  * @since 0.0.1
  */
-exports.createElement = function(tagName, className) {
+dom.createElement = function(tagName, className) {
   var elem = document.createElement(tagName);
 
   if (className) {
     var classes = className.split(' ');
     for (var i = 0; i < classes.length; i++) {
-      exports.addClass(elem, classes[i]);
+      dom.addClass(elem, classes[i]);
     }
   }
 
@@ -64,7 +66,7 @@ exports.createElement = function(tagName, className) {
  * 
  * @since 0.0.1
  */
-exports.isElement = function(node) {
+dom.isElement = function(node) {
   return node.nodeType === 1;
 };
 
@@ -77,7 +79,7 @@ exports.isElement = function(node) {
  * 
  * @since 0.0.1
  */
-exports.isTextNode = function(node) {
+dom.isTextNode = function(node) {
   return node.nodeType === 3;
 }
 
@@ -94,7 +96,7 @@ exports.isTextNode = function(node) {
  * 
  * @since 0.0.1
  */
-exports.hasType = function(elem, type) {
+dom.hasType = function(elem, type) {
   return elem.nodeName === type;
 };
 
@@ -106,7 +108,7 @@ exports.hasType = function(elem, type) {
  * 
  * @since 0.0.1
  */
-exports.addClass = function(elem, className) {
+dom.addClass = function(elem, className) {
   if (elem.classList)
     return elem.classList.add(className);
 
@@ -126,7 +128,7 @@ exports.addClass = function(elem, className) {
  * 
  * @since 0.0.1
  */
-exports.hasClass = function(elem, className) {
+dom.hasClass = function(elem, className) {
   if (elem.classList)
     return elem.classList.contains(className);
 
@@ -142,7 +144,7 @@ exports.hasClass = function(elem, className) {
  * 
  * @since 0.0.1
  */
-exports.removeClass = function(elem, className) {
+dom.removeClass = function(elem, className) {
   if (elem.classList)
     return elem.classList.remove(className);
 
@@ -167,7 +169,7 @@ exports.removeClass = function(elem, className) {
  * 
  * @since 0.0.1
  */
-exports.getFirstClass = function(elem) {
+dom.getFirstClass = function(elem) {
   if (elem.classList)
     return elem.classList[0];
 
@@ -182,7 +184,7 @@ exports.getFirstClass = function(elem) {
  * 
  * @since 0.0.1
  */
-exports.replaceNode = function(a, b) {
+dom.replaceNode = function(a, b) {
   a.parentNode.replaceChild(b, a);
 };
 
@@ -195,7 +197,7 @@ exports.replaceNode = function(a, b) {
  * 
  * @since 0.0.1
  */
-exports.nodeToXML = function(node) {
+dom.nodeToXML = function(node) {
   var result;
 
   if (node instanceof HTMLElement) {
@@ -226,7 +228,7 @@ exports.nodeToXML = function(node) {
   return result;
 };
 
-exports.containsNode = function(ancestor, child) {
+dom.containsNode = function(ancestor, child) {
   while (child.parentNode != null) {
     if (child.parentNode === ancestor)
       return true;
@@ -248,7 +250,7 @@ exports.containsNode = function(ancestor, child) {
  * 
  * @returns {Array<HTMLElement>}
  */
-exports.allBetween = function(start, end) {
+dom.allBetween = function(start, end) {
   if (start === null || end === null) {
     return [];
   }
