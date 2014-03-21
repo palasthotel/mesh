@@ -123,12 +123,12 @@ function ContentEditableView(content, conf, escaped) {
     for (var i = 0; i < size; i++) {
       var blockElem = m.get(i).getElement();
 
-      $(blockElem.parentNode).removeClass('focus');
+      $(blockElem.parentNode).removeClass('mesh-focus');
 
       if (dom.containsNode(blockElem, range.startContainer)) {
         // remember first block
         selected = blockElem;
-        $(blockElem.parentNode).addClass('focus');
+        $(blockElem.parentNode).addClass('mesh-focus');
       }
     }
 
@@ -221,6 +221,7 @@ function BlockView(blockModel, documentView) {
 
   // remove button
   var remove = dom.createElement('div', 'mesh-remove');
+  $(remove).attr('title', 'remove');
   $(remove).click(function onRemoveBlock() {
     $(wrapper).fadeOut(400, function() {
       $(wrapper).remove();
@@ -240,6 +241,7 @@ function BlockView(blockModel, documentView) {
 
   // attribute editor button
   var attrs = dom.createElement('div', 'mesh-attrs');
+  $(attrs).attr('title', 'edit attributes');
   $(attrs).click(function onEditBlockAttributes() {
     // TODO show attribute editor
   });
