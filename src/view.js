@@ -115,35 +115,21 @@ function ContentEditableView(content, conf, escaped) {
     var m = view.getModel();
     var size = m.length();
 
-    // first and last selected block
-    var first = null, last = null;
+    // selected block
+    var selected = null;
 
-    // highlight all selected blocks
+    // highlight the selected block
     for (var i = 0; i < size; i++) {
       var blockElem = m.get(i).getElement();
 
       if (dom.containsNode(blockElem, range.startContainer)) {
         // remember first block
-        first = blockElem;
-      }
-
-      // if we didn't find the first block yet, skip to next block
-      if (first === null) {
-        continue;
-      }
-
-      if (dom.containsNode(blockElem, range.endContainer)) {
-        // remember last block
-        last = blockElem;
+        selected = blockElem;
+        break;
       }
     }
 
-    // set size and position of the block handle
-    if (!first || !last) {
-      return;
-    }
-
-    view.setSelectionModel(new model.BlockSelectionModel(first, last));
+    view.setSelectionModel(new model.BlockSelectionModel(selected));
   });
 }
 
