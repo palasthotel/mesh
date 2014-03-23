@@ -43,6 +43,7 @@ function Editor(textarea, conf) {
   this._conf = conf;
   // undoStack
   this._undo = new undo.UndoStack(conf.undoSize);
+  this._delayedEdit = null;
 
   // set the view according to configuration
   if (conf.defaultView === 'textarea') {
@@ -60,11 +61,19 @@ function Editor(textarea, conf) {
 oo.extend(Editor, events.EventEmitter);
 
 Editor.prototype.onSelect = function onSelect() {
-
 };
 
 Editor.prototype.onEdit = function onEdit(event) {
-  // TODO undo stack
+  var editor = this;
+
+  // cancel last undo stack change
+  if (this._delayedEdit !== null) {
+    clearTimeout(this._delayedEdit);
+  }
+
+  this._delayedEdit = setTimeout(function delayedEdit() {
+    console.log(editor.getView().getModel().toXML());
+  }, this._conf.undoDelay);
 };
 
 Editor.prototype.setView = function(v) {
