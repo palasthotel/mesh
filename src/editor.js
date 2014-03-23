@@ -38,11 +38,11 @@ function Editor(textarea, conf) {
 
   util.requires(dom.hasType(textarea, 'TEXTAREA'), 'not a <textarea>');
 
-  this.textarea = textarea;
+  this._textarea = textarea;
 
-  this.conf = conf;
+  this._conf = conf;
   // undoStack
-  this.undo = new undo.UndoStack(conf.undoSize);
+  this._undo = new undo.UndoStack(conf.undoSize);
 
   // set the view according to configuration
   if (conf.defaultView === 'textarea') {
@@ -59,15 +59,33 @@ function Editor(textarea, conf) {
 
 oo.extend(Editor, events.EventEmitter);
 
+Editor.prototype.onSelect = function onSelect() {
+
+};
+
+Editor.prototype.onEdit = function onEdit(event) {
+  // TODO undo stack
+};
+
 Editor.prototype.setView = function(v) {
-  this.view = v;
+  var editor = this;
+  this._view = v;
 
   // replace textarea
   if (v instanceof view.ContentEditableView) {
     dom.replaceNode(this.textarea, this.view.getElement());
   }
+
+  // register event listeners
+  v.on('select', function(selection) {
+    editor.onSelect(selection);
+  });
+
+  v.on('edit', function(event) {
+    editor.onEdit(event);
+  });
 };
 
 Editor.prototype.getView = function() {
-  return this.view;
+  return this._view;
 };
