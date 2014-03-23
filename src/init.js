@@ -1,16 +1,6 @@
-/**
- * Main module and entry point to Mesh.
- * 
- * @module main
- * @author Paul Vorbach
- */
-
-// $/jQuery is not imported by browserify, but instead is used as a global
-// variable
-var editor = require('./editor.js');
-var dom = require('./dom.js');
-var util = require('./util.js');
 var config = require('./config.js');
+var editor = require('./editor.js');
+var util = require('./util.js');
 
 /**
  * Called when the editor is initialized.
@@ -18,7 +8,6 @@ var config = require('./config.js');
  * @callback InitCallback
  * @param {Error} error
  * @param {Editor} editor
- * 
  */
 
 /**
@@ -30,7 +19,7 @@ var config = require('./config.js');
  * 
  * @since 0.0.1
  */
-exports.init = function init(textarea, conf, cb) {
+module.exports = function init(textarea, conf, cb) {
   // extend default configuration with given conf
   var thisConf = util.extend(config.DEFAULT, conf);
 

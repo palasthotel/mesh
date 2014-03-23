@@ -73,7 +73,7 @@ Editor.prototype.setView = function(v) {
 
   // replace textarea
   if (v instanceof view.ContentEditableView) {
-    dom.replaceNode(this.textarea, this.view.getElement());
+    dom.replaceNode(this._textarea, this._view.getElement());
   }
 
   // register event listeners

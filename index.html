@@ -16,7 +16,11 @@
       <textarea class="mesh-content">&lt;p&gt;Single line text without formatting&lt;/p&gt;
 &lt;p&gt;Text with &lt;b&gt;some&lt;/b&gt; &lt;i&gt;form&lt;b&gt;atting&lt;/b&gt;&lt;/i&gt;&lt;br&gt;
 A &lt;a href=&quot;/&quot;&gt;Link&lt;/a&gt;&lt;/p&gt;
-&lt;blockquote&gt;Quote&lt;/blockquote&gt;</textarea>
+&lt;blockquote&gt;Quote&lt;/blockquote&gt;
+&lt;ul&gt;
+  &lt;li&gt;Unsorted&lt;/li&gt;
+  &lt;li&gt;List&lt;/li&gt;
+&lt;/ul&gt;</textarea>
       <div id="mesh-status"></div>
       <div id="mesh-actions">
         <button id="mesh-source-preview">Source preview</button>
@@ -48,8 +52,10 @@ A &lt;a href=&quot;/&quot;&gt;Link&lt;/a&gt;&lt;/p&gt;
   <script type="text/javascript" src="lib/jquery.ui.sortable.js"></script>
   <script type="text/javascript" src="lib/rangy.js"></script>
   <script type="text/javascript" src="mesh.js"></script>
+  <script type="text/javascript" src="mesh-plugins.js"></script>
   <script type="text/javascript">
     var mesh = require('mesh');
+    var plugins = require('mesh-plugins');
 
     // set configuration here
     var conf = {
