@@ -3,5 +3,6 @@ node_modules
 bak.src
 bower_components
 mesh.js
+mesh-plugins.js
 out
 tmp.js
