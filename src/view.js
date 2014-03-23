@@ -95,6 +95,7 @@ function ContentEditableView(content, conf, escaped) {
       // remove selection when the document is sorted
       view.deselectAll();
       view.updateModel();
+      view.emit('edit');
     }
   });
 
@@ -103,7 +104,9 @@ function ContentEditableView(content, conf, escaped) {
     if (e.type === 'keyup' && (e.keyCode < 33 || e.keyCode > 40)) {
       // when the pressed key was not a selection key, sth. has been edited
       // selection keys are the arrow keys, home and end
-      view.emit('edit', e);
+      if (!e.ctrlKey) {
+        view.emit('edit', e);
+      }
     } else {
       // selection change
       view.onSelect(rangy.getSelection());
@@ -182,8 +185,6 @@ ContentEditableView.prototype.updateModel = function() {
   $(this.getElement()).find('.mesh-block').each(function() {
     docModel.append(this.children[0]);
   });
-
-  this.emit('edit');
 };
 
 ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
@@ -233,6 +234,7 @@ function BlockView(blockModel, documentView) {
       $(wrapper).remove();
 
       documentView.updateModel();
+      documentView.emit('edit');
 
       rangy.getSelection().removeAllRanges();
 
