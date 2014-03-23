@@ -206,15 +206,15 @@ dom.nodeToXML = function(node) {
 
     // add attributes
     util.forEach(node.attributes, function(attr) {
-      result += ' ' + attr.name + '="' + attr.value;
+      result += ' ' + attr.name + '="' + attr.value+'"';
     });
 
     if (node.childNodes.length > 0) {
       result += '>';
 
       // add childNodes
-      util.forEach(elem.childNodes, function(node) {
-        result += nodeToXML(node);
+      util.forEach(node.childNodes, function(node) {
+        result += dom.nodeToXML(node);
       });
 
       result += '</' + tagName + '>';
