@@ -151,6 +151,10 @@ h2:first-child {
   background-image: url('res/attrs.png');
 }
 
+.mesh-code {
+  background-image: url('res/code.png');
+}
+
 .mesh-block:hover .mesh-controls {
   display: block;
 }
