@@ -19,17 +19,17 @@ exports.EditorView = EditorView;
  * @abstract
  */
 function EditorView() {
-  this.model = null;
+  this._model = null;
 }
 
 oo.extend(EditorView, events.EventEmitter);
 
 EditorView.prototype.setModel = function(model) {
-  this.model = model;
+  this._model = model;
 };
 
 EditorView.prototype.getModel = function() {
-  return this.model;
+  return this._model;
 };
 
 exports.TextareaView = TextareaView;
@@ -72,12 +72,6 @@ function ContentEditableView(content, conf, escaped) {
 
   this.conf = conf;
 
-  // create and set document model
-  this.setModel(new model.DocumentModel(content, escaped));
-
-  // initialize with empty selection model
-  this.setSelectionModel(new model.SelectionModel(null));
-
   this.elem = dom.createElement('div');
 
   // set contenteditable
@@ -85,7 +79,12 @@ function ContentEditableView(content, conf, escaped) {
 
   $(this.elem).addClass('mesh-content');
 
-  this.updateView();
+  // initialize with empty selection model
+  this.setSelectionModel(new model.SelectionModel(null));
+
+  // create and set document model
+  this.setModel(new model.DocumentModel(content, escaped));
+
   var view = this;
 
   $(this.elem).sortable({
@@ -114,6 +113,11 @@ function ContentEditableView(content, conf, escaped) {
 
 // inheritance
 oo.extend(ContentEditableView, EditorView);
+
+ContentEditableView.prototype.setModel = function(model) {
+  this._model = model;
+  this.updateView();
+};
 
 ContentEditableView.prototype.onSelect = function(selection) {
   // only single selection is supported, so this is ok

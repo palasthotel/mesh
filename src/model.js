@@ -36,14 +36,14 @@ function DocumentModel(content, escaped) {
     return; // if there's no content, leave blocks empty
   }
 
-  var blocksDiv = document.createElement('div');
+  var initHelper = document.createElement('div');
   if (escaped) {
-    blocksDiv.innerHTML = util.xmlDecode(content);
+    initHelper.innerHTML = util.xmlDecode(content);
   } else {
-    blocksDiv.innerHTML = content;
+    initHelper.innerHTML = content;
   }
 
-  util.forEach(blocksDiv.children, function(child) {
+  util.forEach(initHelper.children, function(child) {
     blocks.push(new BlockModel(child));
   });
 }
@@ -128,7 +128,7 @@ BlockModel.prototype.setElement = function(elem) {
 BlockModel.prototype.toXML = function() {
   var result = '';
 
-  return dom.nodeToXML(this.getElement());
+  return dom.nodeToXML(this.getElement()) + '\n';
 };
 
 exports.SelectionModel = SelectionModel;

@@ -7,9 +7,10 @@
  * @since 0.0.1
  */
 
-var events = require('events');
 var dom = require('./dom.js');
+var events = require('events');
 var oo = require('./oo.js');
+var model = require('./model.js');
 var util = require('./util.js');
 var undo = require('./undo.js');
 var view = require('./view.js');
@@ -56,6 +57,36 @@ function Editor(textarea, conf) {
     throw new exceptions.InvalidConfigurationException('no such view: "'
         + conf.defaultView + '"');
   }
+
+  this._undo.addState(this.getView().getModel().toXML());
+
+  // handle key shortcuts
+  var editor = this;
+  $(document).bind('keyup', function(e) {
+    if (!e.ctrlKey)
+      return;
+
+    // CTRL + Z -> undo
+    if (e.keyCode === 90) {
+      // CTRL + SHIFT + Z -> redo
+      if (e.shiftKey) {
+        // default behavior for Macs
+        editor.redo();
+      } else {
+        editor.undo();
+      }
+
+      e.preventDefault();
+      return false;
+    }
+    // CTRL + Y -> redo
+    else if (e.keyCode == 89) {
+      editor.redo();
+
+      e.preventDefault();
+      return false;
+    }
+  });
 };
 
 oo.extend(Editor, events.EventEmitter);
@@ -72,8 +103,25 @@ Editor.prototype.onEdit = function onEdit(event) {
   }
 
   this._delayedEdit = setTimeout(function delayedEdit() {
+    // push the new state to undo stack
+    editor._undo.addState(editor.getView().getModel().toXML());
     console.log(editor.getView().getModel().toXML());
   }, this._conf.undoDelay);
+};
+
+Editor.prototype.undo = function onUndo() {
+  this.getView().deselectAll();
+  if (this._undo.hasPreviousState()) {
+    this.getView().setModel(
+        new model.DocumentModel(this._undo.getPreviousState()));
+  }
+};
+
+Editor.prototype.redo = function onRedo() {
+  this.getView().deselectAll();
+  if (this._undo.hasNextState()) {
+    this.getView().setModel(new model.DocumentModel(this._undo.getNextState()));
+  }
 };
 
 Editor.prototype.setView = function(v) {
