@@ -80,7 +80,7 @@ DocumentModel.prototype.toXML = function() {
   var result = '';
   var length = this.length();
   for (var i = 0; i < length; i++) {
-    result += dom.nodeToXML(this.get(i));
+    result += this.get(i).toXML();
   }
   return result;
 };
@@ -105,8 +105,9 @@ exports.BlockModel = BlockModel;
 function BlockModel(elem) {
   events.EventEmitter.call(this);
 
-  this.elem = elem;
+  this._elem = elem;
 
+  // empty models get a single <br> so they have at least one line
   if (elem.innerHTML == '') {
     elem.innerHTML = '<br/>';
   }
@@ -115,34 +116,19 @@ function BlockModel(elem) {
 oo.extend(BlockModel, events.EventEmitter);
 
 BlockModel.prototype.getElement = function() {
-  return this.elem;
+  return this._elem;
 };
 
 BlockModel.prototype.setElement = function(elem) {
-  this.elem = elem;
+  this._elem = elem;
 
   this.emit('change');
 };
 
 BlockModel.prototype.toXML = function() {
   var result = '';
-  var content = this.content;
 
-  var tagName;
-  if (dom.hasType(content, 'DIV'))
-    tagName = dom.getFirstClass(content);
-  else
-    tagName = this.content.tagName.toLowerCase();
-
-  result += '<' + tagName + '>';
-
-  util.forEach(content.childNodes, function(node) {
-    result += dom.nodeToXML(node);
-  });
-
-  result += '</' + tagName + '>';
-
-  return result;
+  return dom.nodeToXML(this.getElement());
 };
 
 exports.SelectionModel = SelectionModel;
