@@ -13,8 +13,19 @@
  * @type {Object}
  */
 exports.DEFAULT = {
+  // number of different states that can be saved in the undo history stack
   undoSize : 50,
+
+  // if nothing happens for this amount of milliseconds, save the current state
+  // to the undo history stack
   undoDelay : 700,
+
+  // if nothing happens for this amout of milliseconds, clean up the code
+  // (if enabled)
+  cleanupDelay : 10000,
+
+  // delay after which the status bar will be updated
   statusDelay : 1000,
+
   defaultView : 'contenteditable'
 };
