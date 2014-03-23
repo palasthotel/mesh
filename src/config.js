@@ -18,7 +18,7 @@ exports.DEFAULT = {
 
   // if nothing happens for this amount of milliseconds, save the current state
   // to the undo history stack
-  undoDelay : 700,
+  undoDelay : 800,
 
   // if nothing happens for this amout of milliseconds, clean up the code
   // (if enabled)
