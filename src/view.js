@@ -99,45 +99,47 @@ function ContentEditableView(content, conf, escaped) {
     }
   });
 
-  // Update the selection model on click and keyup
+  // Listen for mouse and keyboard events
   $(this.elem).bind('click keyup', function selectionChange(e) {
-    if (e.type === 'keyup' && e.keyCode < 33 && e.keyCode > 40) {
-      // when the pressed key was not a selection key, return
+    if (e.type === 'keyup' && (e.keyCode < 33 || e.keyCode > 40)) {
+      // when the pressed key was not a selection key, sth. has been edited
       // selection keys are the arrow keys, home and end
-      return;
+      view.emit('edit', e);
+    } else {
+      // selection change
+      view.onSelect(rangy.getSelection());
     }
-
-    // get the selection
-    var selection = rangy.getSelection();
-
-    // only single selection is supported, so this is ok
-    var range = selection.getRangeAt(0);
-
-    var m = view.getModel();
-    var size = m.length();
-
-    // selected block
-    var selected = null;
-
-    // highlight the selected block
-    for (var i = 0; i < size; i++) {
-      var blockElem = m.get(i).getElement();
-
-      $(blockElem.parentNode).removeClass('mesh-focus');
-
-      if (dom.containsNode(blockElem, range.startContainer)) {
-        // remember first block
-        selected = blockElem;
-        $(blockElem.parentNode).addClass('mesh-focus');
-      }
-    }
-
-    view.setSelectionModel(new model.SelectionModel(selected));
   });
 }
 
 // inheritance
 oo.extend(ContentEditableView, EditorView);
+
+ContentEditableView.prototype.onSelect = function(selection) {
+  // only single selection is supported, so this is ok
+  var range = selection.getRangeAt(0);
+
+  var docModel = this.getModel();
+  var size = docModel.length();
+
+  // selected block
+  var selected = null;
+
+  // highlight the selected block
+  for (var i = 0; i < size; i++) {
+    var blockElem = docModel.get(i).getElement();
+
+    $(blockElem.parentNode).removeClass('mesh-focus');
+
+    if (dom.containsNode(blockElem, range.startContainer)) {
+      // remember first block
+      selected = blockElem;
+      $(blockElem.parentNode).addClass('mesh-focus');
+    }
+  }
+
+  this.setSelectionModel(new model.SelectionModel(selected));
+};
 
 /**
  * @returns {HTMLElement}
@@ -177,13 +179,13 @@ ContentEditableView.prototype.updateModel = function() {
     docModel.append(this.children[0]);
   });
 
-  this.emit('change');
+  this.emit('edit');
 };
 
 ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
   this.selectionModel = selectionModel;
 
-  this.emit('selection');
+  this.emit('select');
 };
 
 ContentEditableView.prototype.getSelectionModel = function() {
@@ -196,7 +198,7 @@ ContentEditableView.prototype.getSelectionModel = function() {
 ContentEditableView.prototype.deselectAll = function() {
   rangy.getSelection().removeAllRanges();
   this.setSelectionModel(new model.SelectionModel(null));
-  $(this.getElement()).find('.mesh-block').removeClass('focus');
+  $(this.getElement()).find('.mesh-block').removeClass('mesh-focus');
 };
 
 // BLOCK VIEW
@@ -246,8 +248,15 @@ function BlockView(blockModel, documentView) {
     // TODO show attribute editor
   });
 
+  var code = dom.createElement('div', 'mesh-code');
+  $(code).attr('title', 'edit code');
+  $(code).click(function onEditBlockCode() {
+    // TODO show code editor
+  });
+
   controls.appendChild(remove);
   controls.appendChild(attrs);
+  controls.appendChild(code);
 
   wrapper.appendChild(content);
   wrapper.appendChild(handle);
