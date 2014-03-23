@@ -19,40 +19,42 @@ exports.UndoStack = UndoStack;
  *                regain a previously persisted `UndoStack`.
  */
 function UndoStack(size, stack) {
-  if (typeof size === "undefined") {
+  if (typeof size === "undefined" || size <= 0) {
     size = 50;
   }
 
   if (typeof stack === "undefined") {
-    stack = [];
+    stack = new Array(size);
   }
 
-  this.size = size;
-  this.stack = stack;
-  this.cursor = stack.length - 1;
+  this._size = size;
+  this._stack = stack;
+  this._cursor = -1;
+  this._top = -1;
 }
 
 /**
- * Push back a new state.
+ * Add a new state.
  * 
  * @param {T} state
  */
-UndoStack.prototype.pushState = function(state) {
-  // lose states that have been popped before
-  if (this.cursor < this.stack.length - 1) {
-    this.stack = this.stack.slice(0, this.cursor);
-  }
+UndoStack.prototype.addState = function(state) {
+  this._cursor++;
 
-  if (this.cursor === this.size - 1) {
-    // if the stack has reached the maximum size, remove the first item
-    this.stack = this.stack.slice(1);
+  if (this._cursor == this._size) {
+    // remove the first item
+    this._stack = this._stack.slice(1);
+    this._stack.push(state); // append new state
+    this._cursor--; // decrement the cursor
   } else {
-    // otherwise, just increment the cursor
-    this.cursor++;
+    this._stack[this._cursor] = state;
   }
 
-  // push the new state
-  this.stack.push(state);
+  this._top = this._cursor;
+};
+
+UndoStack.prototype.hasPreviousState = function() {
+  return this._cursor > 0;
 };
 
 /**
@@ -60,13 +62,14 @@ UndoStack.prototype.pushState = function(state) {
  * 
  * @returns {T}
  */
-UndoStack.prototype.popState = function() {
-  this.cursor--;
+UndoStack.prototype.getPreviousState = function() {
+  return this._stack[--this._cursor];
+};
 
-  // can't pop state below zero, will return stack[0] instead
-  if (this.cursor < 0) {
-    this.cursor = 0;
-  }
+UndoStack.prototype.hasNextState = function() {
+  return this._cursor < this._top;
+};
 
-  return this.stack[this.cursor];
+UndoStack.prototype.getNextState = function() {
+  return this._stack[this._cursor++];
 };
