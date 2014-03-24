@@ -67,10 +67,13 @@ A &lt;a href=&quot;/&quot;&gt;Link&lt;/a&gt;&lt;/p&gt;
     };
 
     // get the textarea
-    var textarea = $('textarea.mesh-content')[0];
+    var $editor = $('#mesh-editor-1');
+    var textarea = $editor.find('.mesh-content')[0];
+    var toolbar = $editor.find('.mesh-tools')[0];
+    var statusbar = $editor.find('.mesh-status')[0];
 
     // initialize app
-    mesh.init(textarea, conf, function(err, ed) {
+    mesh.init(textarea, toolbar, statusbar, conf, function(err, ed) {
       // handle the error
       if (err) {
         console.error('Initialization failed.')

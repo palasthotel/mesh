@@ -14,24 +14,21 @@ var util = require('./util.js');
  * Initialize the editor.
  * 
  * @param {HTMLElement} textarea - `<textarea>`
+ * @param {HTMLElement} toolbar - toolbar element
+ * @param {HTMLElement} statusbar - statusbar element
  * @param {Object} conf - configuration object
  * @param {InitCallback} cb - initialization callback
  * 
  * @since 0.0.1
  */
-module.exports = function init(textarea, conf, cb) {
+module.exports = function init(textarea, toolbar, statusbar, conf, cb) {
   // extend default configuration with given conf
   var thisConf = util.extend(config.DEFAULT, conf);
 
   // when the dom is ready, set up the editor
   $(document).ready(function() {
     try {
-      var ed = new editor.Editor(textarea, thisConf);
-
-      var status = document.getElementById(thisConf.statusID);
-      ed.addListener('change', function() {
-        status.innerHTML = ed.elem.textContent.split(/\s+/).length + ' words';
-      });
+      var ed = new editor.Editor(textarea, toolbar, statusbar, thisConf);
 
       // return editor instance
       cb(null, ed);

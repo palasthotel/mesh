@@ -24,22 +24,34 @@ exports.Editor = Editor;
  * @constructor
  * 
  * @param {HTMLElement|String} textarea - textarea or id of a textarea
+ * @param {HTMLElement|String} toolbar - toolbar or id of the toolbar
+ * @param {HTMLElement|String} statusbar - status bar or id of the status bar
  * @param {Object} conf - configuration object
  * 
  * @extends EventEmitter
  * 
  * @since 0.0.1
  */
-function Editor(textarea, conf) {
+function Editor(textarea, toolbar, statusbar, conf) {
   events.EventEmitter.call(this);
 
   if (typeof textarea === 'string') {
     textarea = document.getElementById(textarea);
   }
 
+  if (typeof toolbar === 'string') {
+    toolbar = document.getElementById(toolbar);
+  }
+
+  if (typeof statusbar === 'string') {
+    statusbar = document.getElementById(statusbar);
+  }
+
   util.requires(dom.hasType(textarea, 'TEXTAREA'), 'not a <textarea>');
 
   this._textarea = textarea;
+  this._toolbar = toolbar;
+  this._statusbar = statusbar;
 
   this._conf = conf;
   // undoStack
@@ -95,6 +107,7 @@ Editor.prototype.onSelect = function onSelect() {
 };
 
 Editor.prototype.onEdit = function onEdit(event) {
+  // save ref to this (used by callbacks)
   var editor = this;
 
   // cancel last undo stack change
@@ -104,8 +117,8 @@ Editor.prototype.onEdit = function onEdit(event) {
 
   this._delayedEdit = setTimeout(function delayedEdit() {
     // push the new state to undo stack
-    editor._undo.addState(editor.getView().getModel().toXML());
-    console.log(editor.getView().getModel().toXML());
+    var newState = editor.getView().getModel().toXML();
+    editor._undo.addState(newState);
   }, this._conf.undoDelay);
 };
 
