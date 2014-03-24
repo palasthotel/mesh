@@ -206,6 +206,10 @@ dom.nodeToXML = function(node) {
 
     // add attributes
     util.forEach(node.attributes, function(attr) {
+      if (attr.name === 'style') {
+        return;
+      }
+
       result += ' ' + attr.name + '="' + attr.value + '"';
     });
 
