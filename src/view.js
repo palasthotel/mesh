@@ -257,9 +257,7 @@ function BlockView(blockModel, documentView) {
     var attrs = dom.createElement('div', 'mesh-attrs');
     $(attrs).attr('title', 'edit attributes');
     $(attrs).click(function onEditBlockAttributes() {
-      $('#mesh-attr-editor').fadeIn(400, function() {
-        console.log('attr')
-      });
+      documentView.emit('edit-block-attrs');
     });
     controls.appendChild(attrs);
   }
@@ -268,7 +266,7 @@ function BlockView(blockModel, documentView) {
     var code = dom.createElement('div', 'mesh-code');
     $(code).attr('title', 'edit code');
     $(code).click(function onEditBlockCode() {
-      // TODO show code editor
+      documentView.emit('edit-block-code');
     });
     controls.appendChild(code);
   }
@@ -282,4 +280,21 @@ function BlockView(blockModel, documentView) {
 
 BlockView.prototype.getElement = function() {
   return this._elem;
+};
+
+exports.BlockCodeEditorView = BlockCodeEditorView;
+
+function BlockCodeEditorView(elem) {
+  this._elem = elem;
+
+  var elem = document.createFragment();
+  // TODO
+}
+
+BlockCodeEditorView.setModel = function(code) {
+  $(this._textarea).val(code);
+};
+
+BlockCodeEditorView.getModel = function() {
+  $(this._textarea).val();
 };
