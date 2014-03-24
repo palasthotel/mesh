@@ -283,7 +283,7 @@ dom.createDivIfNotFound = function(id) {
   var elem = document.getElementById(id);
   if (elem === null) {
     elem = document.createElement('div');
-    elem.id = 'mesh-attribute-editor';
+    elem.id = id;
     document.body.appendChild(elem);
   }
   return elem;
