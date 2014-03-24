@@ -1,17 +1,31 @@
+exports.ControlPlugin = ControlPlugin;
 
-function ButtonPlugin(title, hint) {
-  this._title = hint;
+function ControlPlugin(title, hint) {
+  this._title = title;
   this._hint = hint;
 };
 
-ButtonPlugin.prototype.getName = function() {
-  return this._name;
+ControlPlugin.prototype.getTitle = function() {
+  return this._title;
 };
 
-ButtonPlugin.prototype.getHint = function() {
+ControlPlugin.prototype.getHint = function() {
   return null;
 };
 
-ButtonPlugin.prototype.getElement = function() {
-  return document.createElement('button');
+ControlPlugin.prototype.createControlElement = function() {
+  var button = document.createElement('button');
+  button.innerHTML = this.getTitle();
+
+  if (this.getHint() !== null) {
+    $(button).attr('title', this.getHint());
+  }
+
+  return button;
+};
+
+/**
+ * Override this method to change the action of this plugin.
+ */
+ControlPlugin.prototype.action = function(editor, selection) {
 };
