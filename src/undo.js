@@ -39,6 +39,10 @@ function UndoStack(size, stack) {
  * @param {T} state
  */
 UndoStack.prototype.addState = function(state) {
+  if (state === this._stack[this._top]) {
+    return;
+  }
+
   this._cursor++;
 
   if (this._cursor == this._size) {
@@ -51,6 +55,10 @@ UndoStack.prototype.addState = function(state) {
   }
 
   this._top = this._cursor;
+};
+
+UndoStack.prototype.getCurrentState = function() {
+  return this._stack[this._cursor];
 };
 
 UndoStack.prototype.hasPreviousState = function() {
@@ -71,5 +79,5 @@ UndoStack.prototype.hasNextState = function() {
 };
 
 UndoStack.prototype.getNextState = function() {
-  return this._stack[this._cursor++];
+  return this._stack[++this._cursor];
 };
