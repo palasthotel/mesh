@@ -296,7 +296,13 @@ dom.removeAllChildren = function(elem) {
 };
 
 var combinableElements = 'B,I,U,STRONG,EM,SUP,SUB'.split(',');
+var inheritedElements = 'B,I,U,STRONG,EM'.split(',');
+
 function isCombinable(node) {
+  return combinableElements.indexOf(node.nodeName) > -1;
+}
+
+function isInherited(node) {
   return combinableElements.indexOf(node.nodeName) > -1;
 }
 
@@ -306,6 +312,16 @@ dom.cleanupElement = function(elem) {
   var prevNode = null;
 
   util.forEach(elem.childNodes, function(childNode) {
+    // if the parent node of this node is of the same type, remove child node
+    // example: '<b>Hello <b>you</b>!</b>' --> '<b>Hello you!</b>'
+    if (elem.nodeName === childNode.nodeName && isInherited(childNode)) {
+      while (childNode.firstChild) {
+        elem.insertBefore(childNode.firstChild, childNode);
+      }
+
+      elem.removeChild(childNode);
+    }
+
     if (prevNode !== null) {
       // Combine elements of same type
       if (childNode.nodeType === 1 && prevNode.nodeType === 1
