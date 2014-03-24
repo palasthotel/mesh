@@ -144,14 +144,24 @@ BlockModel.prototype.toXML = function() {
 
 exports.SelectionModel = SelectionModel;
 
-function SelectionModel(selected) {
-  this.selected = selected;
+function SelectionModel(selectedElements) {
+  this.setSelectedElements(selectedElements);
 }
 
 SelectionModel.prototype.isEmpty = function() {
-  return this.selected === null;
+  return this._selected.length === 0;
 };
 
-SelectionModel.prototype.getSelectedBlock = function() {
-  return this.selected;
+SelectionModel.prototype.getSelectedElements = function() {
+  return this._selected;
 };
+
+/**
+ * @param {Array<BlockModel>} selectedElements
+ */
+SelectionModel.prototype.setSelectedElements = function(selectedElements) {
+  if (!selectedElements)
+    this._selected = [];
+  else
+    this._selected = selectedElements;
+}
