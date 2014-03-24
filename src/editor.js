@@ -26,13 +26,14 @@ exports.Editor = Editor;
  * @param {HTMLElement|String} textarea - textarea or id of a textarea
  * @param {HTMLElement|String} toolbar - toolbar or id of the toolbar
  * @param {HTMLElement|String} statusbar - status bar or id of the status bar
+ * @param {HTMLElement} plugins - plugins
  * @param {Object} conf - configuration object
  * 
  * @extends EventEmitter
  * 
  * @since 0.0.1
  */
-function Editor(textarea, toolbar, statusbar, conf) {
+function Editor(textarea, toolbar, statusbar, plugins, conf) {
   events.EventEmitter.call(this);
 
   if (typeof textarea === 'string') {
@@ -48,6 +49,8 @@ function Editor(textarea, toolbar, statusbar, conf) {
   }
 
   util.requires(dom.hasType(textarea, 'TEXTAREA'), 'not a <textarea>');
+
+  this._view = null;
 
   this._textarea = textarea;
   this._toolbar = toolbar;
@@ -168,6 +171,8 @@ Editor.prototype.setView = function(v) {
   v.on('edit', function(event) {
     editor.onEdit(event);
   });
+
+  this.emit('view-change');
 };
 
 Editor.prototype.getView = function() {
