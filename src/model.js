@@ -76,6 +76,12 @@ DocumentModel.prototype.remove = function(i) {
   this._blocks = newBlocks;
 };
 
+DocumentModel.prototype.cleanup = function() {
+  for (var i = 0; i < this._blocks.length; i++) {
+    this._blocks[i].cleanup();
+  }
+};
+
 DocumentModel.prototype.toXML = function() {
   var result = '';
   var length = this.length();
@@ -120,9 +126,14 @@ BlockModel.prototype.getElement = function() {
 };
 
 BlockModel.prototype.setElement = function(elem) {
+  dom.replaceNode(this._elem, elem);
   this._elem = elem;
 
   this.emit('change');
+};
+
+BlockModel.prototype.cleanup = function() {
+  this.setElement(dom.cleanupElement(this.getElement()));
 };
 
 BlockModel.prototype.toXML = function() {
