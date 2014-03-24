@@ -206,7 +206,7 @@ dom.nodeToXML = function(node) {
 
     // add attributes
     util.forEach(node.attributes, function(attr) {
-      result += ' ' + attr.name + '="' + attr.value+'"';
+      result += ' ' + attr.name + '="' + attr.value + '"';
     });
 
     if (node.childNodes.length > 0) {
@@ -274,3 +274,13 @@ dom.allBetween = function(start, end) {
 
   return result;
 };
+
+dom.createDivIfNotFound = function(id) {
+  var elem = document.getElementById(id);
+  if (elem === null) {
+    elem = document.createElement('div');
+    elem.id = 'mesh-attribute-editor';
+    document.body.appendChild(elem);
+  }
+  return elem;
+}
