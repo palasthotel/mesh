@@ -16,19 +16,20 @@ var util = require('./util.js');
  * @param {HTMLElement} textarea - `<textarea>`
  * @param {HTMLElement} toolbar - toolbar element
  * @param {HTMLElement} statusbar - statusbar element
- * @param {Object} conf - configuration object
+ * @param {Array<ControlPlugin>} plugins - array of enabled plugins
+ * @param {Object} conf - custom configuration object
  * @param {InitCallback} cb - initialization callback
  * 
  * @since 0.0.1
  */
-module.exports = function init(textarea, toolbar, statusbar, conf, cb) {
+module.exports = function init(textarea, toolbar, statusbar, plugins, conf, cb) {
   // extend default configuration with given conf
   var thisConf = util.extend(config.DEFAULT, conf);
 
   // when the dom is ready, set up the editor
   $(document).ready(function() {
     try {
-      var ed = new editor.Editor(textarea, toolbar, statusbar, thisConf);
+      var ed = new editor.Editor(textarea, toolbar, statusbar, plugins, thisConf);
 
       // return editor instance
       cb(null, ed);
