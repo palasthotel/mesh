@@ -9,10 +9,10 @@
 
 var dom = require('./dom.js');
 var events = require('events');
-var oo = require('./oo.js');
 var model = require('./model.js');
-var util = require('./util.js');
+var oo = require('./oo.js');
 var undo = require('./undo.js');
+var util = require('./util.js');
 var view = require('./view.js');
 
 exports.Editor = Editor;
@@ -52,6 +52,15 @@ function Editor(textarea, toolbar, statusbar, conf) {
   this._textarea = textarea;
   this._toolbar = toolbar;
   this._statusbar = statusbar;
+
+  this._attrEditor = null;
+  this._codeEditor = null;
+
+  if (conf.enableBlockAttrEditor) {
+    this._attrEditor = dom.createDivIfNotFound('mesh-attr-editor');
+  } else {
+    this._codeEditor = dom.createDivIfNotFound('mesh-code-editor');
+  }
 
   this._conf = conf;
   // undoStack

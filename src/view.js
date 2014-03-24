@@ -71,14 +71,14 @@ exports.ContentEditableView = ContentEditableView;
 function ContentEditableView(content, conf, escaped) {
   EditorView.call(this);
 
-  this.conf = conf;
+  this._conf = conf;
 
-  this.elem = dom.createElement('div');
+  this._elem = dom.createElement('div');
 
   // set contenteditable
-  this.elem.contentEditable = true;
+  this._elem.contentEditable = true;
 
-  $(this.elem).addClass('mesh-content');
+  $(this._elem).addClass('mesh-content');
 
   // initialize with empty selection model
   this.setSelectionModel(new model.SelectionModel(null));
@@ -88,7 +88,7 @@ function ContentEditableView(content, conf, escaped) {
 
   var view = this;
 
-  $(this.elem).sortable({
+  $(this._elem).sortable({
     axis : 'y',
     handle : '.mesh-handle',
     placeholder : 'mesh-placeholder',
@@ -101,7 +101,7 @@ function ContentEditableView(content, conf, escaped) {
   });
 
   // Listen for mouse and keyboard events
-  $(this.elem).bind('click keyup', function selectionChange(e) {
+  $(this._elem).bind('click keyup', function selectionChange(e) {
     if (e.type === 'keyup' && (e.keyCode < 33 || e.keyCode > 40)) {
       // when the pressed key was not a selection key, sth. has been edited
       // selection keys are the arrow keys, home and end
@@ -153,7 +153,7 @@ ContentEditableView.prototype.onSelect = function(selection) {
  * @returns {HTMLElement}
  */
 ContentEditableView.prototype.getElement = function() {
-  return this.elem;
+  return this._elem;
 };
 
 /**
@@ -250,31 +250,36 @@ function BlockView(blockModel, documentView) {
       }
     });
   });
-
-  // attribute editor button
-  var attrs = dom.createElement('div', 'mesh-attrs');
-  $(attrs).attr('title', 'edit attributes');
-  $(attrs).click(function onEditBlockAttributes() {
-    // TODO show attribute editor
-  });
-
-  var code = dom.createElement('div', 'mesh-code');
-  $(code).attr('title', 'edit code');
-  $(code).click(function onEditBlockCode() {
-    // TODO show code editor
-  });
-
   controls.appendChild(remove);
-  controls.appendChild(attrs);
-  controls.appendChild(code);
+
+  if (documentView._conf.enableBlockAttrEditor) {
+    // attribute editor button
+    var attrs = dom.createElement('div', 'mesh-attrs');
+    $(attrs).attr('title', 'edit attributes');
+    $(attrs).click(function onEditBlockAttributes() {
+      $('#mesh-attr-editor').fadeIn(400, function() {
+        console.log('attr')
+      });
+    });
+    controls.appendChild(attrs);
+  }
+
+  if (documentView._conf.enableBlockCodeEditor) {
+    var code = dom.createElement('div', 'mesh-code');
+    $(code).attr('title', 'edit code');
+    $(code).click(function onEditBlockCode() {
+      // TODO show code editor
+    });
+    controls.appendChild(code);
+  }
 
   wrapper.appendChild(content);
   wrapper.appendChild(handle);
   wrapper.appendChild(controls);
 
-  this.elem = wrapper;
+  this._elem = wrapper;
 }
 
 BlockView.prototype.getElement = function() {
-  return this.elem;
+  return this._elem;
 };

@@ -27,5 +27,11 @@ exports.DEFAULT = {
   // delay after which the status bar will be updated
   statusDelay : 1000,
 
-  defaultView : 'contenteditable'
+  defaultView : 'contenteditable',
+
+  // enables the attribute editor
+  enableBlockAttrEditor : true,
+
+  // enables the block code editor
+  enableBlockCodeEditor : true
 };
