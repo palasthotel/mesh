@@ -182,9 +182,12 @@ ContentEditableView.prototype.updateView = function() {
  */
 ContentEditableView.prototype.updateModel = function() {
   var docModel = new model.DocumentModel();
-  $(this.getElement()).find('.mesh-block').each(function() {
-    docModel.append(this.children[0]);
-  });
+  var blockElems = this.getElement().children;
+  var length = blockElems.length;
+  for (var i = 0; i < length; i++) {
+    docModel.append(new model.BlockModel(blockElems[i].children[0]));
+  }
+  this._model = docModel;
 };
 
 ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
