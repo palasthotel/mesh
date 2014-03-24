@@ -102,7 +102,6 @@ h2:first-child {
 .mesh-content {
   border: 1px solid #ddd;
   width: 100%;
-  margin-bottom: 1em;
   min-width: 100%;
   max-width: 100%;
   line-height: 1.5;
@@ -246,7 +245,7 @@ h2:first-child {
   font-size: 14px;
 }
 
-#mesh-attributes {
+#mesh-attr-editor, #mesh-code-editor {
   background: rgba(0, 0, 0, .6);
   display: none;
   position: fixed;
@@ -257,23 +256,23 @@ h2:first-child {
   bottom: 0;
 }
 
-#mesh-attributes table {
+#mesh-attr-editor table, #mesh-code-editor textarea {
   background: white;
   width: 570px;
   margin: 50px auto;
 }
 
-#mesh-attributes th {
+#mesh-attr-editor th {
   font-weight: normal;
   text-align: left;
 }
 
-#mesh-attributes table input {
+#mesh-attr-editor table input {
   font-family: monospace;
   width: 99%;
 }
 
-#mesh-attributes table td:last-child {
+#mesh-attr-editor table td:last-child {
   text-align: right;
 }
 
