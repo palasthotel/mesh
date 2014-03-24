@@ -1,10 +1,15 @@
 mesh
 ====
 
-A HTML5 content-editable and jQuery text-editor
-
+Mesh is a HTML5 WYSIWYG editor for HTML texts using the `contenteditable`
+attribute for making the HTML editable directly. It also allows you to sort
+entire paragraphs through drag and drop. It can be extended with plug-ins.
 
 ## Prerequisites
+
+This project uses [browserify](http://browserify.org/) as its build tool. To
+make the build process work, you need to install several tools. Follow the
+instructions below.
 
  1. Install [Node.js](http://nodejs.org/). This usually includes NPM.
 
@@ -64,7 +69,7 @@ A (likely outdated) version of the documentation can be found here:
 <http://palasthotel.github.io/mesh/api/current/>.
 
 
-## Final directory structure
+### Final directory structure
 
 Here's the directory structure you should have if you followed the instructions
 above.
