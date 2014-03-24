@@ -81,6 +81,7 @@ function Editor(textarea, toolbar, statusbar, conf) {
         + conf.defaultView + '"');
   }
 
+  this.getView().getModel().cleanup();
   this._undo.addState(this.getView().getModel().toXML());
 
   // handle key shortcuts
@@ -127,8 +128,10 @@ Editor.prototype.onEdit = function onEdit(event) {
   }
 
   this._delayedEdit = setTimeout(function delayedEdit() {
+    var model = editor.getView().getModel();
+    model.cleanup();
     // push the new state to undo stack
-    var newState = editor.getView().getModel().toXML();
+    var newState = model.toXML();
     editor._undo.addState(newState);
   }, this._conf.undoDelay);
 };
