@@ -58,7 +58,9 @@ function Editor(textarea, toolbar, statusbar, conf) {
 
   if (conf.enableBlockAttrEditor) {
     this._attrEditor = dom.createDivIfNotFound('mesh-attr-editor');
-  } else {
+  }
+
+  if (conf.enableBlockCodeEditor) {
     this._codeEditor = dom.createDivIfNotFound('mesh-code-editor');
   }
 
