@@ -30,7 +30,7 @@ exports.DocumentModel = DocumentModel;
 function DocumentModel(content, escaped) {
   events.EventEmitter.call(this);
 
-  var blocks = this.blocks = [];
+  var blocks = this._blocks = [];
 
   if (typeof content == 'undefined' || content === null) {
     return; // if there's no content, leave blocks empty
@@ -49,31 +49,31 @@ function DocumentModel(content, escaped) {
 }
 
 DocumentModel.prototype.length = function() {
-  return this.blocks.length;
+  return this._blocks.length;
 };
 
 DocumentModel.prototype.get = function(i) {
-  return this.blocks[i];
+  return this._blocks[i];
 };
 
 DocumentModel.prototype.set = function(i, block) {
-  this.blocks[i] = block;
+  this._blocks[i] = block;
 };
 
 DocumentModel.prototype.append = function(block) {
-  this.blocks.push(block);
+  this._blocks.push(block);
 };
 
 DocumentModel.prototype.remove = function(i) {
   var newBlocks = [];
 
-  for (var j = 0; j < this.blocks.length; j++) {
+  for (var j = 0; j < this._blocks.length; j++) {
     if (j != i) {
-      newBlocks.push(this.blocks[j]);
+      newBlocks.push(this._blocks[j]);
     }
   }
 
-  this.blocks = newBlocks;
+  this._blocks = newBlocks;
 };
 
 DocumentModel.prototype.toXML = function() {
