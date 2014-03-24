@@ -287,4 +287,61 @@ dom.createDivIfNotFound = function(id) {
     document.body.appendChild(elem);
   }
   return elem;
+};
+
+dom.removeAllChildren = function(elem) {
+  while (elem.firstChild) {
+    elem.removeChild(elem.firstChild);
+  }
+};
+
+var combinableElements = 'B,I,U,STRONG,EM'.split(',');
+function isCombinable(node) {
+  return combinableElements.indexOf(node.nodeName) > -1;
 }
+
+dom.cleanupElement = function(elem) {
+  // copy the existing element
+  var prevPrevNode = null;
+  var prevNode = null;
+
+  util.forEach(elem.childNodes, function(childNode) {
+    if (prevNode !== null) {
+      // Combine elements of same type
+      if (childNode.nodeType === 1 && prevNode.nodeType === 1
+          && prevNode.nodeName === childNode.nodeName
+          && isCombinable(childNode)) {
+
+        // do a cleanup
+        dom.cleanupElement(childNode);
+
+        // combine both elements
+        prevNode.innerHTML = prevNode.innerHTML + childNode.innerHTML;
+        return elem.removeChild(childNode);
+      }
+    }
+
+    if (prevNode !== null && prevPrevNode !== null) {
+      if (childNode.nodeType === 1 && prevNode.nodeType === 3
+          && prevPrevNode.nodeType === 1 && /^\s*$/.test(prevNode.textContent)
+          && isCombinable(childNode)) {
+        prevPrevNode.innerHTML = prevPrevNode.innerHTML + prevNode.textContent
+            + childNode.innerHTML;
+
+        elem.removeChild(prevNode);
+        elem.removeChild(childNode);
+
+        childNode = null;
+        prevNode = null;
+      }
+    } else {
+      dom.cleanupElement(childNode);
+    }
+
+    // backtracking
+    prevPrevNode = prevNode;
+    prevNode = childNode;
+  });
+
+  return elem;
+};
