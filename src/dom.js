@@ -295,7 +295,7 @@ dom.removeAllChildren = function(elem) {
   }
 };
 
-var combinableElements = 'B,I,U,STRONG,EM'.split(',');
+var combinableElements = 'B,I,U,STRONG,EM,SUP,SUB'.split(',');
 function isCombinable(node) {
   return combinableElements.indexOf(node.nodeName) > -1;
 }
