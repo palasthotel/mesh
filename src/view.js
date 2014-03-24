@@ -3,8 +3,9 @@
  */
 
 var events = require('events');
-var model = require('./model.js');
 var dom = require('./dom.js');
+var key = require('./key.js');
+var model = require('./model.js');
 var oo = require('./oo.js');
 var util = require('./util.js');
 
@@ -104,7 +105,7 @@ function ContentEditableView(content, conf, escaped) {
     if (e.type === 'keyup' && (e.keyCode < 33 || e.keyCode > 40)) {
       // when the pressed key was not a selection key, sth. has been edited
       // selection keys are the arrow keys, home and end
-      if (!e.ctrlKey) {
+      if (!e.ctrlKey && key.isAlterationKey(e.keyCode)) {
         view.emit('edit', e);
       }
     } else {
