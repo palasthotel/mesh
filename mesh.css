@@ -23,7 +23,7 @@ h2:first-child {
   padding: 1em;
 }
 
-#mesh-editor {
+.mesh-editor {
   float: left;
   width: 570px;
 }
@@ -69,7 +69,7 @@ h2:first-child {
   margin-top: 0;
 }
 
-#mesh-status {
+.mesh-status {
   background: #eee;
   border-top: 1px solid #aaa;
   padding: 4px;
@@ -77,15 +77,15 @@ h2:first-child {
   font-size: 0.7em;
 }
 
-#mesh-save {
+.mesh-save {
   float: right;
 }
 
-#mesh-title {
+.mesh-title {
   margin-bottom: .5em;
 }
 
-#mesh-title input {
+.mesh-title input {
   border: none;
   font-size: 2em;
   outline: none;
@@ -95,7 +95,7 @@ h2:first-child {
   width: 100%;
 }
 
-#mesh-attributes {
+.mesh-attributes {
   margin-bottom: 1em;
 }
 
@@ -223,26 +223,26 @@ h2:first-child {
   margin: 0;
 }
 
-#mesh-tools {
+.mesh-tools {
   background: #ccc;
   border: 1px outset #ddd;
   border-radius: 5px;
   margin-bottom: .5em;
 }
 
-#mesh-tools button {
+.mesh-tools button {
   font-family: serif;
 }
 
-#mesh-tools button:focus {
+.mesh-tools button:focus {
   outline: none;
 }
 
-#mesh-tools button.active {
+.mesh-tools button.active {
   border-style: inset;
 }
 
-#mesh-tools .fa {
+.mesh-tools .fa {
   font-size: 14px;
 }
 
