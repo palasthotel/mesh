@@ -220,7 +220,6 @@ ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
   var oldSelectionModel = this._selectionModel;
   this._selectionModel = selectionModel;
 
-  // TODO This is a hack (more or less). Figure out a nicer way to do it!
   // if the selection model is longer than 1, wrap the selection
   if (selectionModel.length > 1) {
     // remove selection
@@ -246,6 +245,7 @@ ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
       enableBlockCodeEditor : false
     });
   } else if (this._wrappedSelection) {
+    // get selected elements out of old selection model
     var selectedElements = [];
     var length = oldSelectionModel.length;
     for (var i = 0; i < length; i++) {
