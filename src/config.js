@@ -25,7 +25,7 @@ exports.DEFAULT = {
 
   defaultView : 'contenteditable',
 
-  textareaAlwaysVisible : true,
+  textareaAlwaysVisible : false,
 
   // enables the attribute editor
   enableBlockAttrEditor : true,
