@@ -20,18 +20,19 @@ exports.DEFAULT = {
   // to the undo history stack
   undoDelay : 800,
 
-  // if nothing happens for this amout of milliseconds, clean up the code
-  // (if enabled)
-  cleanupDelay : 10000,
-
   // delay after which the status bar will be updated
   statusDelay : 1000,
 
   defaultView : 'contenteditable',
 
+  textareaAlwaysVisible : true,
+
   // enables the attribute editor
   enableBlockAttrEditor : true,
 
   // enables the block code editor
-  enableBlockCodeEditor : true
+  enableBlockCodeEditor : true,
+
+  // enables spell checking
+  enableSpellChecking : true
 };
