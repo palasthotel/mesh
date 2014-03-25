@@ -36,10 +36,41 @@ function Button(editor, content, hint) {
   this._content = content;
   this._hint = hint;
 
+  this._enabled = true;
+  this._activated = false;
+
   ControlElement.call(this, editor);
 }
 
 oo.extend(Button, ControlElement);
+
+Button.prototype.setEnabled = function(enabled) {
+  if (!enabled) {
+    $(this.getElement()).addClass('disabled')
+  } else {
+    $(this.getElement()).removeClass('disabled');
+  }
+
+  this._enabled = enabled;
+};
+
+Button.prototype.isEnabled = function() {
+  return this._enabled;
+};
+
+Button.prototype.setActivated = function(activated) {
+  if (activated) {
+    $(this.getElement()).addClass('active')
+  } else {
+    $(this.getElement()).removeClass('active');
+  }
+
+  this._activated = activated;
+};
+
+Button.prototype.isActivated = function() {
+  return this._activated;
+};
 
 Button.prototype.getElement = function() {
   if (this._elem === null) {
@@ -49,6 +80,11 @@ Button.prototype.getElement = function() {
 
     $button.click(function onClick(e) {
       e.preventDefault();
+
+      // do nothing if not enabled
+      if (!button.isEnabled()) {
+        return;
+      }
 
       var editor = button.getEditor();
 
@@ -81,6 +117,16 @@ Button.prototype.getElement = function() {
 Button.prototype.action = function(selectionModel, range) {
   throw new exceptions.ImplementationMissingException(
       'Override ButtonPlugin.prototype.action()');
+};
+
+Button.prototype.selectionChange = function() {
+  var sel = rangy.getSelection();
+  if (sel.rangeCount === 0) {
+    return this.setActivated(false);
+  }
+
+  var range = sel.getRangeAt(0);
+  range
 };
 
 exports.Divider = Divider;
