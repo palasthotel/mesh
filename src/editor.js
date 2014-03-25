@@ -85,7 +85,11 @@ function Editor(textarea, toolbar, statusbar, plugins, conf) {
   }
 
   this.getView().getModel().cleanup();
-  this._undo.addState(this.getView().getModel().toXML());
+
+  // save cleaned state
+  var cleaned = this.getView().getModel().toXML();
+  $(this._textarea).val(cleaned);
+  this._undo.addState(cleaned);
 
   // handle key shortcuts
   var editor = this;
@@ -141,6 +145,7 @@ Editor.prototype.onEdit = function onEdit(event) {
     model.cleanup();
     // push the new state to undo stack
     var newState = model.toXML();
+    $(editor._textarea).val(newState);
     editor._undo.addState(newState);
   }, this._conf.undoDelay);
 };
@@ -164,9 +169,10 @@ Editor.prototype.setView = function(v) {
   var editor = this;
   this._view = v;
 
-  // replace textarea
+  // hide textarea and append view element
   if (v instanceof view.ContentEditableView) {
-    dom.replaceNode(this._textarea, this._view.getElement());
+    if (this._conf)
+      $(this._textarea).css('display', 'block').before(this._view.getElement());
   }
 
   // register event listeners
