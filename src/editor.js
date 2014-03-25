@@ -114,6 +114,12 @@ function Editor(textarea, toolbar, statusbar, plugins, conf) {
       return false;
     }
   });
+
+  this._controls = [];
+  var controlPlugins = plugins.controls;
+  for (var i = 0; i < controlPlugins.length; i++) {
+    this._controls.push(new controlPlugins[i](this));
+  }
 };
 
 oo.extend(Editor, events.EventEmitter);
@@ -177,4 +183,8 @@ Editor.prototype.setView = function(v) {
 
 Editor.prototype.getView = function() {
   return this._view;
+};
+
+Editor.prototype.getToolbar = function() {
+  return this._toolbar;
 };
