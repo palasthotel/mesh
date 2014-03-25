@@ -1,3 +1,4 @@
+var dom = require('./dom.js');
 var exceptions = require('./exceptions.js');
 var oo = require('./oo.js');
 
@@ -42,12 +43,33 @@ oo.extend(Button, ControlElement);
 
 Button.prototype.getElement = function() {
   if (this._elem === null) {
-    var $button = $('<div class="mesh-button" title="' + this._hint + '">'
-        + this._content + '</div>');
+    var $button = $('<button class="mesh-button" title="' + this._hint + '">'
+        + this._content + '</button>');
     var button = this;
 
-    $button.click(function() {
-      button.action();
+    $button.click(function onClick(e) {
+      e.preventDefault();
+
+      var editor = button.getEditor();
+
+      var viewElem = editor.getView().getElement();
+      var selectionModel = editor.getView().getSelectionModel();
+
+      var sel = rangy.getSelection();
+
+      // don't apply a range, if no one is selected
+      if (sel.rangeCount === 0) {
+        return button.action(selectionModel);
+      }
+
+      var range = sel.getRangeAt(0);
+      // determine if range is in editor
+      // if not, do nothing
+      if (!range.isValid() || !dom.containsNode(viewElem, range.startContainer)
+          || !dom.containsNode(viewElem, range.endContainer))
+        return false;
+
+      button.action(selectionModel, range);
     });
 
     this._elem = $button[0];
@@ -56,7 +78,7 @@ Button.prototype.getElement = function() {
   return this._elem;
 };
 
-Button.prototype.action = function() {
+Button.prototype.action = function(selectionModel, range) {
   throw new exceptions.ImplementationMissingException(
       'Override ButtonPlugin.prototype.action()');
 };
