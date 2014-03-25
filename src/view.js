@@ -129,6 +129,10 @@ ContentEditableView.prototype.setModel = function(model) {
 
 ContentEditableView.prototype.selected = function(selection) {
   // only single selection is supported, so this is ok
+  if (selection.rangeCount == 0) {
+    this.setSelectionModel([]);
+  }
+
   var range = selection.getRangeAt(0);
 
   var docModel = this.getModel();
@@ -231,11 +235,13 @@ ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
       selectedElements.push(selectionModel[i].getElement().parentNode);
     }
 
-    // wrap all
+    // wrap all selected elements in a new block
     $(selectedElements).wrapAll('<div class="mesh-block"></div>');
     // TODO a bit hacky. Is there another way to get reference to wrapper?
     var wrapper = selectionModel[0].getElement().parentNode.parentNode;
-    var blockView = addHandleAndControls(wrapper, this, {
+
+    // add handle and remove control
+    addHandleAndControls(wrapper, this, {
       enableBlockAttrEditor : false,
       enableBlockCodeEditor : false
     });
@@ -287,21 +293,20 @@ function addHandleAndControls(wrapper, documentView, conf) {
   var remove = dom.createElement('div', 'mesh-remove');
   $(remove).attr('title', 'remove');
   $(remove).click(function onRemoveBlock() {
-    $(wrapper).fadeOut(400, function() {
-      $(wrapper).remove();
+    // remove the element
+    $(wrapper).remove();
 
-      documentView.updateModel();
-      documentView.emit('edit');
+    documentView.updateModel();
+    documentView.emit('edit');
 
-      rangy.getSelection().removeAllRanges();
+    rangy.getSelection().removeAllRanges();
 
-      if (documentView.getModel().length() == 0) {
-        // if there is no other content, add an empty paragraph
-        var p = document.createElement('p');
-        documentView.getModel().append(new model.BlockModel(p));
-        documentView.updateView();
-      }
-    });
+    if (documentView.getModel().length() == 0) {
+      // if there is no other content, add an empty paragraph
+      var p = document.createElement('p');
+      documentView.getModel().append(new model.BlockModel(p));
+      documentView.updateView();
+    }
   });
   controls.appendChild(remove);
 
