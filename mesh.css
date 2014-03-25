@@ -106,7 +106,10 @@ h2:first-child {
   min-width: 100%;
   max-width: 100%;
   line-height: 1.5;
-  width: 100%;
+}
+
+textarea.mesh-content {
+  min-height: 30em;
 }
 
 .mesh-content:focus {
@@ -191,8 +194,8 @@ h2:first-child {
 }
 
 .mesh-placeholder {
-  background: #f5f5f5;
-  border: 1px solid #eee;
+  background: #eee;
+  border: 1px solid #ccc;
   padding: 1em;
   margin: 1em 1em;
 }
@@ -257,8 +260,6 @@ h2:first-child {
   border-radius: 3px;
   padding: 3px 5px;
   margin: 4px 0 5px 5px;
-  min-width: 1.2em;
-  max-width: 3em;
   text-align: center;
   text-shadow: 1px 1px 0 #eee;
   -webkit-box-shadow: 1px 1px 0 #999;
