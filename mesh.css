@@ -161,7 +161,7 @@ h2:first-child {
 .mesh-block {
   border: 1px solid #fff;
   padding-left: 12px;
-  padding-right: 12px;
+  padding-right: 16px;
   margin: 1px;
   border: 1px solid transparent;
 }
