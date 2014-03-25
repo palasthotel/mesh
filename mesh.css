@@ -273,6 +273,14 @@ textarea.mesh-content {
   box-shadow: 1px 1px 0 #999, inset 1px 1px 3px #bbb;
 }
 
+.mesh-button.disabled,.mesh-button.disabled:active {
+  background: linear-gradient(to bottom, #ddd 0%, #bbb 100%);
+  border-color: #bbb;
+  box-shadow: 1px 1px 0 #999;
+  color: #bbb;
+  outline: none;
+}
+
 .mesh-tools .fa {
   font-size: 14px;
 }
