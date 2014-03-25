@@ -167,7 +167,8 @@ h2:first-child {
 }
 
 .mesh-block.ui-sortable-helper {
-  background: rgba(255, 255, 255, .8);
+  background: rgba(255, 255, 255, .6);
+  opacity: 0.8;
 }
 
 .mesh-block.ui-sortable-helper .mesh-block {
