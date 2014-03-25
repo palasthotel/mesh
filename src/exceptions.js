@@ -9,6 +9,8 @@
 
 var oo = require('./oo.js');
 
+var exceptions = exports;
+
 /**
  * Standard exception.
  * 
@@ -19,13 +21,13 @@ var oo = require('./oo.js');
  * 
  * @since 0.0.1
  */
-exports.Exception = function Exception(message) {
+exceptions.Exception = function Exception(message) {
   Error.call(this, message);
 };
 
-exports.Exception.prototype.name = 'Exception';
+exceptions.Exception.prototype.name = 'Exception';
 
-exports.Exception.prototype.toString = function() {
+exceptions.Exception.prototype.toString = function() {
   return this.name + ': ' + this.message;
 };
 
@@ -44,13 +46,13 @@ exports.Exception.prototype.toString = function() {
  * 
  * @since 0.0.1
  */
-exports.NoSuchElementException = function NoSuchElementException(message) {
+exceptions.NoSuchElementException = function NoSuchElementException(message) {
   Exception.call(this, message);
 };
 
-exports.NoSuchElementException.prototype.name = 'NoSuchElementException';
+exceptions.NoSuchElementException.prototype.name = 'NoSuchElementException';
 
-oo.extend(exports.NoSuchElementException, exports.Exception);
+oo.extend(exceptions.NoSuchElementException, exceptions.Exception);
 
 /**
  * Illegal argument.
@@ -66,10 +68,32 @@ oo.extend(exports.NoSuchElementException, exports.Exception);
  * 
  * @since 0.0.1
  */
-exports.IllegalArgumentException = function IllegalArgumentException(message) {
+exceptions.IllegalArgumentException = function IllegalArgumentException(message) {
   Exception.call(this, message);
 };
 
-exports.IllegalArgumentException.prototype.name = 'IllegalArgumentException';
+exceptions.IllegalArgumentException.prototype.name = 'IllegalArgumentException';
 
-oo.extend(exports.IllegalArgumentException, exports.Exception);
+oo.extend(exceptions.IllegalArgumentException, exceptions.Exception);
+
+/**
+ * Not implemented.
+ * 
+ * Overriding this method is required.
+ * 
+ * @class NotImplementedException
+ * @constructor
+ * 
+ * @param {String} message - error message
+ * 
+ * @extends Exception
+ * 
+ * @since 0.0.1
+ */
+exceptions.NotImplementedException = function NotImplementedException(message) {
+  Exception.call(this, message);
+}
+
+exceptions.NotImplementedException.prototype.name = 'NotImplementedException';
+
+oo.extend(exceptions.NotImplementedException, exceptions.Exception);
