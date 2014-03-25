@@ -17,15 +17,16 @@ var exceptions = exports;
  * @class Exception
  * @constructor
  * 
+ * @param {String} name - name of the exception type
  * @param {String} message - error message
  * 
  * @since 0.0.1
  */
-exceptions.Exception = function Exception(message) {
-  Error.call(this, message);
+exceptions.Exception = function Exception(name, message) {
+  Error.call(this);
+  this.name = name;
+  this.message = message;
 };
-
-exceptions.Exception.prototype.name = 'Exception';
 
 exceptions.Exception.prototype.toString = function() {
   return this.name + ': ' + this.message;
@@ -47,10 +48,8 @@ exceptions.Exception.prototype.toString = function() {
  * @since 0.0.1
  */
 exceptions.NoSuchElementException = function NoSuchElementException(message) {
-  Exception.call(this, message);
+  exceptions.Exception.call(this, 'NoSuchElementException', message);
 };
-
-exceptions.NoSuchElementException.prototype.name = 'NoSuchElementException';
 
 oo.extend(exceptions.NoSuchElementException, exceptions.Exception);
 
@@ -69,10 +68,8 @@ oo.extend(exceptions.NoSuchElementException, exceptions.Exception);
  * @since 0.0.1
  */
 exceptions.IllegalArgumentException = function IllegalArgumentException(message) {
-  Exception.call(this, message);
+  exceptions.Exception.call(this, 'IllegalArgumentException', message);
 };
-
-exceptions.IllegalArgumentException.prototype.name = 'IllegalArgumentException';
 
 oo.extend(exceptions.IllegalArgumentException, exceptions.Exception);
 
@@ -90,10 +87,9 @@ oo.extend(exceptions.IllegalArgumentException, exceptions.Exception);
  * 
  * @since 0.0.1
  */
-exceptions.NotImplementedException = function NotImplementedException(message) {
-  Exception.call(this, message);
+exceptions.ImplementationMissingException = function ImplementationMissingException(
+    message) {
+  exceptions.Exception.call(this, 'NotImplementedException', message);
 }
 
-exceptions.NotImplementedException.prototype.name = 'NotImplementedException';
-
-oo.extend(exceptions.NotImplementedException, exceptions.Exception);
+oo.extend(exceptions.ImplementationMissingException, exceptions.Exception);
