@@ -56,6 +56,14 @@ function buttonSelectionChangeFor(nodeName) {
     }
 
     var range = sel.getRangeAt(0);
+    var viewElem = this.getEditor().getView().getElement();
+
+    if (!dom.containsNode(viewElem, range.startContainer)
+        || !dom.containsNode(viewElem, range.endContainer)) {
+      return this.setEnabled(false);
+    } else {
+      this.setEnabled(true);
+    }
 
     if (dom.matchParent(range.startContainer, nodeName) === null
         || dom.matchParent(range.endContainer, nodeName) === null) {
