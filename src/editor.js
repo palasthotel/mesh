@@ -129,6 +129,10 @@ function Editor(textarea, toolbar, statusbar, plugins, conf) {
 oo.extend(Editor, events.EventEmitter);
 
 Editor.prototype.onSelect = function onSelect() {
+  for (var i = 0; i < this._controls.length; i++) {
+    var control = this._controls[i];
+    control.selectionChange();
+  }
 };
 
 Editor.prototype.onEdit = function onEdit(event) {
@@ -169,10 +173,19 @@ Editor.prototype.setView = function(v) {
   var editor = this;
   this._view = v;
 
+  this._textarea.spellcheck = this._conf.enableSpellChecking;
+
   // hide textarea and append view element
   if (v instanceof view.ContentEditableView) {
-    if (this._conf)
-      $(this._textarea).css('display', 'block').before(this._view.getElement());
+    var displayValue = 'none';
+    if (this._conf.textareaAlwaysVisible) {
+      displayValue = 'block';
+    }
+
+    $(this._textarea).css('display', displayValue).before(
+        this._view.getElement());
+
+    this._view.getElement().spellcheck = this._conf.enableSpellChecking;
   }
 
   // register event listeners
