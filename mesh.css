@@ -101,10 +101,12 @@ h2:first-child {
 
 .mesh-content {
   border: 1px solid #ddd;
+  box-sizing: border-box;
   width: 100%;
   min-width: 100%;
   max-width: 100%;
   line-height: 1.5;
+  width: 100%;
 }
 
 .mesh-content:focus {
@@ -237,26 +239,52 @@ h2:first-child {
 }
 
 .mesh-tools {
-  background: #ccc;
-  border: 1px outset #ddd;
-  border-radius: 5px;
+  background: #eee;
+  border: 1px solid #aaa;
   margin-bottom: .5em;
+  position: relative;
+  overflow: hidden;
 }
 
-.mesh-tools button {
-  font-family: serif;
+.mesh-tools>div {
+  float: left;
 }
 
-.mesh-tools button:focus {
-  outline: none;
+.mesh-button {
+  background: #ddd;
+  background: linear-gradient(to bottom, #fff 0%, #d9d9d9 100%);
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 3px 5px;
+  margin: 4px 0 5px 5px;
+  min-width: 1.2em;
+  max-width: 3em;
+  text-align: center;
+  text-shadow: 1px 1px 0 #eee;
+  -webkit-box-shadow: 1px 1px 0 #999;
+  -moz-box-shadow: 1px 1px 0 #999;
+  box-shadow: 1px 1px 0 #999;
+  min-width: 1.2em;
 }
 
-.mesh-tools button.active {
-  border-style: inset;
+.mesh-button:active,.mesh-button.active {
+  background: linear-gradient(to bottom, #d9d9d9 0%, #fff 100%);
+  box-shadow: 1px 1px 0 #999, inset 1px 1px 3px #bbb;
 }
 
 .mesh-tools .fa {
   font-size: 14px;
+}
+
+/* TODO improve */
+.mesh-divider {
+  border: none;
+  border-left: 1px solid #000;
+  margin: 0 5px;
+  width: 0;
+  position: relative;
+  top: 0;
+  bottom: 0;
 }
 
 #mesh-attr-editor,#mesh-code-editor {
