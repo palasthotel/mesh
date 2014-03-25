@@ -26,6 +26,26 @@ exports.requires = function(condition, msg) {
 };
 
 /**
+ * Get index of `obj` in `arr`.
+ * 
+ * @param arr
+ * @param obj
+ * @returns
+ * 
+ * @since 0.0.1
+ */
+exports.indexOf = function(arr, obj) {
+  if (arr.indexOf)
+    return arr.indexOf(obj);
+
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i] === obj)
+      return i;
+  }
+  return -1;
+};
+
+/**
  * Extends `a` with `b` by adding all properties of `b` to a copy of `a`. `a`
  * and `b` do not change but a new `Object` is returned.
  * 
@@ -59,11 +79,10 @@ exports.extend = function(a, b) {
  * 
  * @since 0.0.1
  */
-exports.xmlEncode =
-    function(xml) {
-      return xml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g,
-          '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-    };
+exports.xmlEncode = function(xml) {
+  return xml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+};
 
 /**
  * Decodes a previously encoded XML string.
@@ -74,11 +93,10 @@ exports.xmlEncode =
  * 
  * @since 0.0.1
  */
-exports.xmlDecode =
-    function(encodedXML) {
-      return encoded.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(
-          /&quot;/g, '"').replace(/&#039;/g, '\'').replace(/&amp;/g, '&');
-    };
+exports.xmlDecode = function(encodedXML) {
+  return encoded.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g,
+      '"').replace(/&#039;/g, '\'').replace(/&amp;/g, '&');
+};
 
 /**
  * Apply an action to `arg`.
