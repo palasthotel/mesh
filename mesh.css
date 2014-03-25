@@ -170,6 +170,10 @@ h2:first-child {
   background: rgba(255, 255, 255, .8);
 }
 
+.mesh-block.ui-sortable-helper .mesh-block {
+  background-color: transparent;
+}
+
 .mesh-block:hover .mesh-handle,.mesh-block.ui-sortable-helper .mesh-handle {
   display: block;
 }
@@ -203,6 +207,15 @@ h2:first-child {
   left: 1px;
   width: 10px;
   display: none;
+}
+
+/* Don't show handle on bulk move */
+.mesh-block .mesh-block .mesh-handle,.mesh-block .mesh-block .mesh-controls {
+  display: none;
+}
+
+.mesh-block .mesh-block:hover {
+  border-color: 1px solid #ccc;
 }
 
 .mesh-content p {
@@ -245,7 +258,7 @@ h2:first-child {
   font-size: 14px;
 }
 
-#mesh-attr-editor, #mesh-code-editor {
+#mesh-attr-editor,#mesh-code-editor {
   background: rgba(0, 0, 0, .6);
   display: none;
   position: fixed;
@@ -256,7 +269,7 @@ h2:first-child {
   bottom: 0;
 }
 
-#mesh-attr-editor table, #mesh-code-editor textarea {
+#mesh-attr-editor table,#mesh-code-editor textarea {
   background: white;
   width: 570px;
   margin: 50px auto;

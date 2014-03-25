@@ -78,10 +78,13 @@ function ContentEditableView(content, conf, escaped) {
   // set contenteditable
   this._elem.contentEditable = true;
 
+  // selection wrapper
+  this._wrappedSelection = false;
+
   $(this._elem).addClass('mesh-content');
 
   // initialize with empty selection model
-  this.setSelectionModel(new model.SelectionModel(null));
+  this.setSelectionModel([]);
 
   // create and set document model
   this.setModel(new model.DocumentModel(content, escaped));
@@ -100,6 +103,7 @@ function ContentEditableView(content, conf, escaped) {
     }
   });
 
+  var timeout;
   // Listen for mouse and keyboard events
   $(this._elem).bind('click keyup', function selectionChange(e) {
     if (e.type === 'keyup' && (e.keyCode < 33 || e.keyCode > 40)) {
@@ -110,7 +114,7 @@ function ContentEditableView(content, conf, escaped) {
       }
     } else {
       // selection change
-      view.onSelect(rangy.getSelection());
+      view.selected(rangy.getSelection());
     }
   });
 }
@@ -123,30 +127,40 @@ ContentEditableView.prototype.setModel = function(model) {
   this.updateView();
 };
 
-ContentEditableView.prototype.onSelect = function(selection) {
+ContentEditableView.prototype.selected = function(selection) {
   // only single selection is supported, so this is ok
   var range = selection.getRangeAt(0);
 
   var docModel = this.getModel();
   var size = docModel.length();
 
-  // selected block
-  var selected = null;
+  // is block selected?
+  var selected = false;
+
+  var selectionModel = [];
 
   // highlight the selected block
   for (var i = 0; i < size; i++) {
-    var blockElem = docModel.get(i).getElement();
-
-    $(blockElem.parentNode).removeClass('mesh-focus');
+    var block = docModel.get(i);
+    var blockElem = block.getElement();
 
     if (dom.containsNode(blockElem, range.startContainer)) {
-      // remember first block
-      selected = blockElem;
+      selected = true;
+    }
+
+    if (selected) {
       $(blockElem.parentNode).addClass('mesh-focus');
+      selectionModel.push(block);
+    } else {
+      $(blockElem.parentNode).removeClass('mesh-focus');
+    }
+
+    if (dom.containsNode(blockElem, range.endContainer)) {
+      selected = false;
     }
   }
 
-  this.setSelectionModel(new model.SelectionModel(selected));
+  this.setSelectionModel(selectionModel);
 };
 
 /**
@@ -166,12 +180,15 @@ ContentEditableView.prototype.updateView = function() {
 
   $(this.getElement()).find('.mesh-block').remove();
 
+  this._blockViews = [];
+
   // build the view
   var size = m.length();
   for (var i = 0; i < size; i++) {
-    var blockView = new BlockView(m.get(i), this);
+    var blockView = new BlockView(m.get(i).getElement(), this);
 
     docFrgmt.appendChild(blockView.getElement());
+    this._blockViews.push(blockView);
   }
 
   this.getElement().appendChild(docFrgmt);
@@ -185,6 +202,10 @@ ContentEditableView.prototype.updateModel = function() {
   var docModel = new model.DocumentModel();
   var blockElems = this.getElement().children;
   var length = blockElems.length;
+
+  // Do this to correctly be able to update the model (unwraps wrapped blocks)
+  this.setSelectionModel([]);
+
   for (var i = 0; i < length; i++) {
     docModel.append(new model.BlockModel(blockElems[i].children[0]));
   }
@@ -192,34 +213,66 @@ ContentEditableView.prototype.updateModel = function() {
 };
 
 ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
-  this.selectionModel = selectionModel;
+  var oldSelectionModel = this._selectionModel;
+  this._selectionModel = selectionModel;
+
+  // TODO This is a hack (more or less). Figure out a nicer way to do it!
+  // if the selection model is longer than 1, wrap the selection
+  if (selectionModel.length > 1) {
+    // remove selection
+    rangy.getSelection().removeAllRanges();
+
+    this._wrappedSelection = true;
+
+    // get array of selected elements
+    var selectedElements = [];
+    var length = this._selectionModel.length;
+    for (var i = 0; i < length; i++) {
+      selectedElements.push(selectionModel[i].getElement().parentNode);
+    }
+
+    // wrap all
+    $(selectedElements).wrapAll('<div class="mesh-block"></div>');
+    // TODO a bit hacky. Is there another way to get reference to wrapper?
+    var wrapper = selectionModel[0].getElement().parentNode.parentNode;
+    var blockView = addHandleAndControls(wrapper, this, {
+      enableBlockAttrEditor : false,
+      enableBlockCodeEditor : false
+    });
+  } else if (this._wrappedSelection) {
+    var selectedElements = [];
+    var length = oldSelectionModel.length;
+    for (var i = 0; i < length; i++) {
+      selectedElements.push(oldSelectionModel[i].getElement().parentNode);
+    }
+
+    // unwrap the selected blocks
+    $(selectedElements).unwrap();
+
+    // remove handle and controls
+    var children = [].slice.call(this.getElement().children);
+    $(children).filter('.mesh-handle, .mesh-controls').remove();
+
+    this._wrappedSelection = false;
+  }
 
   this.emit('select');
 };
 
 ContentEditableView.prototype.getSelectionModel = function() {
-  return this.selectionModel;
+  return this._selectionModel;
 };
 
 /**
- * Deselect every
+ * Deselect all blocks.
  */
 ContentEditableView.prototype.deselectAll = function() {
   rangy.getSelection().removeAllRanges();
-  this.setSelectionModel(new model.SelectionModel(null));
+  this.setSelectionModel([]);
   $(this.getElement()).find('.mesh-block').removeClass('mesh-focus');
 };
 
-// BLOCK VIEW
-
-exports.BlockView = BlockView;
-
-function BlockView(blockModel, documentView) {
-  var wrapper = dom.createElement('div', 'mesh-block');
-
-  // content
-  var content = blockModel.getElement();
-
+function addHandleAndControls(wrapper, documentView, conf) {
   // drag handle
   var handle = dom.createElement('div', 'mesh-handle');
   handle.contentEditable = false;
@@ -252,7 +305,7 @@ function BlockView(blockModel, documentView) {
   });
   controls.appendChild(remove);
 
-  if (documentView._conf.enableBlockAttrEditor) {
+  if (conf.enableBlockAttrEditor) {
     // attribute editor button
     var attrs = dom.createElement('div', 'mesh-attrs');
     $(attrs).attr('title', 'edit attributes');
@@ -262,7 +315,7 @@ function BlockView(blockModel, documentView) {
     controls.appendChild(attrs);
   }
 
-  if (documentView._conf.enableBlockCodeEditor) {
+  if (conf.enableBlockCodeEditor) {
     var code = dom.createElement('div', 'mesh-code');
     $(code).attr('title', 'edit code');
     $(code).click(function onEditBlockCode() {
@@ -270,12 +323,30 @@ function BlockView(blockModel, documentView) {
     });
     controls.appendChild(code);
   }
-
-  wrapper.appendChild(content);
   wrapper.appendChild(handle);
   wrapper.appendChild(controls);
 
+  return {
+    handle : handle,
+    controls : controls
+  };
+}
+
+// BLOCK VIEW
+
+exports.BlockView = BlockView;
+
+function BlockView(blockElement, documentView) {
+  var wrapper = dom.createElement('div', 'mesh-block');
+  wrapper.appendChild(blockElement);
+
+  var hc = addHandleAndControls(wrapper, documentView, documentView._conf);
+
   this._elem = wrapper;
+
+  this._content = blockElement;
+  this._handle = hc.handle;
+  this._controls = hc.controls;
 }
 
 BlockView.prototype.getElement = function() {
