@@ -10,7 +10,7 @@ ControlPlugin.prototype.getTitle = function() {
 };
 
 ControlPlugin.prototype.getHint = function() {
-  return null;
+  return this._hint;
 };
 
 ControlPlugin.prototype.createControlElement = function() {
