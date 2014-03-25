@@ -9,6 +9,8 @@
 
 var exceptions = require('./exceptions.js');
 
+var util = exports;
+
 /**
  * Requires `condition` to be `true`. Otherwise an `IllegalArgumentException`
  * will be thrown.
@@ -20,7 +22,7 @@ var exceptions = require('./exceptions.js');
  * 
  * @since 0.0.1
  */
-exports.requires = function(condition, msg) {
+util.requires = function(condition, msg) {
   if (!condition)
     throw new exceptions.IllegalArgumentException(msg);
 };
@@ -34,7 +36,7 @@ exports.requires = function(condition, msg) {
  * 
  * @since 0.0.1
  */
-exports.indexOf = function(arr, obj) {
+util.indexOf = function(arr, obj) {
   if (arr.indexOf)
     return arr.indexOf(obj);
 
@@ -56,7 +58,7 @@ exports.indexOf = function(arr, obj) {
  * 
  * @since 0.0.1
  */
-exports.extend = function(a, b) {
+util.extend = function(a, b) {
   var result = {};
 
   for ( var prop in a) {
@@ -79,7 +81,7 @@ exports.extend = function(a, b) {
  * 
  * @since 0.0.1
  */
-exports.xmlEncode = function(xml) {
+util.xmlEncode = function(xml) {
   return xml.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 };
@@ -93,7 +95,7 @@ exports.xmlEncode = function(xml) {
  * 
  * @since 0.0.1
  */
-exports.xmlDecode = function(encodedXML) {
+util.xmlDecode = function(encodedXML) {
   return encoded.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g,
       '"').replace(/&#039;/g, '\'').replace(/&amp;/g, '&');
 };
@@ -114,11 +116,11 @@ exports.xmlDecode = function(encodedXML) {
  * 
  * @since 0.0.1
  */
-exports.forEach = function(ts, action) {
+util.forEach = function(ts, action) {
   if (ts instanceof Array)
     [].forEach.call(ts, action);
   else
-    exports.forEach([].slice.call(ts), action);
+    util.forEach([].slice.call(ts), action);
 }
 
 /**
@@ -140,7 +142,7 @@ exports.forEach = function(ts, action) {
  * 
  * @since 0.0.1
  */
-exports.map = function(ts, mapper) {
+util.map = function(ts, mapper) {
   var result = new Array(ts.length);
   for (var i = 0; i < ts.length; i++) {
     result[i] = mapper(ts[i]);
@@ -167,7 +169,7 @@ exports.map = function(ts, mapper) {
  * 
  * @since 0.0.1
  */
-exports.filter = function(ts, filter) {
+util.filter = function(ts, filter) {
   var result = new Array();
   var t = null;
   for (var i = 0; i < ts.length; i++) {
