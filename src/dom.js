@@ -339,8 +339,9 @@ dom.cleanupElement = function(elem) {
 
     if (prevNode !== null && prevPrevNode !== null) {
       if (childNode.nodeType === 1 && prevNode.nodeType === 3
-          && prevPrevNode.nodeType === 1 && /^\s*$/.test(prevNode.textContent)
-          && isCombinable(childNode)) {
+          && prevPrevNode.nodeType === 1
+          && childNode.nodeName === prevPrevNode.nodeName
+          && /^\s*$/.test(prevNode.textContent) && isCombinable(childNode)) {
         prevPrevNode.innerHTML = prevPrevNode.innerHTML + prevNode.textContent
             + childNode.innerHTML;
 
