@@ -233,7 +233,7 @@ dom.nodeToXML = function(node) {
 };
 
 dom.containsNode = function(ancestor, child) {
-  while (child.parentNode != null) {
+  while (child.parentNode !== null) {
     if (child.parentNode === ancestor)
       return true;
 
@@ -241,6 +241,43 @@ dom.containsNode = function(ancestor, child) {
   }
 
   return false;
+};
+
+/**
+ * Checks whether a node is inside an element that can be matched by the given
+ * selector and returns that ancestor node.
+ * 
+ * @param {Node} node - dom node
+ * @param {String} selector - jQuery/CSS selector
+ * @param {Node} [top] - won't search for ancestors higher than this node
+ * 
+ * @return {Node}
+ */
+dom.matchParent = function(node, selector, top) {
+  if (typeof top === 'undefined')
+    top = null;
+
+  if ($(node).is(selector)) {
+    return node;
+  }
+
+  while (node.parentNode !== top) {
+    if ($(node.parentNode).is(selector)) {
+      return node.parentNode;
+    }
+
+    node = node.parentNode;
+  }
+
+  return null;
+};
+
+dom.unwrapChildren = function(elem) {
+  while (elem.firstChild) {
+    elem.parentNode.insertBefore(elem.firstChild, elem);
+  }
+
+  elem.parentNode.removeChild(elem);
 };
 
 /**
