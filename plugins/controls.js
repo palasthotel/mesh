@@ -118,6 +118,9 @@ AnchorButton.prototype.action = function(selectionModel, range) {
 
     // prompt for new URL
     url = prompt('Change URL:', url);
+    if (url === null) {
+      return;
+    }
 
     if (url === '') {
       // remove <strong>
@@ -127,6 +130,11 @@ AnchorButton.prototype.action = function(selectionModel, range) {
     }
 
     this.getEditor().getView().emit('edit');
+    return;
+  }
+
+  if (range.collapsed) {
+    alert('Nothing selected');
     return;
   }
 
@@ -146,6 +154,11 @@ AnchorButton.prototype.action = function(selectionModel, range) {
 
   // contents changed
   this.getEditor().getView().emit('edit');
+};
+
+var anchorSelectionChange = buttonSelectionChangeFor('a');
+AnchorButton.prototype.selectionChange = function() {
+  anchorSelectionChange.call(this);
 };
 
 // finally set the order of the buttons
