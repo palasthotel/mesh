@@ -101,7 +101,55 @@ ItalicButton.prototype.selectionChange = function() {
   italicSelectionChange.call(this);
 };
 
+function AnchorButton(editor) {
+  plugin.Button.call(this, editor, '<i class="fa fa-anchor" />',
+      'create a link')
+}
+
+oo.extend(AnchorButton, plugin.Button);
+
+AnchorButton.prototype.action = function(selectionModel, range) {
+  var url = '';
+  var affected = null;
+  if ((affected = dom.matchParent(range.startContainer, 'a')) !== null
+      || (affected = dom.matchParent(range.endContainer, 'a')) !== null) {
+    // get existing URL
+    url = $(affected).attr('href');
+
+    // prompt for new URL
+    url = prompt('Change URL:', url);
+
+    if (url === '') {
+      // remove <strong>
+      dom.unwrapChildren(affected);
+    } else {
+      $(affected).attr('href', url);
+    }
+
+    this.getEditor().getView().emit('edit');
+    return;
+  }
+
+  var newNode = document.createElement('a');
+
+  // prompt for new URL
+  url = prompt('Enter URL:', url);
+
+  // if URL is empty, decard creating link
+  if (url === '') {
+    return;
+  }
+
+  $(newNode).attr('href', url);
+  // wrap selected range with newly created element
+  range.surroundContents(newNode);
+
+  // contents changed
+  this.getEditor().getView().emit('edit');
+};
+
 // finally set the order of the buttons
 controls.push(BoldButton);
 controls.push(ItalicButton);
+controls.push(AnchorButton);
 // TODO controls.push(plugin.Divider);
