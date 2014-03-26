@@ -103,9 +103,8 @@ function ContentEditableView(content, conf, escaped) {
     }
   });
 
-  var timeout;
   // Listen for mouse and keyboard events
-  $(this._elem).bind('click keyup', function selectionChange(e) {
+  function listener(e) {
     if (e.type === 'keyup' && (e.keyCode < 33 || e.keyCode > 40)) {
       // when the pressed key was not a selection key, sth. has been edited
       // selection keys are the arrow keys, home and end
@@ -116,7 +115,10 @@ function ContentEditableView(content, conf, escaped) {
       // selection change
       view.selected(rangy.getSelection());
     }
-  });
+  }
+
+  $(document.body).click(listener)
+  $(this._elem).bind('keyup', listener);
 }
 
 // inheritance
