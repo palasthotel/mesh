@@ -164,8 +164,17 @@ AnchorButton.prototype.selectionChange = function() {
   anchorSelectionChange.call(this);
 };
 
+function ContentTypeSelect(editor) {
+  plugin.Dropdown.call(this, editor);
+  this._blockTypes = blockTypes;
+}
+
+oo.extend
+
 // finally set the order of the buttons
 controls.push(BoldButton);
 controls.push(ItalicButton);
 controls.push(AnchorButton);
-// TODO controls.push(plugin.Divider);
+controls.push(ContentTypeSelect);
+// TODO insert multiple dividers:
+// controls.push(plugin.Divider);
