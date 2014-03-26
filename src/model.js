@@ -10,7 +10,6 @@
 var events = require('events');
 var dom = require('./dom.js');
 var util = require('./util.js');
-var oo = require('./oo.js');
 
 exports.DocumentModel = DocumentModel;
 
@@ -23,13 +22,9 @@ exports.DocumentModel = DocumentModel;
  * @param {String} [content] - content of the document
  * @param {Boolean} [escaped=false] - is the given `content` XML escaped?
  * 
- * @extends EventEmitter
- * 
  * @since 0.0.1
  */
 function DocumentModel(content, escaped) {
-  events.EventEmitter.call(this);
-
   var blocks = this._blocks = [];
 
   if (typeof content == 'undefined' || content === null) {
@@ -82,6 +77,10 @@ DocumentModel.prototype.cleanup = function() {
   }
 };
 
+DocumentModel.prototype.getBlockTypes = function() {
+  return this._blockTypes;
+};
+
 DocumentModel.prototype.toXML = function() {
   var result = '';
   var length = this.length();
@@ -102,15 +101,10 @@ exports.BlockModel = BlockModel;
  * @constructor
  * 
  * @param {HTMLElement} elem - surrounding element
- * @param {Document} doc - parent document
- * 
- * @extends EventEmitter
  * 
  * @since 0.0.1
  */
 function BlockModel(elem) {
-  events.EventEmitter.call(this);
-
   this._elem = elem;
 
   // empty models get a single <br> so they have at least one line
@@ -119,17 +113,8 @@ function BlockModel(elem) {
   }
 };
 
-oo.extend(BlockModel, events.EventEmitter);
-
 BlockModel.prototype.getElement = function() {
   return this._elem;
-};
-
-BlockModel.prototype.setElement = function(elem) {
-  dom.replaceNode(this._elem, elem);
-  this._elem = elem;
-
-  this.emit('change');
 };
 
 BlockModel.prototype.cleanup = function() {
