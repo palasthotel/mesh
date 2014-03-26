@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: exceptions</title>
+    <title>JSDoc: Source: init.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,99 +17,56 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: exceptions</h1>
+    <h1 class="page-title">Source: init.js</h1>
 
     
 
 
-
-<section>
-
-<header>
-    <h2>
-    exceptions
-    </h2>
     
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var config = require('./config.js');
+var editor = require('./editor.js');
+var util = require('./util.js');
 
-<article>
-    <div class="container-overview">
-    
+/**
+ * Called when the editor is initialized.
+ * 
+ * @callback InitCallback
+ * @param {Error} error
+ * @param {Editor} editor
+ */
 
-    
-        
-            <div class="description">Commonly used exception classes.</div>
-        
+/**
+ * Initialize the editor.
+ * 
+ * @param {HTMLElement} textarea - `&lt;textarea>`
+ * @param {HTMLElement} toolbar - toolbar element
+ * @param {HTMLElement} statusbar - statusbar element
+ * @param {Array&lt;ControlPlugin>} plugins - array of enabled plugins
+ * @param {Object} conf - custom configuration object
+ * @param {InitCallback} cb - initialization callback
+ * 
+ * @since 0.0.1
+ */
+module.exports = function init(textarea, toolbar, statusbar, plugins, conf, cb) {
+  // extend default configuration with given conf
+  var thisConf = util.extend(config.DEFAULT, conf);
 
-        
-<dl class="details">
-    
+  // when the dom is ready, set up the editor
+  $(document).ready(function() {
+    try {
+      var ed = new editor.Editor(textarea, toolbar, statusbar, plugins, thisConf);
 
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>0.0.1</dd>
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Paul Vorbach</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="exceptions.js.html">exceptions.js</a>, <a href="exceptions.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+      // return editor instance
+      cb(null, ed);
+    } catch (err) {
+      cb(err);
+    }
+  });
+};</code></pre>
+        </article>
+    </section>
 
 
 

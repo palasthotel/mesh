@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Source: dom.js</title>
-    
+
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,9 +16,9 @@
 <body>
 
 <div id="main">
-    
+
     <h1 class="page-title">Source: dom.js</h1>
-    
+
     
 
 
@@ -37,6 +37,8 @@
 var events = require('events');
 var util = require('./util.js');
 
+var dom = module.exports;
+
 /**
  * Called when the DOM is ready.
  * 
@@ -50,7 +52,7 @@ var util = require('./util.js');
  * 
  * @since 0.0.1
  */
-exports.onReady = function(cb) {
+dom.onReady = function(cb) {
   if (/in/.test(document.readyState)) {
     setTimeout(ready, 9, cb);
   } else {
@@ -62,17 +64,21 @@ exports.onReady = function(cb) {
  * Creates an `HTMLElement` with an optional class.
  * 
  * @param {String} tagName - tag name of the element
- * @param {String} [className] - class that the element should have
+ * @param {String} [className] - class that the element should have (may be
+ *                space seperated list of classes)
  * 
  * @returns {HTMLElement} created element
  * 
  * @since 0.0.1
  */
-exports.createElement = function(tagName, className) {
+dom.createElement = function(tagName, className) {
   var elem = document.createElement(tagName);
 
   if (className) {
-    addClass(element, className);
+    var classes = className.split(' ');
+    for (var i = 0; i &lt; classes.length; i++) {
+      dom.addClass(elem, classes[i]);
+    }
   }
 
   return elem;
@@ -87,7 +93,7 @@ exports.createElement = function(tagName, className) {
  * 
  * @since 0.0.1
  */
-exports.isElement = function(node) {
+dom.isElement = function(node) {
   return node.nodeType === 1;
 };
 
@@ -100,7 +106,7 @@ exports.isElement = function(node) {
  * 
  * @since 0.0.1
  */
-exports.isTextNode = function(node) {
+dom.isTextNode = function(node) {
   return node.nodeType === 3;
 }
 
@@ -117,7 +123,7 @@ exports.isTextNode = function(node) {
  * 
  * @since 0.0.1
  */
-exports.hasType = function(elem, type) {
+dom.hasType = function(elem, type) {
   return elem.nodeName === type;
 };
 
@@ -129,7 +135,7 @@ exports.hasType = function(elem, type) {
  * 
  * @since 0.0.1
  */
-exports.addClass = function(elem, className) {
+dom.addClass = function(elem, className) {
   if (elem.classList)
     return elem.classList.add(className);
 
@@ -149,7 +155,7 @@ exports.addClass = function(elem, className) {
  * 
  * @since 0.0.1
  */
-exports.hasClass = function(elem, className) {
+dom.hasClass = function(elem, className) {
   if (elem.classList)
     return elem.classList.contains(className);
 
@@ -165,7 +171,7 @@ exports.hasClass = function(elem, className) {
  * 
  * @since 0.0.1
  */
-exports.removeClass = function(elem, className) {
+dom.removeClass = function(elem, className) {
   if (elem.classList)
     return elem.classList.remove(className);
 
@@ -190,7 +196,7 @@ exports.removeClass = function(elem, className) {
  * 
  * @since 0.0.1
  */
-exports.getFirstClass = function(elem) {
+dom.getFirstClass = function(elem) {
   if (elem.classList)
     return elem.classList[0];
 
@@ -205,7 +211,7 @@ exports.getFirstClass = function(elem) {
  * 
  * @since 0.0.1
  */
-exports.replaceNode = function(a, b) {
+dom.replaceNode = function(a, b) {
   a.parentNode.replaceChild(b, a);
 };
 
@@ -218,7 +224,7 @@ exports.replaceNode = function(a, b) {
  * 
  * @since 0.0.1
  */
-exports.nodeToXML = function(node) {
+dom.nodeToXML = function(node) {
   var result;
 
   if (node instanceof HTMLElement) {
@@ -227,15 +233,19 @@ exports.nodeToXML = function(node) {
 
     // add attributes
     util.forEach(node.attributes, function(attr) {
-      result += ' ' + attr.name + '="' + attr.value;
+      if (attr.name === 'style') {
+        return;
+      }
+
+      result += ' ' + attr.name + '="' + attr.value + '"';
     });
 
     if (node.childNodes.length > 0) {
       result += '>';
 
       // add childNodes
-      util.forEach(elem.childNodes, function(node) {
-        result += nodeToXML(node);
+      util.forEach(node.childNodes, function(node) {
+        result += dom.nodeToXML(node);
       });
 
       result += '&lt;/' + tagName + '>';
@@ -247,7 +257,181 @@ exports.nodeToXML = function(node) {
   }
 
   return result;
+};
+
+dom.containsNode = function(ancestor, child) {
+  while (child.parentNode !== null) {
+    if (child.parentNode === ancestor)
+      return true;
+
+    child = child.parentNode;
+  }
+
+  return false;
+};
+
+/**
+ * Checks whether a node is inside an element that can be matched by the given
+ * selector and returns that ancestor node.
+ * 
+ * @param {Node} node - dom node
+ * @param {String} selector - jQuery/CSS selector
+ * @param {Node} [top] - won't search for ancestors higher than this node
+ * 
+ * @return {Node}
+ */
+dom.matchParent = function(node, selector, top) {
+  if (typeof top === 'undefined')
+    top = null;
+
+  if ($(node).is(selector)) {
+    return node;
+  }
+
+  while (node.parentNode !== top) {
+    if ($(node.parentNode).is(selector)) {
+      return node.parentNode;
+    }
+
+    node = node.parentNode;
+  }
+
+  return null;
+};
+
+dom.unwrapChildren = function(elem) {
+  while (elem.firstChild) {
+    elem.parentNode.insertBefore(elem.firstChild, elem);
+  }
+
+  elem.parentNode.removeChild(elem);
+};
+
+/**
+ * Selects all elements between `start` and `end`.
+ * 
+ * If `end` is not found, this function will return all elements until there is
+ * no next element.
+ * 
+ * @param {HTMLElement} start
+ * @param {HTMLElement} end
+ * 
+ * @returns {Array&lt;HTMLElement>}
+ */
+dom.allBetween = function(start, end) {
+  if (start === null || end === null) {
+    return [];
+  }
+
+  var result = [ start ];
+
+  if (start.isSameNode(end)) {
+    return result;
+  }
+
+  var next = start.nextSibling;
+  while (next !== null) {
+    result.push(next);
+
+    if (end.isSameNode(next)) {
+      break;
+    }
+
+    next = next.nextSibling;
+  }
+
+  return result;
+};
+
+dom.createDivIfNotFound = function(id) {
+  var elem = document.getElementById(id);
+  if (elem === null) {
+    elem = document.createElement('div');
+    elem.id = id;
+    document.body.appendChild(elem);
+  }
+  return elem;
+};
+
+dom.removeAllChildren = function(elem) {
+  while (elem.firstChild) {
+    elem.removeChild(elem.firstChild);
+  }
+};
+
+dom.moveChildNodes = function(from, to) {
+  while (from.firstChild) {
+    to.appendChild(from.firstChild);
+  }
+};
+
+var combinableElements = 'B,I,U,STRONG,EM,SUP,SUB'.split(',');
+var inheritedElements = 'B,I,U,STRONG,EM'.split(',');
+
+function isCombinable(node) {
+  return combinableElements.indexOf(node.nodeName) > -1;
 }
+
+function isInherited(node) {
+  return combinableElements.indexOf(node.nodeName) > -1;
+}
+
+dom.cleanupElement = function(elem) {
+  // copy the existing element
+  var prevPrevNode = null;
+  var prevNode = null;
+
+  util.forEach(elem.childNodes, function(childNode) {
+    // if the parent node of this node is of the same type, remove child node
+    // example: '&lt;b>Hello &lt;b>you&lt;/b>!&lt;/b>' --> '&lt;b>Hello you!&lt;/b>'
+    if (elem.nodeName === childNode.nodeName &amp;&amp; isInherited(childNode)) {
+      while (childNode.firstChild) {
+        elem.insertBefore(childNode.firstChild, childNode);
+      }
+
+      elem.removeChild(childNode);
+    }
+
+    if (prevNode !== null) {
+      // Combine elements of same type
+      if (childNode.nodeType === 1 &amp;&amp; prevNode.nodeType === 1
+          &amp;&amp; prevNode.nodeName === childNode.nodeName
+          &amp;&amp; isCombinable(childNode)) {
+
+        // do a cleanup
+        dom.cleanupElement(childNode);
+
+        // combine both elements
+        prevNode.innerHTML = prevNode.innerHTML + childNode.innerHTML;
+        return elem.removeChild(childNode);
+      }
+    }
+
+    if (prevNode !== null &amp;&amp; prevPrevNode !== null) {
+      if (childNode.nodeType === 1 &amp;&amp; prevNode.nodeType === 3
+          &amp;&amp; prevPrevNode.nodeType === 1
+          &amp;&amp; childNode.nodeName === prevPrevNode.nodeName
+          &amp;&amp; /^\s*$/.test(prevNode.textContent) &amp;&amp; isCombinable(childNode)) {
+        prevPrevNode.innerHTML = prevPrevNode.innerHTML + prevNode.textContent
+            + childNode.innerHTML;
+
+        elem.removeChild(prevNode);
+        elem.removeChild(childNode);
+
+        childNode = null;
+        prevNode = null;
+      }
+    } else {
+      dom.cleanupElement(childNode);
+    }
+
+    // backtracking
+    prevPrevNode = prevNode;
+    prevNode = childNode;
+  });
+
+  return elem;
+};
 </code></pre>
         </article>
     </section>
@@ -258,13 +442,13 @@ exports.nodeToXML = function(node) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dataStore.html">dataStore</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-main.html">main</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-Block.html">Block</a></li><li><a href="module-model-Document.html">Document</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#indexOf">indexOf</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions-exceptions.ImplementationMissingException.html">ImplementationMissingException</a></li><li><a href="module-exceptions-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-BlockModel.html">BlockModel</a></li><li><a href="module-model-DocumentModel.html">DocumentModel</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li><li><a href="module-view-ContentEditableView.html">ContentEditableView</a></li><li><a href="module-view-EditorView.html">EditorView</a></li><li><a href="module-view-TextareaView.html">TextareaView</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#ControlElement">ControlElement</a></li><li><a href="global.html#providers">providers</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:14 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Wed Mar 26 2014 20:38:19 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>

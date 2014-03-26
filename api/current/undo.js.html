@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Source: undo.js</title>
-    
+
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,9 +16,9 @@
 <body>
 
 <div id="main">
-    
+
     <h1 class="page-title">Source: undo.js</h1>
-    
+
     
 
 
@@ -42,43 +42,61 @@ exports.UndoStack = UndoStack;
  * @constructor
  * 
  * @param {Number} [size=50] - number of elements the stack can store
- * @param {T[]} [stack=[]] - pre-filled stack as an Array
+ * @param {T[]} [stack=[]] - pre-filled stack as an Array. This can be used to
+ *                regain a previously persisted `UndoStack`.
  */
 function UndoStack(size, stack) {
-  if (typeof size === "undefined") {
+  if (typeof size === "undefined" || size &lt;= 0) {
     size = 50;
   }
 
   if (typeof stack === "undefined") {
-    stack = [];
+    stack = new Array(size);
   }
 
-  this.size = size;
-  this.stack = stack;
-  this.cursor = stack.length - 1;
+  this._size = size;
+  this._stack = stack;
+  this._cursor = -1;
+  this._top = -1;
 }
 
 /**
- * Push back a new state.
+ * Add a new state.
  * 
  * @param {T} state
  */
-UndoStack.prototype.pushState = function(state) {
-  // lose states that have been popped before
-  if (this.cursor &lt; this.stack.length - 1) {
-    this.stack = this.stack.slice(0, this.cursor);
+UndoStack.prototype.addState = function(state) {
+  // if the current state is the same, leave as is
+  if (this._cursor >= 0 &amp;&amp; state === this._stack[this._cursor]) {
+    return;
   }
 
-  if (this.cursor === this.size - 1) {
-    // if the stack has reached the maximum size, remove the first item
-    this.stack = this.stack.slice(1);
+  // if the top state is the same, move to top
+  if (this._top >= 0 &amp;&amp; state === this._stack[this._top]) {
+    this._cursor = this._top;
+    return;
+  }
+
+  this._cursor++;
+
+  if (this._cursor == this._size) {
+    // remove the first item
+    this._stack = this._stack.slice(1);
+    this._stack.push(state); // append new state
+    this._cursor--; // decrement the cursor
   } else {
-    // otherwise, just increment the cursor
-    this.cursor++;
+    this._stack[this._cursor] = state;
   }
 
-  // push the new state
-  this.stack.push(state);
+  this._top = this._cursor;
+};
+
+UndoStack.prototype.getCurrentState = function() {
+  return this._stack[this._cursor];
+};
+
+UndoStack.prototype.hasPreviousState = function() {
+  return this._cursor > 0;
 };
 
 /**
@@ -86,15 +104,16 @@ UndoStack.prototype.pushState = function(state) {
  * 
  * @returns {T}
  */
-UndoStack.prototype.popState = function() {
-  this.cursor--;
+UndoStack.prototype.getPreviousState = function() {
+  return this._stack[--this._cursor];
+};
 
-  // can't pop state below zero, will return stack[0] instead
-  if (this.cursor &lt; 0) {
-    this.cursor = 0;
-  }
+UndoStack.prototype.hasNextState = function() {
+  return this._cursor &lt; this._top;
+};
 
-  return this.stack[this.cursor];
+UndoStack.prototype.getNextState = function() {
+  return this._stack[++this._cursor];
 };
 </code></pre>
         </article>
@@ -106,13 +125,13 @@ UndoStack.prototype.popState = function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dataStore.html">dataStore</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-main.html">main</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-Block.html">Block</a></li><li><a href="module-model-Document.html">Document</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#indexOf">indexOf</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions-exceptions.ImplementationMissingException.html">ImplementationMissingException</a></li><li><a href="module-exceptions-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-BlockModel.html">BlockModel</a></li><li><a href="module-model-DocumentModel.html">DocumentModel</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li><li><a href="module-view-ContentEditableView.html">ContentEditableView</a></li><li><a href="module-view-EditorView.html">EditorView</a></li><li><a href="module-view-TextareaView.html">TextareaView</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#ControlElement">ControlElement</a></li><li><a href="global.html#providers">providers</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:14 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Wed Mar 26 2014 20:38:19 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Class: Editor</title>
-    
+
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,15 +16,15 @@
 <body>
 
 <div id="main">
-    
+
     <h1 class="page-title">Class: Editor</h1>
-    
+
     
 
 
 
 <section>
-    
+
 <header>
     <h2>
         <span class="ancestors"><a href="module-editor.html">editor</a>~</span>
@@ -32,62 +32,140 @@
     Editor
     </h2>
     
-        <div class="class-description"><p>Editor</p></div>
+        <div class="class-description">Editor</div>
     
-</header>  
+</header>
 
 <article>
     <div class="container-overview">
     
-    
+
     
         
 <dt>
-    <h4 class="name" id="Editor"><span class="type-signature"></span>new Editor<span class="signature">(container, conf)</span><span class="type-signature"></span></h4>
-    
+    <h4 class="name" id="Editor"><span class="type-signature"></span>new Editor<span class="signature">(textarea, toolbar, statusbar, plugins, conf)</span><span class="type-signature"></span></h4>
+
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p>Modular HTML5 WYSIWYG Editor.</p>
+        Modular HTML5 WYSIWYG Editor.
     </div>
     
 
     
+
     
-    
-    
+
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
         <tr>
             
-                <td class="name"><code>container</code></td>
+                <td class="name"><code>textarea</code></td>
             
+
+            <td class="type">
             
+                
+<span class="param-type">HTMLElement</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">textarea or id of a textarea</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>toolbar</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">toolbar or id of the toolbar</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>statusbar</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">status bar or id of the status bar</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>plugins</code></td>
+            
+
             <td class="type">
             
                 
@@ -96,21 +174,21 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
-            <td class="description last"><p>surrounding element</p></td>
+
+            <td class="description last">plugins</td>
         </tr>
-	
-	
-	
+
+    
+
         <tr>
             
                 <td class="name"><code>conf</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -119,647 +197,101 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
-            <td class="description last"><p>configuration</p></td>
+
+            <td class="description last">configuration object</td>
         </tr>
-	
-	
-	</tbody>
+
+    
+    </tbody>
 </table>
     
-    
+
     
 <dl class="details">
     
-        
+
     
-    
+
     
     <dt class="tag-since">Since:</dt>
     <dd class="tag-since"><ul class="dummy"><li>0.0.1</dd>
     
 
     
+
     
+
     
+
     
+
     
+
     
-    
-    
-    
-    
-    
-    
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line31">line 31</a>
+        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line37">line 37</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
+
     
-    
-    
-    
+
     
 </dd>
 
     
     </div>
-    
+
     
         <h3 class="subsection-title">Extends</h3>
-        
+
         <ul>
             <li>EventEmitter</li>
         </ul>
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        <h3 class="subsection-title">Methods</h3>
-        
-        <dl>
-            
-<dt>
-    <h4 class="name" id="getContent"><span class="type-signature"></span>getContent<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Get the editor's contents.</p>
-    </div>
-    
 
     
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line119">line 119</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
     
 
     
 
     
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
 
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">String</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="getDocument"><span class="type-signature"></span>getDocument<span class="signature">()</span><span class="type-signature"> &rarr; {Document}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Get the editor's document.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line141">line 141</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
     
 
     
 
     
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
 
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Document</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="isView"><span class="type-signature"></span>isView<span class="signature">(viewType)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Checks, whether the view of this editor is the given <code>viewType</code>.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>viewType</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"><p>view type of interest, either <code>'textarea'</code> or
-               <code>'contenteditable'</code></p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line88">line 88</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Boolean</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="setContent"><span class="type-signature"></span>setContent<span class="signature">(content)</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Set the editor's contents.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>content</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"><p>HTML string</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line103">line 103</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="setDocument"><span class="type-signature"></span>setDocument<span class="signature">(doc)</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Set the editor's document.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>doc</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Document</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"><p>document</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="editor.js.html">editor.js</a>, <a href="editor.js.html#line132">line 132</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        </dl>
-    
-    
-    
-    
     
 </article>
 
-</section>  
+</section>
 
 
 
@@ -767,13 +299,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dataStore.html">dataStore</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-main.html">main</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-Block.html">Block</a></li><li><a href="module-model-Document.html">Document</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#indexOf">indexOf</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions-exceptions.ImplementationMissingException.html">ImplementationMissingException</a></li><li><a href="module-exceptions-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-BlockModel.html">BlockModel</a></li><li><a href="module-model-DocumentModel.html">DocumentModel</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li><li><a href="module-view-ContentEditableView.html">ContentEditableView</a></li><li><a href="module-view-EditorView.html">EditorView</a></li><li><a href="module-view-TextareaView.html">TextareaView</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#ControlElement">ControlElement</a></li><li><a href="global.html#providers">providers</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:15 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Wed Mar 26 2014 20:38:19 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>

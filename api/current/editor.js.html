@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Source: editor.js</title>
-    
+
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,9 +16,9 @@
 <body>
 
 <div id="main">
-    
+
     <h1 class="page-title">Source: editor.js</h1>
-    
+
     
 
 
@@ -34,11 +34,14 @@
  * @since 0.0.1
  */
 
-var events = require('events');
 var dom = require('./dom.js');
+var events = require('events');
+var model = require('./model.js');
 var oo = require('./oo.js');
-var util = require('./util.js');
 var undo = require('./undo.js');
+var util = require('./util.js');
+var view = require('./view.js');
+var flickr = require('./content/flickr.js');
 
 exports.Editor = Editor;
 
@@ -48,125 +51,274 @@ exports.Editor = Editor;
  * @class Editor
  * @constructor
  * 
- * @param {HTMLElement} container - surrounding element
- * @param {Object} conf - configuration
+ * @param {HTMLElement|String} textarea - textarea or id of a textarea
+ * @param {HTMLElement|String} toolbar - toolbar or id of the toolbar
+ * @param {HTMLElement|String} statusbar - status bar or id of the status bar
+ * @param {HTMLElement} plugins - plugins
+ * @param {Object} conf - configuration object
  * 
  * @extends EventEmitter
  * 
  * @since 0.0.1
  */
-function Editor(container, conf) {
-  EventEmitter.call(this);
+function Editor(textarea, toolbar, statusbar, plugins, conf) {
+  events.EventEmitter.call(this);
 
-  util.requires(dom.hasType(container, 'TEXTAREA'), 'not a &lt;textarea>');
+  if (typeof textarea === 'string') {
+    textarea = document.getElementById(textarea);
+  }
 
-  this.conf = conf;
+  if (typeof toolbar === 'string') {
+    toolbar = document.getElementById(toolbar);
+  }
+
+  if (typeof statusbar === 'string') {
+    statusbar = document.getElementById(statusbar);
+  }
+
+  util.requires(dom.hasType(textarea, 'TEXTAREA'), 'not a &lt;textarea>');
+
+  this._view = null;
+
+  this._textarea = textarea;
+  this._toolbar = toolbar;
+  this._statusbar = statusbar;
+
+  this._attrEditor = null;
+  this._codeEditor = null;
+
+  if (conf.enableBlockAttrEditor) {
+    this._attrEditor = dom.createDivIfNotFound('mesh-attr-editor');
+  }
+
+  if (conf.enableBlockCodeEditor) {
+    this._codeEditor = dom.createDivIfNotFound('mesh-code-editor');
+  }
+
+  this._conf = conf;
   // undoStack
-  this.undo = new undo.UndoStack(conf.undoSize);
+  this._undo = new undo.UndoStack(conf.undoSize);
+  this._delayedEdit = null;
 
   // set the view according to configuration
   if (conf.defaultView === 'textarea') {
     // use the textarea as-is
-    this.elem = container;
+    this.setView(new view.TextareaView(textarea, conf));
   } else if (conf.defaultView === 'contenteditable') {
-    // use the id of the textarea as the new id of the container
-    var id = container.id;
-    this.elem = document.createElement('div');
-    this.elem.id = id;
-
-    // decode the existing content of the textarea
-    var content = util.xmlDecode(container.textContent);
-    this.setContent(content);
-
-    // replace the container node
-    dom.replaceNode(container, this.elem);
-
-    // make content editable
-    this.elem.contentEditable = 'true';
+    this.setView(new view.ContentEditableView($(textarea).val(), conf, false,
+        plugins.blockTypes));
   } else {
     // unknown case
     throw new exceptions.InvalidConfigurationException('no such view: "'
         + conf.defaultView + '"');
   }
 
-  // save a ref to this editor
-  dataStore.get(this.elem).editor = this;
+  this.getView().getModel().cleanup();
 
-  // on every change of the content, push a new state to the undo stack
-  this.addListener('change', function() {
-    var content = this.getContent();
-    this.undo.pushState(content);
+  // save cleaned state
+  var cleaned = this.getView().getModel().toXML();
+  $(this._textarea).val(cleaned);
+  this._undo.addState(cleaned);
+
+  // handle key shortcuts
+  var editor = this;
+  $(document).bind('keyup', function(e) {
+    if (!e.ctrlKey)
+      return;
+
+    // CTRL + Z -> undo
+    if (e.keyCode === 90) {
+      // CTRL + SHIFT + Z -> redo
+      if (e.shiftKey) {
+        // default behavior for Macs
+        editor.redo();
+      } else {
+        editor.undo();
+      }
+
+      e.preventDefault();
+      return false;
+    }
+    // CTRL + Y -> redo
+    else if (e.keyCode == 89) {
+      editor.redo();
+
+      e.preventDefault();
+      return false;
+    }
   });
 
-  // emit change event after a short delay
-  setTimeout(function() {
-    this.emit('change');
-  }, 0);
-};
-
-/**
- * Checks, whether the view of this editor is the given `viewType`.
- * 
- * @param {String} viewType - view type of interest, either `'textarea'` or
- *                `'contenteditable'`
- * 
- * @returns {Boolean}
- */
-Editor.prototype.isView = function(viewType) {
-  if (viewType === 'textarea') {
-    return dom.hasType(this.elem, 'TEXTAREA');
-  } else if (viewType === 'contenteditable') {
-    return dom.hasType(this.elem, 'DIV');
-  }
-
-  return false;
-};
-
-/**
- * Set the editor's contents.
- * 
- * @param {String} content - HTML string
- */
-Editor.prototype.setContent = function(content) {
-  if (this.isView('textarea')) {
-    // straight forward
-    this.elem.textContent = content;
-  } else {
-    this.setDocument(new model.Document(this.elem, content));
-  }
-
-  this.emit('change');
-};
-
-/**
- * Get the editor's contents.
- * 
- * @returns {String}
- */
-Editor.prototype.getContent = function() {
-  if (this.isView('textarea')) {
-    return this.elem.textContent;
-  } else {
-    return this.elem.innerHTML;
+  this._controls = [];
+  var controlPlugins = plugins.controls;
+  for (var i = 0; i &lt; controlPlugins.length; i++) {
+    this._controls.push(new controlPlugins[i](this));
   }
 };
 
-/**
- * Set the editor's document.
- * 
- * @param {Document} doc - document
- */
-Editor.prototype.setDocument = function(doc) {
-  this.doc = doc;
+oo.extend(Editor, events.EventEmitter);
+
+Editor.prototype.selectionChange = function selectionChange() {
+  // call selectionChange on every control element
+  for (var i = 0; i &lt; this._controls.length; i++) {
+    var control = this._controls[i];
+    control.selectionChange();
+  }
 };
 
-/**
- * Get the editor's document.
- * 
- * @returns {Document}
- */
-Editor.prototype.getDocument = function() {
-  return this.doc;
+Editor.prototype.contentChange = function contentChange(event) {
+  // save ref to this (used by callbacks)
+  var editor = this;
+
+  // cancel last undo stack change
+  if (this._delayedEdit !== null) {
+    clearTimeout(this._delayedEdit);
+  }
+
+  this._delayedEdit = setTimeout(function delayedEdit() {
+    var model = editor.getView().getModel();
+    model.cleanup();
+    // push the new state to undo stack
+    var newState = model.toXML();
+    $(editor._textarea).val(newState);
+
+    editor._undo.addState(newState);
+
+    // call contentChange on every control element
+    for (var i = 0; i &lt; editor._controls.length; i++) {
+      var control = editor._controls[i];
+      control.contentChange();
+    }
+  }, this._conf.undoDelay);
+};
+
+Editor.prototype.undo = function onUndo() {
+  this.getView().deselectAll();
+  if (this._undo.hasPreviousState()) {
+    this.getView().setModel(
+        new model.DocumentModel(this._undo.getPreviousState()));
+  }
+};
+
+Editor.prototype.redo = function onRedo() {
+  this.getView().deselectAll();
+  if (this._undo.hasNextState()) {
+    this.getView().setModel(new model.DocumentModel(this._undo.getNextState()));
+  }
+};
+
+Editor.prototype.setView = function(v) {
+  var editor = this;
+  this._view = v;
+
+  v.getElement().id = 'mesh-content-1';
+
+  this._textarea.spellcheck = this._conf.enableSpellChecking;
+
+  // hide textarea and append view element
+  if (v instanceof view.ContentEditableView) {
+    var displayValue = 'none';
+    if (this._conf.textareaAlwaysVisible) {
+      displayValue = 'block';
+    }
+
+    $(this._textarea).css('display', displayValue).before(
+        this._view.getElement());
+
+    this._view.getElement().spellcheck = this._conf.enableSpellChecking;
+  }
+
+  // register event listeners
+  v.on('select', function(selection) {
+    editor.selectionChange(selection);
+  });
+
+  v.on('edit', function(event) {
+    editor.contentChange(event);
+  });
+
+  this.emit('view-change');
+};
+
+Editor.prototype.getView = function() {
+  return this._view;
+};
+
+Editor.prototype.getToolbar = function() {
+  return this._toolbar;
+};
+
+Editor.prototype.getUndoStack = function() {
+  return this._undo;
+};
+
+// TODO This is a HACK!
+Editor.prototype.initSearch = function(query, submit, results) {
+  var $results = $(results);
+
+  $(submit).click(function(e) {
+    e.preventDefault();
+    $(results).html('');
+    search($(query).val(), 1);
+  });
+
+  function search(query, page, loadMore) {
+    flickr.search(query, {
+      page : page
+    }, function(err, result) {
+      if (err)
+        return; // TODO show warning
+
+      try {
+        var todo = result.photos.photo.length;
+        $(result.photos.photo).each(function() {
+          flickr.oembed(this, {}, function(err, data) {
+            if (loadMore) {
+              loadMore.remove();
+              loadMore = null;
+            }
+
+            if (err) {
+              todo--;
+              throw err;
+            }
+
+            $results.append(flickr.embedCode(data));
+
+            if (--todo === 0) {
+              draggableResults();
+
+              $results.append('&lt;div class="load-more">Load more&lt;/div>');
+              var btn = $('#mesh-results .load-more');
+              btn.bind('click', function() {
+                btn.html('...');
+                btn.unbind();
+                search(query, page + 1, btn);
+              });
+            }
+          });
+        });
+      } catch (ex) {
+        // TODO show warning: unexpected format
+        // exception
+      } finally {
+      }
+    });
+  }
+
+  function draggableResults() {
+    var $results = $('#mesh-results .mesh-block');
+    $results.each(function() {
+      $(this).draggable({
+        connectToSortable : '#mesh-content-1',
+        helper : 'clone',
+        revert : 'invalid',
+        containment : $('#container'),
+        drag : function(ev, b) {
+          console.log(ev, b)
+        }
+      });
+    });
+  }
 };
 </code></pre>
         </article>
@@ -178,13 +330,13 @@ Editor.prototype.getDocument = function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dataStore.html">dataStore</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-main.html">main</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-Block.html">Block</a></li><li><a href="module-model-Document.html">Document</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#indexOf">indexOf</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions-exceptions.ImplementationMissingException.html">ImplementationMissingException</a></li><li><a href="module-exceptions-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-BlockModel.html">BlockModel</a></li><li><a href="module-model-DocumentModel.html">DocumentModel</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li><li><a href="module-view-ContentEditableView.html">ContentEditableView</a></li><li><a href="module-view-EditorView.html">EditorView</a></li><li><a href="module-view-TextareaView.html">TextareaView</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#ControlElement">ControlElement</a></li><li><a href="global.html#providers">providers</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:14 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Wed Mar 26 2014 20:38:19 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>

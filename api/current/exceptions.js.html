@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Source: exceptions.js</title>
-    
+
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,9 +16,9 @@
 <body>
 
 <div id="main">
-    
+
     <h1 class="page-title">Source: exceptions.js</h1>
-    
+
     
 
 
@@ -36,23 +36,26 @@
 
 var oo = require('./oo.js');
 
+var exceptions = exports;
+
 /**
  * Standard exception.
  * 
  * @class Exception
  * @constructor
  * 
+ * @param {String} name - name of the exception type
  * @param {String} message - error message
  * 
  * @since 0.0.1
  */
-exports.Exception = function Exception(message) {
-  Error.call(this, message);
+exceptions.Exception = function Exception(name, message) {
+  Error.call(this);
+  this.name = name;
+  this.message = message;
 };
 
-exports.Exception.prototype.name = 'Exception';
-
-exports.Exception.prototype.toString = function() {
+exceptions.Exception.prototype.toString = function() {
   return this.name + ': ' + this.message;
 };
 
@@ -71,13 +74,11 @@ exports.Exception.prototype.toString = function() {
  * 
  * @since 0.0.1
  */
-exports.NoSuchElementException = function NoSuchElementException(message) {
-  Exception.call(this, message);
+exceptions.NoSuchElementException = function NoSuchElementException(message) {
+  exceptions.Exception.call(this, 'NoSuchElementException', message);
 };
 
-exports.NoSuchElementException.prototype.name = 'NoSuchElementException';
-
-oo.extend(exports.NoSuchElementException, exports.Exception);
+oo.extend(exceptions.NoSuchElementException, exceptions.Exception);
 
 /**
  * Illegal argument.
@@ -93,13 +94,32 @@ oo.extend(exports.NoSuchElementException, exports.Exception);
  * 
  * @since 0.0.1
  */
-exports.IllegalArgumentException = function IllegalArgumentException(message) {
-  Exception.call(this, message);
+exceptions.IllegalArgumentException = function IllegalArgumentException(message) {
+  exceptions.Exception.call(this, 'IllegalArgumentException', message);
 };
 
-exports.IllegalArgumentException.prototype.name = 'IllegalArgumentException';
+oo.extend(exceptions.IllegalArgumentException, exceptions.Exception);
 
-oo.extend(exports.IllegalArgumentException, exports.Exception);
+/**
+ * Not implemented.
+ * 
+ * Overriding this method is required.
+ * 
+ * @class NotImplementedException
+ * @constructor
+ * 
+ * @param {String} message - error message
+ * 
+ * @extends Exception
+ * 
+ * @since 0.0.1
+ */
+exceptions.ImplementationMissingException = function ImplementationMissingException(
+    message) {
+  exceptions.Exception.call(this, 'NotImplementedException', message);
+}
+
+oo.extend(exceptions.ImplementationMissingException, exceptions.Exception);
 </code></pre>
         </article>
     </section>
@@ -110,13 +130,13 @@ oo.extend(exports.IllegalArgumentException, exports.Exception);
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dataStore.html">dataStore</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-main.html">main</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-Block.html">Block</a></li><li><a href="module-model-Document.html">Document</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#indexOf">indexOf</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions-exceptions.ImplementationMissingException.html">ImplementationMissingException</a></li><li><a href="module-exceptions-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-BlockModel.html">BlockModel</a></li><li><a href="module-model-DocumentModel.html">DocumentModel</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li><li><a href="module-view-ContentEditableView.html">ContentEditableView</a></li><li><a href="module-view-EditorView.html">EditorView</a></li><li><a href="module-view-TextareaView.html">TextareaView</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#ControlElement">ControlElement</a></li><li><a href="global.html#providers">providers</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:14 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Wed Mar 26 2014 20:38:19 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>

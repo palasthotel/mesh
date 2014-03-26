@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Source: oembed.js</title>
-    
+
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,108 +16,98 @@
 <body>
 
 <div id="main">
-    
+
     <h1 class="page-title">Source: oembed.js</h1>
-    
+
     
 
 
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>(function(window) {
+            <pre class="prettyprint source linenums"><code>var oembed = exports;
 
-  if (typeof $ === 'undefined')
-    throw new Error('jQuery undefined')
+/**
+ * Array of all oEmbed providers.
+ */
+var providers = oembed.providers = [];
 
-  var oembed = {};
+oembed.providers.push({
+  scheme : 'http://www.flickr.com/photos/*',
+  endpoint : 'http://www.flickr.com/services/oembed/',
+  callbackParameter : 'jsoncallback'
+});
 
-  /**
-   * Array of all oEmbed providers.
-   */
-  var providers = oembed.providers = [];
+/**
+ * Get the corresponding oEmbed provider for a given URL.
+ * 
+ * @returns a provider object, if the URL is embeddable, false otherwise
+ */
+oembed.getProviderFor = function getProviderFor(url) {
+  var i, provider, regex;
 
-  oembed.providers.push({
-    scheme : 'http://www.flickr.com/photos/*',
-    endpoint : 'http://www.flickr.com/services/oembed/',
-    callbackParameter : 'jsoncallback'
-  });
+  // for every provider, check if the given url matches the provider's scheme.
+  for (i = 0; i &lt; providers.length; i++) {
+    provider = providers[i];
+    var scheme = provider.scheme;
+    regex = new RegExp(scheme.replace('*', '.+'))
+    if (regex.test(url))
+      return provider;
+  }
 
-  /**
-   * Get the corresponding oEmbed provider for a given URL.
-   * 
-   * @returns a provider object, if the URL is embeddable, false otherwise
-   */
-  oembed.getProviderFor = function getProviderFor(url) {
-    var i, provider, regex;
+  return false;
+};
 
-    // for every provider, check if the given url matches the provider's scheme.
-    for (i = 0; i &lt; providers.length; i++) {
-      provider = providers[i];
-      var scheme = provider.scheme;
-      regex = new RegExp(scheme.replace('*', '.+'))
-      if (regex.test(url))
-        return provider;
-    }
+/**
+ * Request oEmbed information.
+ * 
+ * @param {String} url - the url you want to embed
+ * @param {Object} requestParams - an object that contains additional request
+ *                parameters (such as maxwidth, maxheight)
+ * @param {Function} callback - a callback function(err, info)
+ */
+oembed.request = function request(url, requestParams, callback) {
+  var provider = oembed.getProviderFor(url);
+  if (provider === false)
+    return callback(new Error('not embeddable'));
 
-    return false;
-  };
+  var requestUrl = provider.endpoint;
+  // set the query parameters of the request url
+  requestUrl += '?url=' + encodeURI(url);
+  var keys = Object.keys(requestParams);
+  for (var i = 0; i &lt; keys.length; i++) {
+    var key = keys[i];
+    requestUrl += '&amp;' + key + '=' + requestParams[key];
+  }
+  if (typeof provider.callbackParameter !== 'undefined')
+    requestUrl += '&amp;' + provider.callbackParameter + '=?';
 
-  /**
-   * Request oEmbed information.
-   * 
-   * @param url
-   *                the url you want to embed
-   * @param requestParams
-   *                an object that contains additional request parameters (such
-   *                as maxwidth, maxheight)
-   * @param callback
-   *                a callback function(err, info)
-   */
-  oembed.request = function request(url, requestParams, callback) {
-    var provider = oembed.getProviderFor(url);
-    if (provider === false)
-      return callback(new Error('not embeddable'));
+  function request(dataType) {
+    $.ajax({
+      url : requestUrl,
+      type : 'GET',
+      dataType : dataType,
+      success : function(data, textStatus, jqXHR) {
+        callback(null, data);
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        callback(errorThrown);
+      }
+    });
+  }
 
-    var requestUrl = provider.endpoint;
-    // set the query parameters of the request url
-    requestUrl += '?url=' + encodeURI(url);
-    var keys = Object.keys(requestParams);
-    for ( var i = 0; i &lt; keys.length; i++) {
-      var key = keys[i];
-      requestUrl += '&amp;' + key + '=' + requestParams[key];
-    }
-    if (typeof provider.callbackParameter !== 'undefined')
-      requestUrl += '&amp;' + provider.callbackParameter + '=?';
+  try {
+    request('json');
+  } catch (err) {
+    request('jsonp');
+  }
+};
 
-    function request(dataType) {
-      $.ajax({
-        url : requestUrl,
-        type : 'GET',
-        dataType : dataType,
-        success : function(data, textStatus, jqXHR) {
-          callback(null, data);
-        },
-        error : function(jqXHR, textStatus, errorThrown) {
-          callback(errorThrown);
-        }
-      });
-    }
-
-    try {
-      request('json');
-    } catch (err) {
-      request('jsonp');
-    }
-  };
-
-  oembed.discover = function discover(url, callback) {
-    // does nothing at the moment
-    callback(new Error('not impelemented'));
-  };
-
-  window.oembed = oembed;
-})(this);</code></pre>
+oembed.discover = function discover(url, callback) {
+  // does nothing at the moment
+  callback(new Error('not impelemented'));
+};
+</code></pre>
         </article>
     </section>
 
@@ -127,13 +117,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dataStore.html">dataStore</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-main.html">main</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-Block.html">Block</a></li><li><a href="module-model-Document.html">Document</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#indexOf">indexOf</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions-exceptions.ImplementationMissingException.html">ImplementationMissingException</a></li><li><a href="module-exceptions-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-BlockModel.html">BlockModel</a></li><li><a href="module-model-DocumentModel.html">DocumentModel</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li><li><a href="module-view-ContentEditableView.html">ContentEditableView</a></li><li><a href="module-view-EditorView.html">EditorView</a></li><li><a href="module-view-TextareaView.html">TextareaView</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#ControlElement">ControlElement</a></li><li><a href="global.html#providers">providers</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Thu Feb 27 2014 11:50:14 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Wed Mar 26 2014 20:38:19 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>

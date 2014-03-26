@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: exceptions</title>
+    <title>JSDoc: Source: content/flickr.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,99 +17,71 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: exceptions</h1>
+    <h1 class="page-title">Source: content/flickr.js</h1>
 
     
 
 
-
-<section>
-
-<header>
-    <h2>
-    exceptions
-    </h2>
     
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var apiKey = '43569ea83198fcb014f0d1b9f2600e72';
+var secret = '4ff2d8088fb45677';
 
-<article>
-    <div class="container-overview">
-    
+var endpoint = 'https://secure.flickr.com/services/rest';
+var method = '?method=flickr.photos.search';
+var api = '&amp;api_key=' + apiKey;
+var format = '&amp;format=json';
 
-    
-        
-            <div class="description">Commonly used exception classes.</div>
-        
+var oembed = require('../oembed.js');
+var flickr = exports;
 
-        
-<dl class="details">
-    
+/**
+ * Searches Flickr.
+ */
+flickr.search = function(query, options, callback) {
+  options = options || {};
+  jsonFlickrApi.callback = callback; // set the callback globally
 
-    
+  var text = '&amp;text=' + query;
+  var page = '&amp;page=' + (options.page || 1);
+  var perPage = '&amp;per_page=' + (options.perPage || 10);
+  var sort = '&amp;sort=' + (options.sort || 'relevance');
+  var url = endpoint + method + api + format + text + page + perPage + sort;
 
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>0.0.1</dd>
-    
+  $.ajax({
+    url : url,
+    type : 'GET',
+    dataType : 'jsonp',
+    success : function(data, textStatus, jqXHR) {
+      callback(null, data);
+    },
+    error : function(jqXHR, textStatus, errorThrown) {
+      callback(errorThrown);
+    }
+  });
+};
 
-    
+flickr.oembed = function(item, options, callback) {
+  var url = 'http://www.flickr.com/photos/' + item.owner + '/' + item.id + '/';
 
-    
+  var options = {
+    format : 'json',
+    maxwidth : 500,
+    maxheight : 300
+  };
 
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Paul Vorbach</li>
-        </ul>
-    </dd>
-    
+  oembed.request(url, options, callback);
+};
 
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="exceptions.js.html">exceptions.js</a>, <a href="exceptions.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+flickr.embedCode = function(data) {
+  return [ '&lt;div class="mesh-block">&lt;div class="mesh-handle" ',
+      'unselectable="on" contenteditable="false">',
+      '&lt;/div>&lt;p>&lt;img alt="', data.title, '" title="',
+      data.title, '" src="', data.url, '" ', '/>&lt;/p>&lt;/div>' ].join('');
+};</code></pre>
+        </article>
+    </section>
 
 
 

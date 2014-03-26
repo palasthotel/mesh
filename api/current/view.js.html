@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: view.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: view.js</h1>
+
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module view
+ */
+
+var events = require('events');
+var dom = require('./dom.js');
+var key = require('./key.js');
+var model = require('./model.js');
+var oo = require('./oo.js');
+var util = require('./util.js');
+
+exports.EditorView = EditorView;
+
+/**
+ * View for an `Editor`.
+ * 
+ * Should not be instantiated directly.
+ * 
+ * @constructor
+ * @abstract
+ */
+function EditorView() {
+  this._model = null;
+}
+
+oo.extend(EditorView, events.EventEmitter);
+
+EditorView.prototype.setModel = function(model) {
+  this._model = model;
+};
+
+EditorView.prototype.getModel = function() {
+  return this._model;
+};
+
+exports.TextareaView = TextareaView;
+
+/**
+ * Creates a view out of a `&lt;textarea>`.
+ * 
+ * @param {HTMLElement} textarea - textarea element
+ * 
+ * @constructor
+ * @extends EditorView
+ */
+function TextareaView(textarea) {
+  EditorView.call(this);
+
+  this.setModel(new model.DocumentModel($(textarea).val(), false));
+}
+
+// inheritance
+oo.extend(TextareaView, EditorView);
+
+// ContentEditableView
+
+exports.ContentEditableView = ContentEditableView;
+
+/**
+ * Creates a new view for a `DocumentModel` using a `DIV` with
+ * `contenteditable=true`.
+ * 
+ * @param {String} content - content string
+ * @param {Object} conf - configuration object
+ * @param {Boolean} escaped - determines whether the given content string is
+ *                already escaped
+ * @param {Array&lt;BlockType>} blockTypes - set of possible block types
+ * 
+ * @constructor
+ * @extends EditorView
+ */
+function ContentEditableView(content, conf, escaped, blockTypes) {
+  EditorView.call(this);
+
+  this._conf = conf;
+
+  this._blockTypes = blockTypes;
+
+  this._elem = dom.createElement('div');
+
+  // set contenteditable
+  this._elem.contentEditable = true;
+
+  // selection wrapper
+  this._wrappedSelection = false;
+
+  $(this._elem).addClass('mesh-content');
+
+  // initialize with empty selection model
+  this.setSelectionModel([]);
+
+  // create and set document model
+  this.setModel(new model.DocumentModel(content, escaped));
+
+  var view = this;
+
+  $(this._elem).sortable({
+    axis : 'y',
+    handle : '.mesh-handle',
+    placeholder : 'mesh-placeholder',
+    stop : function stopSort() {
+      // remove selection when the document is sorted
+      view.deselectAll();
+      view.updateModel();
+      view.emit('edit');
+    }
+  });
+
+  // Listen for mouse and keyboard events
+  function listener(e) {
+    if (e.type === 'keyup' &amp;&amp; (e.keyCode &lt; 33 || e.keyCode > 40)) {
+      // when the pressed key was not a selection key, sth. has been edited
+      // selection keys are the arrow keys, home and end
+      if (!e.ctrlKey &amp;&amp; key.isAlterationKey(e.keyCode)) {
+        view.emit('edit', e);
+      }
+    } else {
+      // selection change
+      view.selected(rangy.getSelection());
+    }
+  }
+
+  // listen for mouse clicks
+  $(this._elem).click(function(e) {
+    // selection change
+    view.selected(rangy.getSelection());
+  });
+
+  // listen for local keyup events
+  $(this._elem).bind('keyup', function(e) {
+    // if the key is an arrow/home/end key or tab
+    if (e.keyCode >= 33 &amp;&amp; e.keyCode &lt;= 40 || e.keyCode == 9) {
+      return view.selected(rangy.getSelection());
+    }
+
+    // check whether the key could alter something
+    if (!e.ctrlKey &amp;&amp; key.isAlterationKey(e.keyCode)) {
+      view.emit('edit', e);
+    }
+  });
+}
+
+// inheritance
+oo.extend(ContentEditableView, EditorView);
+
+ContentEditableView.prototype.setModel = function(model) {
+  this._model = model;
+  this.updateView();
+  this.emit('edit');
+};
+
+ContentEditableView.prototype.getBlockViews = function() {
+  return this._blockViews;
+};
+
+ContentEditableView.prototype.selected = function(selection) {
+  // only single selection is supported, so this is ok
+  if (selection.rangeCount === 0) {
+    return this.setSelectionModel([]);
+  }
+
+  var range = selection.getRangeAt(0);
+
+  var blockViews = this.getBlockViews();
+  var size = blockViews.length;
+
+  // is block selected?
+  var selected = false;
+
+  var selectionModel = [];
+
+  // highlight the selected block
+  for (var i = 0; i &lt; size; i++) {
+    var blockElem = blockViews[i].getElement();
+
+    if (dom.containsNode(blockElem, range.startContainer)) {
+      selected = true;
+    }
+
+    if (selected) {
+      $(blockElem).addClass('mesh-focus');
+      selectionModel.push(blockViews[i]);
+    } else {
+      $(blockElem).removeClass('mesh-focus');
+    }
+
+    if (dom.containsNode(blockElem, range.endContainer)) {
+      selected = false;
+    }
+  }
+
+  this.setSelectionModel(selectionModel);
+};
+
+/**
+ * @returns {HTMLElement}
+ */
+ContentEditableView.prototype.getElement = function() {
+  return this._elem;
+};
+
+/**
+ * This method gets called whenever the model changed and the changes shall be
+ * applied to the view accordingly.
+ */
+ContentEditableView.prototype.updateView = function() {
+  var m = this.getModel();
+  var docFrgmt = document.createDocumentFragment();
+
+  $(this.getElement()).find('.mesh-block').remove();
+
+  this._blockViews = [];
+
+  // build the view
+  var size = m.length();
+  var numOfBlockTypes = this._blockTypes.length;
+  for (var i = 0; i &lt; size; i++) {
+    var blockView = null;
+    var blockModel = m.get(i);
+
+    // find corresponding block type and create the view
+    for (var j = 0; j &lt; numOfBlockTypes; j++) {
+      var blockType = this._blockTypes[j];
+      if (blockType.matches(blockModel)) {
+        blockView = blockType.createViewFor(blockModel, this);
+        break;
+      }
+    }
+
+    // if no block type could match the model, use the last block type
+    // maybe this should throw an error instead
+    if (blockView === null) {
+      blockView = new BlockView(blockModel, this, this._blockTypes[j]);
+    }
+
+    docFrgmt.appendChild(blockView.getElement());
+    this._blockViews.push(blockView);
+  }
+
+  this.getElement().appendChild(docFrgmt);
+};
+
+/**
+ * This method gets called whenever the view changed and the changes shall be
+ * applied to the model accordingly.
+ */
+ContentEditableView.prototype.updateModel = function() {
+  var docModel = new model.DocumentModel();
+  var blockElems = this.getElement().children;
+  var length = blockElems.length;
+
+  // Do this to correctly be able to update the model (unwraps wrapped blocks)
+  this.setSelectionModel([]);
+
+  for (var i = 0; i &lt; length; i++) {
+    docModel.append(new model.BlockModel(blockElems[i].children[0]));
+  }
+  this._model = docModel;
+};
+
+ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
+  var oldSelectionModel = this._selectionModel;
+  this._selectionModel = selectionModel;
+
+  // if the selection model is longer than 1, wrap the selection
+  if (selectionModel.length > 1) {
+    // remove selection
+    rangy.getSelection().removeAllRanges();
+
+    this._wrappedSelection = true;
+
+    // get array of selected elements
+    var selectedElements = [];
+    var length = this._selectionModel.length;
+    for (var i = 0; i &lt; length; i++) {
+      selectedElements
+          .push(selectionModel[i].getModel().getElement().parentNode);
+    }
+
+    // wrap all selected elements in a new block
+    $(selectedElements).wrapAll('&lt;div class="mesh-block">&lt;/div>');
+    // TODO a bit hacky. Is there another way to get reference to wrapper?
+    var wrapper = selectionModel[0].getModel().getElement().parentNode.parentNode;
+
+    // add handle and remove control
+    addHandleAndControls(wrapper, this, {
+      enableBlockAttrEditor : false,
+      enableBlockCodeEditor : false
+    });
+  } else if (this._wrappedSelection) {
+    // get selected elements out of old selection model
+    var selectedElements = [];
+    var length = oldSelectionModel.length;
+    for (var i = 0; i &lt; length; i++) {
+      selectedElements
+          .push(oldSelectionModel[i].getModel().getElement().parentNode);
+    }
+
+    // unwrap the selected blocks
+    $(selectedElements).unwrap();
+
+    // remove handle and controls
+    var children = [].slice.call(this.getElement().children);
+    $(children).filter('.mesh-handle, .mesh-controls').remove();
+
+    this._wrappedSelection = false;
+  }
+
+  this.emit('select');
+};
+
+ContentEditableView.prototype.getSelectionModel = function() {
+  return this._selectionModel;
+};
+
+/**
+ * Deselect all blocks.
+ */
+ContentEditableView.prototype.deselectAll = function() {
+  rangy.getSelection().removeAllRanges();
+  this.setSelectionModel([]);
+  $(this.getElement()).find('.mesh-block').removeClass('mesh-focus');
+};
+
+function addHandleAndControls(wrapper, documentView, conf) {
+  // drag handle
+  var handle = dom.createElement('div', 'mesh-handle');
+  handle.contentEditable = false;
+  $(handle).disableSelection();
+
+  // block controls
+  var controls = dom.createElement('div', 'mesh-controls');
+  controls.contentEditable = false;
+  $(controls).disableSelection();
+
+  // remove button
+  var remove = dom.createElement('div', 'mesh-remove');
+  $(remove).attr('title', 'remove');
+  $(remove).click(function onRemoveBlock() {
+    // remove the element
+    $(wrapper).remove();
+
+    documentView.updateModel();
+    documentView.emit('edit');
+
+    rangy.getSelection().removeAllRanges();
+
+    if (documentView.getModel().length() == 0) {
+      // if there is no other content, add an empty paragraph
+      var p = document.createElement('p');
+      documentView.getModel().append(new model.BlockModel(p));
+      documentView.updateView();
+    }
+  });
+  controls.appendChild(remove);
+
+  if (conf.enableBlockAttrEditor) {
+    // attribute editor button
+    var attrs = dom.createElement('div', 'mesh-attrs');
+    $(attrs).attr('title', 'edit attributes');
+    $(attrs).click(function onEditBlockAttributes() {
+      documentView.emit('edit-block-attrs');
+    });
+    controls.appendChild(attrs);
+  }
+
+  if (conf.enableBlockCodeEditor) {
+    var code = dom.createElement('div', 'mesh-code');
+    $(code).attr('title', 'edit code');
+    $(code).click(function onEditBlockCode() {
+      documentView.emit('edit-block-code');
+    });
+    controls.appendChild(code);
+  }
+  wrapper.appendChild(handle);
+  wrapper.appendChild(controls);
+
+  return {
+    handle : handle,
+    controls : controls
+  };
+}
+
+// BLOCK VIEW
+
+exports.BlockView = BlockView;
+
+function BlockView(model, documentView, type) {
+  this._model = model;
+  this._type = type;
+
+  var wrapper = dom.createElement('div', 'mesh-block');
+  this._elem = wrapper;
+
+  wrapper.appendChild(model.getElement());
+
+  var hc = addHandleAndControls(wrapper, documentView, documentView._conf);
+  this._handle = hc.handle;
+  this._controls = hc.controls;
+}
+
+BlockView.prototype.getElement = function() {
+  return this._elem;
+};
+
+BlockView.prototype.getModel = function() {
+  return this._model;
+};
+
+BlockView.prototype.getType = function() {
+  return this._type;
+};
+
+exports.BlockCodeEditorView = BlockCodeEditorView;
+
+function BlockCodeEditorView(elem) {
+  this._elem = elem;
+
+  var elem = document.createFragment();
+  // TODO
+}
+
+BlockCodeEditorView.setModel = function(code) {
+  $(this._textarea).val(code);
+};
+
+BlockCodeEditorView.getModel = function() {
+  $(this._textarea).val();
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-config.html">config</a></li><li><a href="module-dom.html">dom</a></li><li><a href="module-editor.html">editor</a></li><li><a href="module-exceptions.html">exceptions</a></li><li><a href="module-model.html">model</a></li><li><a href="module-oo.html">oo</a></li><li><a href="module-undo.html">undo</a></li><li><a href="module-util.html">util</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="module-editor-Editor.html">Editor</a></li><li><a href="module-exceptions-exceptions.Exception.html">Exception</a></li><li><a href="module-exceptions-exceptions.IllegalArgumentException.html">IllegalArgumentException</a></li><li><a href="module-exceptions-exceptions.ImplementationMissingException.html">ImplementationMissingException</a></li><li><a href="module-exceptions-exceptions.NoSuchElementException.html">NoSuchElementException</a></li><li><a href="module-model-BlockModel.html">BlockModel</a></li><li><a href="module-model-DocumentModel.html">DocumentModel</a></li><li><a href="module-undo-UndoStack.html">UndoStack</a></li><li><a href="module-view-ContentEditableView.html">ContentEditableView</a></li><li><a href="module-view-EditorView.html">EditorView</a></li><li><a href="module-view-TextareaView.html">TextareaView</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ContentPlugin">ContentPlugin</a></li><li><a href="global.html#ControlElement">ControlElement</a></li><li><a href="global.html#providers">providers</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Wed Mar 26 2014 20:38:19 GMT+0100 (Mitteleuropäische Zeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
