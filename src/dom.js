@@ -332,6 +332,12 @@ dom.removeAllChildren = function(elem) {
   }
 };
 
+dom.moveChildNodes = function(from, to) {
+  while (from.firstChild) {
+    to.appendChild(from.firstChild);
+  }
+};
+
 var combinableElements = 'B,I,U,STRONG,EM,SUP,SUB'.split(',');
 var inheritedElements = 'B,I,U,STRONG,EM'.split(',');
 

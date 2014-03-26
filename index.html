@@ -58,6 +58,14 @@
   <script type="text/javascript" src="mesh.js"></script>
   <script type="text/javascript" src="mesh-plugins.js"></script>
   <script type="text/javascript">
+    // hack for JSONP
+    function jsonFlickrApi(result) {
+      jsonFlickrApi.callback(null, result);
+    }
+    
+    jsonFlickrApi.callback = function() {
+    };
+  
     var mesh = require('mesh');
     var plugins = require('mesh-plugins');
 
@@ -74,14 +82,20 @@
     var toolbar = $editor.find('.mesh-tools')[0];
     var statusbar = $editor.find('.mesh-status')[0];
 
+    var query = $('#mesh-search-query')[0];
+    var submit = $('#mesh-search-submit')[0];
+    var results = $('#mesh-results')[0];
+
     // initialize app
-    mesh.init(textarea, toolbar, statusbar, plugins, conf, function(err, ed) {
+    mesh.init(textarea, toolbar, statusbar, plugins,
+        conf, function(err, ed) {
       // handle the error
       if (err) {
         console.error('Initialization failed.')
         throw err;
       }
 
+      ed.initSearch(query, submit, results);
       // Do something with it. Usually not required.
     });
   </script>

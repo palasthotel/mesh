@@ -269,6 +269,33 @@ ContentTypeSelect.prototype.selectionChange = function() {
   $(this.getElement()).val(selectionModel[0].getType().getValue());
 };
 
+ContentTypeSelect.prototype.action = function(value) {
+  var editor = this.getEditor();
+  var docView = editor.getView();
+  var selectionModel = docView.getSelectionModel();
+
+  var blockType = null;
+  for (var i = 0; i < blockTypes.length; i++) {
+    blockType = blockTypes[i];
+    if (blockType.getValue() === value) {
+      break;
+    }
+  }
+
+  var change = false;
+  for (var i = 0; i < selectionModel.length; i++) {
+    // if block type is the same, do nothing
+    if (selectionModel[i].getType() === blockType) {
+      continue;
+    } else {
+      blockType.convertFrom(selectionModel[i], docView);
+      change = true;
+    }
+  }
+
+  editor.emit('edit');
+};
+
 // finally set the order of the buttons
 controls.push(ContentTypeSelect);
 controls.push(plugin.Divider);

@@ -14,6 +14,7 @@ var oo = require('./oo.js');
 var undo = require('./undo.js');
 var util = require('./util.js');
 var view = require('./view.js');
+var flickr = require('./content/flickr.js');
 
 exports.Editor = Editor;
 
@@ -182,6 +183,8 @@ Editor.prototype.setView = function(v) {
   var editor = this;
   this._view = v;
 
+  v.getElement().id = 'mesh-content-1';
+
   this._textarea.spellcheck = this._conf.enableSpellChecking;
 
   // hide textarea and append view element
@@ -219,4 +222,71 @@ Editor.prototype.getToolbar = function() {
 
 Editor.prototype.getUndoStack = function() {
   return this._undo;
+};
+
+// TODO This is a HACK!
+Editor.prototype.initSearch = function(query, submit, results) {
+  var $results = $(results);
+
+  $(submit).click(function(e) {
+    e.preventDefault();
+    $(results).html('');
+    search($(query).val(), 1);
+  });
+
+  function search(query, page, loadMore) {
+    flickr.search(query, {
+      page : page
+    }, function(err, result) {
+      if (err)
+        return; // TODO show warning
+
+      try {
+        var todo = result.photos.photo.length;
+        $(result.photos.photo).each(function() {
+          flickr.oembed(this, {}, function(err, data) {
+            if (loadMore) {
+              loadMore.remove();
+              loadMore = null;
+            }
+
+            if (err) {
+              todo--;
+              throw err;
+            }
+
+            $results.append(flickr.embedCode(data));
+
+            if (--todo === 0) {
+              draggableResults();
+
+              $results.append('<div class="load-more">Load more</div>');
+              var btn = $('#mesh-results .load-more');
+              btn.bind('click', function() {
+                btn.html('...');
+                btn.unbind();
+                search(query, page + 1, btn);
+              });
+            }
+          });
+        });
+      } catch (ex) {
+        // TODO show warning: unexpected format
+        // exception
+      } finally {
+      }
+    });
+  }
+
+  function draggableResults() {
+    var $results = $('#mesh-results .mesh-block');
+    $results.each(function() {
+      $(this).draggable({
+        connectToSortable : '#mesh-content-1',
+        helper : 'clone',
+        revert : 'invalid',
+        containment : $('#container')
+      });
+    });
+  }
 };

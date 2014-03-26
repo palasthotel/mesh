@@ -23,8 +23,10 @@ exports.DEFAULT = {
   // delay after which the status bar will be updated
   statusDelay : 1000,
 
+  // either 'contenteditable' or 'textarea'
   defaultView : 'contenteditable',
 
+  // make textarea always visible
   textareaAlwaysVisible : false,
 
   // enables the attribute editor

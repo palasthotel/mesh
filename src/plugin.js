@@ -145,6 +145,7 @@ Dropdown.prototype.getElement = function() {
   if (this._elem === null) {
     var $dropdown = $('<select class="mesh-dropdown" disabled="disabled" title="'
         + this._hint + '" />');
+    var dropdown = this;
 
     var option = null;
     // append all options
@@ -155,7 +156,7 @@ Dropdown.prototype.getElement = function() {
     }
 
     $dropdown.change(function(e) {
-      console.log('change');
+      dropdown.action(this.value);
     });
 
     this._elem = $dropdown[0];
@@ -201,8 +202,7 @@ BlockType.prototype.createViewFor = function(blockModel, documentView) {
   var blockType = this;
   var blockView = new view.BlockView(blockModel, documentView, this);
 
-  $(blockView.getElement()).keyup(function(e) {
-    console.log('keydown');
+  $(blockView.getElement()).keydown(function(e) {
     return blockType.onKeyPressed(e, documentView, blockView);
   });
 
@@ -211,6 +211,17 @@ BlockType.prototype.createViewFor = function(blockModel, documentView) {
   });
 
   return blockView;
+};
+
+BlockType.prototype.convertFrom = function(blockView, documentView) {
+  var blockType = this;
+  var modelElem = blockView.getModel().getElement();
+  var newModelElem = document.createElement(this._elementName);
+
+  dom.moveChildNodes(modelElem, newModelElem);
+  dom.replaceNode(modelElem, newModelElem);
+
+  blockView._type = this;
 };
 
 BlockType.prototype.onKeyPressed = function(e, documentView, blockView) {

@@ -120,8 +120,8 @@ function ContentEditableView(content, conf, escaped, blockTypes) {
     }
   }
 
-  // listen for mouse clicks globally
-  $(document.body).click(function(e) {
+  // listen for mouse clicks
+  $(this._elem).click(function(e) {
     // selection change
     view.selected(rangy.getSelection());
   });

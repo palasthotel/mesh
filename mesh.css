@@ -70,6 +70,7 @@ h2:first-child {
 }
 
 .mesh-status {
+  display: none;
   background: #eee;
   border-top: 1px solid #aaa;
   padding: 4px;
