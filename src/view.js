@@ -62,16 +62,19 @@ exports.ContentEditableView = ContentEditableView;
  * 
  * @param {String} content - content string
  * @param {Object} conf - configuration object
- * @param {Boolean} [escaped] - determines whether the given content string is
+ * @param {Boolean} escaped - determines whether the given content string is
  *                escaped already
+ * @param {Array<BlockType>} blockTypes - set of possible block types
  * 
  * @constructor
  * @extends EditorView
  */
-function ContentEditableView(content, conf, escaped) {
+function ContentEditableView(content, conf, escaped, blockTypes) {
   EditorView.call(this);
 
   this._conf = conf;
+
+  this._blockTypes = blockTypes;
 
   this._elem = dom.createElement('div');
 
@@ -147,7 +150,7 @@ ContentEditableView.prototype.setModel = function(model) {
 
 ContentEditableView.prototype.selected = function(selection) {
   // only single selection is supported, so this is ok
-  if (selection.rangeCount == 0) {
+  if (selection.rangeCount === 0) {
     this.setSelectionModel([]);
   }
 
@@ -359,7 +362,7 @@ function addHandleAndControls(wrapper, documentView, conf) {
 
 exports.BlockView = BlockView;
 
-function BlockView(blockElement, documentView) {
+function BlockView(model, documentView) {
   var wrapper = dom.createElement('div', 'mesh-block');
   wrapper.appendChild(blockElement);
 
@@ -367,7 +370,7 @@ function BlockView(blockElement, documentView) {
 
   this._elem = wrapper;
 
-  this._content = blockElement;
+  this._content = model.getElement();
   this._handle = hc.handle;
   this._controls = hc.controls;
 }
