@@ -1,7 +1,7 @@
 mesh
 ====
 
-Mesh is a HTML5 WYSIWYG editor for HTML texts using the `contenteditable`
+Mesh is an HTML5 WYSIWYG editor for HTML texts using the `contenteditable`
 attribute for making the HTML editable directly. It also allows you to sort
 entire paragraphs through drag and drop. It can be extended with plug-ins.
 
