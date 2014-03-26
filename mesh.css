@@ -87,11 +87,12 @@ h2:first-child {
 
 .mesh-title input {
   border: none;
+  border-bottom: 1px solid #ddd;
   font-size: 2em;
   outline: none;
   display: block;
   margin: 0;
-  padding: 0;
+  padding: 0 0 .2em;
   width: 100%;
 }
 
