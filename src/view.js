@@ -117,8 +117,24 @@ function ContentEditableView(content, conf, escaped) {
     }
   }
 
-  $(document.body).click(listener)
-  $(this._elem).bind('keyup', listener);
+  // listen for mouse clicks globally
+  $(document.body).click(function(e) {
+    // selection change
+    view.selected(rangy.getSelection());
+  });
+
+  // listen for local keyup events
+  $(this._elem).bind('keyup', function(e) {
+    // if the key is an arrow/home/end key or tab
+    if (e.keyCode >= 33 && e.keyCode <= 40 || e.keyCode == 9) {
+      return view.selected(rangy.getSelection());
+    }
+
+    // check whether the key could alter something
+    if (!e.ctrlKey && key.isAlterationKey(e.keyCode)) {
+      view.emit('edit', e);
+    }
+  });
 }
 
 // inheritance
