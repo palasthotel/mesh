@@ -24,6 +24,8 @@ instructions below.
  5. `npm install -g browserify jsdoc` or if necessary `sudo npm install -g
     browserify jsdoc`
 
+If you want to understand how Node.js-style JavaScript modules work, [this
+document](http://nodejs.org/api/modules.html) might help.
 
 ## Build
 
