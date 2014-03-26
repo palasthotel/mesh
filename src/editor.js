@@ -129,14 +129,15 @@ function Editor(textarea, toolbar, statusbar, plugins, conf) {
 
 oo.extend(Editor, events.EventEmitter);
 
-Editor.prototype.onSelect = function onSelect() {
+Editor.prototype.selectionChange = function selectionChange() {
+  // call selectionChange on every control element
   for (var i = 0; i < this._controls.length; i++) {
     var control = this._controls[i];
     control.selectionChange();
   }
 };
 
-Editor.prototype.onEdit = function onEdit(event) {
+Editor.prototype.contentChange = function contentChange(event) {
   // save ref to this (used by callbacks)
   var editor = this;
 
@@ -151,7 +152,14 @@ Editor.prototype.onEdit = function onEdit(event) {
     // push the new state to undo stack
     var newState = model.toXML();
     $(editor._textarea).val(newState);
+
     editor._undo.addState(newState);
+
+    // call contentChange on every control element
+    for (var i = 0; i < editor._controls.length; i++) {
+      var control = editor._controls[i];
+      control.contentChange();
+    }
   }, this._conf.undoDelay);
 };
 
@@ -191,11 +199,11 @@ Editor.prototype.setView = function(v) {
 
   // register event listeners
   v.on('select', function(selection) {
-    editor.onSelect(selection);
+    editor.selectionChange(selection);
   });
 
   v.on('edit', function(event) {
-    editor.onEdit(event);
+    editor.contentChange(event);
   });
 
   this.emit('view-change');
@@ -207,4 +215,8 @@ Editor.prototype.getView = function() {
 
 Editor.prototype.getToolbar = function() {
   return this._toolbar;
+};
+
+Editor.prototype.getUndoStack = function() {
+  return this._undo;
 };

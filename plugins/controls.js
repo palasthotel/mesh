@@ -14,7 +14,24 @@ function BoldButton(editor) {
 oo.extend(BoldButton, plugin.Button);
 
 function buttonActionFor(nodeName) {
-  return function(selectionModel, range) {
+  return function() {
+    var editorView = this.getEditor().getView();
+    var viewElem = editorView.getElement();
+    var selectionModel = editorView.getSelectionModel();
+
+    var selection = rangy.getSelection();
+    if (selection.rangeCount === 0) {
+      return;
+    }
+
+    var range = selection.getRangeAt(0);
+    // determine if range is in editor
+    // if not, do nothing
+    if (!range.isValid() || !dom.containsNode(viewElem, range.startContainer)
+        || !dom.containsNode(viewElem, range.endContainer)) {
+      return;
+    }
+
     var found = false;
     var affected = null;
     if ((affected = dom.matchParent(range.startContainer, nodeName)) !== null) {
@@ -112,7 +129,24 @@ function AnchorButton(editor) {
 
 oo.extend(AnchorButton, plugin.Button);
 
-AnchorButton.prototype.action = function(selectionModel, range) {
+AnchorButton.prototype.action = function() {
+  var editorView = this.getEditor().getView();
+  var viewElem = editorView.getElement();
+  var selectionModel = editorView.getSelectionModel();
+
+  var selection = rangy.getSelection();
+  if (selection.rangeCount === 0) {
+    return;
+  }
+
+  var range = selection.getRangeAt(0);
+  // determine if range is in editor
+  // if not, do nothing
+  if (!range.isValid() || !dom.containsNode(viewElem, range.startContainer)
+      || !dom.containsNode(viewElem, range.endContainer)) {
+    return;
+  }
+
   var url = '';
   var affected = null;
   if ((affected = dom.matchParent(range.startContainer, 'a')) !== null
@@ -147,7 +181,7 @@ AnchorButton.prototype.action = function(selectionModel, range) {
   url = prompt('Enter URL:', url);
 
   // if URL is empty, decard creating link
-  if (url === '') {
+  if (url === null || url === '') {
     return;
   }
 
@@ -164,17 +198,84 @@ AnchorButton.prototype.selectionChange = function() {
   anchorSelectionChange.call(this);
 };
 
-function ContentTypeSelect(editor) {
-  plugin.Dropdown.call(this, editor);
-  this._blockTypes = blockTypes;
+function UndoButton(editor) {
+  plugin.Button.call(this, editor, '<i class="fa fa-undo" />',
+      'undo last change');
 }
 
-oo.extend
+oo.extend(UndoButton, plugin.Button);
+
+UndoButton.prototype.contentChange = function() {
+  if (this.getEditor().getUndoStack().hasPreviousState()) {
+    this.setEnabled(true);
+  } else {
+    this.setEnabled(false);
+  }
+};
+
+UndoButton.prototype.action = function() {
+  this.getEditor().undo();
+};
+
+function RedoButton(editor) {
+  plugin.Button.call(this, editor, '<i class="fa fa-repeat" />',
+      'redo last change');
+}
+
+oo.extend(RedoButton, plugin.Button);
+
+RedoButton.prototype.contentChange = function() {
+  if (this.getEditor().getUndoStack().hasNextState()) {
+    this.setEnabled(true);
+  } else {
+    this.setEnabled(false);
+  }
+};
+
+RedoButton.prototype.action = function() {
+  this.getEditor().redo();
+};
+
+var blockTypes = require('./block-types.js');
+function ContentTypeSelect(editor) {
+  this._blockTypes = blockTypes;
+
+  var blockType = null;
+  var options = [];
+  for (var i = 0; i < blockTypes.length; i++) {
+    blockType = blockTypes[i];
+    options.unshift({
+      value : blockType.getValue(),
+      label : blockType.getLabel()
+    });
+  }
+
+  plugin.Dropdown.call(this, editor, 'select style', options);
+}
+
+oo.extend(ContentTypeSelect, plugin.Dropdown);
+
+ContentTypeSelect.prototype.selectionChange = function() {
+  var editorView = this.getEditor().getView();
+  var selectionModel = editorView.getSelectionModel();
+
+  if (selectionModel.length === 0) {
+    this.setEnabled(false);
+    return;
+  } else {
+    this.setEnabled(true);
+  }
+
+  $(this.getElement()).val(selectionModel[0].getType().getValue());
+};
 
 // finally set the order of the buttons
+controls.push(ContentTypeSelect);
+controls.push(plugin.Divider);
 controls.push(BoldButton);
 controls.push(ItalicButton);
+controls.push(plugin.Divider);
 controls.push(AnchorButton);
-controls.push(ContentTypeSelect);
-// TODO insert multiple dividers:
-// controls.push(plugin.Divider);
+controls.push(plugin.Divider);
+controls.push(UndoButton);
+controls.push(RedoButton);

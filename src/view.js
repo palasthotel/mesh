@@ -146,6 +146,7 @@ oo.extend(ContentEditableView, EditorView);
 ContentEditableView.prototype.setModel = function(model) {
   this._model = model;
   this.updateView();
+  this.emit('edit');
 };
 
 ContentEditableView.prototype.getBlockViews = function() {
@@ -155,7 +156,7 @@ ContentEditableView.prototype.getBlockViews = function() {
 ContentEditableView.prototype.selected = function(selection) {
   // only single selection is supported, so this is ok
   if (selection.rangeCount === 0) {
-    this.setSelectionModel([]);
+    return this.setSelectionModel([]);
   }
 
   var range = selection.getRangeAt(0);
@@ -212,8 +213,25 @@ ContentEditableView.prototype.updateView = function() {
 
   // build the view
   var size = m.length();
+  var numOfBlockTypes = this._blockTypes.length;
   for (var i = 0; i < size; i++) {
-    var blockView = new BlockView(m.get(i), this);
+    var blockView = null;
+    var blockModel = m.get(i);
+
+    // find corresponding block type and create the view
+    for (var j = 0; j < numOfBlockTypes; j++) {
+      var blockType = this._blockTypes[j];
+      if (blockType.matches(blockModel)) {
+        blockView = blockType.createViewFor(blockModel, this);
+        break;
+      }
+    }
+
+    // if no block type could match the model, use the last block type
+    // maybe this should throw an error instead
+    if (blockView === null) {
+      blockView = new BlockView(blockModel, this, this._blockTypes[j]);
+    }
 
     docFrgmt.appendChild(blockView.getElement());
     this._blockViews.push(blockView);
@@ -367,8 +385,9 @@ function addHandleAndControls(wrapper, documentView, conf) {
 
 exports.BlockView = BlockView;
 
-function BlockView(model, documentView) {
+function BlockView(model, documentView, type) {
   this._model = model;
+  this._type = type;
 
   var wrapper = dom.createElement('div', 'mesh-block');
   this._elem = wrapper;
@@ -386,6 +405,10 @@ BlockView.prototype.getElement = function() {
 
 BlockView.prototype.getModel = function() {
   return this._model;
+};
+
+BlockView.prototype.getType = function() {
+  return this._type;
 };
 
 exports.BlockCodeEditorView = BlockCodeEditorView;
