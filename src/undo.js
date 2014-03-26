@@ -39,7 +39,14 @@ function UndoStack(size, stack) {
  * @param {T} state
  */
 UndoStack.prototype.addState = function(state) {
-  if (state === this._stack[this._top]) {
+  // if the current state is the same, leave as is
+  if (this._cursor >= 0 && state === this._stack[this._cursor]) {
+    return;
+  }
+
+  // if the top state is the same, move to top
+  if (this._top >= 0 && state === this._stack[this._top]) {
+    this._cursor = this._top;
     return;
   }
 
