@@ -34,6 +34,10 @@ function buttonActionFor(nodeName) {
       return;
     }
 
+    if (range.collapsed) {
+      return;
+    }
+
     var newNode = document.createElement(nodeName);
     // wrap selected range with newly created element
     range.surroundContents(newNode);
@@ -134,7 +138,6 @@ AnchorButton.prototype.action = function(selectionModel, range) {
   }
 
   if (range.collapsed) {
-    alert('Nothing selected');
     return;
   }
 
