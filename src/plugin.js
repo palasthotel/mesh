@@ -2,6 +2,8 @@ var dom = require('./dom.js');
 var exceptions = require('./exceptions.js');
 var oo = require('./oo.js');
 
+// ControlElement
+
 exports.ControlElement = ControlElement;
 
 /**
@@ -135,13 +137,34 @@ function Divider(editor) {
   ControlElement.call(this, editor);
 }
 
+oo.extend(Divider, ControlElement);
+
 Divider.prototype.getElement = function() {
   if (this._elem === null) {
     var $divider = $('<div class="mesh-divider" />');
-    var divider = this;
 
     this._elem = $divider[0];
   }
 
   return this._elem;
 };
+
+exports.Dropdown = Dropdown;
+
+function Dropdown(editor, hint) {
+  ControlElement.call(this, editor);
+  this._hint = hint;
+}
+
+oo.extend(Dropdown, ControlElement);
+
+Dropdown.prototype.getElement = function() {
+  if (this._elem === null) {
+    var $dropdown = $('<select class="mesh-dropdown" disabled="disabled" title="'
+        + this._hint + '" />');
+
+    this._elem = $dropdown[0];
+  }
+
+  return this._elem;
+}
