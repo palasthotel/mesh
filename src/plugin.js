@@ -74,8 +74,8 @@ Button.prototype.isActivated = function() {
 
 Button.prototype.getElement = function() {
   if (this._elem === null) {
-    var $button = $('<button class="mesh-button" title="' + this._hint + '">'
-        + this._content + '</button>');
+    var $button = $('<button class="mesh-button disabled" title="' + this._hint
+        + '">' + this._content + '</button>');
     var button = this;
 
     $button.click(function onClick(e) {
