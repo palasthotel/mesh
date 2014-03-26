@@ -250,10 +250,6 @@ textarea.mesh-content {
   overflow: hidden;
 }
 
-.mesh-tools>div {
-  float: left;
-}
-
 .mesh-button {
   background: #ddd;
   background: linear-gradient(to bottom, #fff 0%, #d9d9d9 100%);
@@ -291,15 +287,9 @@ textarea.mesh-content {
   font-size: 14px;
 }
 
-/* TODO improve */
 .mesh-divider {
-  border: none;
-  border-left: 1px solid #000;
-  margin: 0 5px;
-  width: 0;
-  position: relative;
-  top: 0;
-  bottom: 0;
+  height: 1em;
+  margin: 4px 3px 5px;
 }
 
 #mesh-attr-editor,#mesh-code-editor {
