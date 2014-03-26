@@ -63,7 +63,7 @@ exports.ContentEditableView = ContentEditableView;
  * @param {String} content - content string
  * @param {Object} conf - configuration object
  * @param {Boolean} escaped - determines whether the given content string is
- *                escaped already
+ *                already escaped
  * @param {Array<BlockType>} blockTypes - set of possible block types
  * 
  * @constructor
@@ -148,6 +148,10 @@ ContentEditableView.prototype.setModel = function(model) {
   this.updateView();
 };
 
+ContentEditableView.prototype.getBlockViews = function() {
+  return this._blockViews;
+};
+
 ContentEditableView.prototype.selected = function(selection) {
   // only single selection is supported, so this is ok
   if (selection.rangeCount === 0) {
@@ -156,8 +160,8 @@ ContentEditableView.prototype.selected = function(selection) {
 
   var range = selection.getRangeAt(0);
 
-  var docModel = this.getModel();
-  var size = docModel.length();
+  var blockViews = this.getBlockViews();
+  var size = blockViews.length;
 
   // is block selected?
   var selected = false;
@@ -166,18 +170,17 @@ ContentEditableView.prototype.selected = function(selection) {
 
   // highlight the selected block
   for (var i = 0; i < size; i++) {
-    var block = docModel.get(i);
-    var blockElem = block.getElement();
+    var blockElem = blockViews[i].getElement();
 
     if (dom.containsNode(blockElem, range.startContainer)) {
       selected = true;
     }
 
     if (selected) {
-      $(blockElem.parentNode).addClass('mesh-focus');
-      selectionModel.push(block);
+      $(blockElem).addClass('mesh-focus');
+      selectionModel.push(blockViews[i]);
     } else {
-      $(blockElem.parentNode).removeClass('mesh-focus');
+      $(blockElem).removeClass('mesh-focus');
     }
 
     if (dom.containsNode(blockElem, range.endContainer)) {
@@ -210,7 +213,7 @@ ContentEditableView.prototype.updateView = function() {
   // build the view
   var size = m.length();
   for (var i = 0; i < size; i++) {
-    var blockView = new BlockView(m.get(i).getElement(), this);
+    var blockView = new BlockView(m.get(i), this);
 
     docFrgmt.appendChild(blockView.getElement());
     this._blockViews.push(blockView);
@@ -252,13 +255,14 @@ ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
     var selectedElements = [];
     var length = this._selectionModel.length;
     for (var i = 0; i < length; i++) {
-      selectedElements.push(selectionModel[i].getElement().parentNode);
+      selectedElements
+          .push(selectionModel[i].getModel().getElement().parentNode);
     }
 
     // wrap all selected elements in a new block
     $(selectedElements).wrapAll('<div class="mesh-block"></div>');
     // TODO a bit hacky. Is there another way to get reference to wrapper?
-    var wrapper = selectionModel[0].getElement().parentNode.parentNode;
+    var wrapper = selectionModel[0].getModel().getElement().parentNode.parentNode;
 
     // add handle and remove control
     addHandleAndControls(wrapper, this, {
@@ -270,7 +274,8 @@ ContentEditableView.prototype.setSelectionModel = function(selectionModel) {
     var selectedElements = [];
     var length = oldSelectionModel.length;
     for (var i = 0; i < length; i++) {
-      selectedElements.push(oldSelectionModel[i].getElement().parentNode);
+      selectedElements
+          .push(oldSelectionModel[i].getModel().getElement().parentNode);
     }
 
     // unwrap the selected blocks
@@ -363,20 +368,24 @@ function addHandleAndControls(wrapper, documentView, conf) {
 exports.BlockView = BlockView;
 
 function BlockView(model, documentView) {
+  this._model = model;
+
   var wrapper = dom.createElement('div', 'mesh-block');
-  wrapper.appendChild(blockElement);
-
-  var hc = addHandleAndControls(wrapper, documentView, documentView._conf);
-
   this._elem = wrapper;
 
-  this._content = model.getElement();
+  wrapper.appendChild(model.getElement());
+
+  var hc = addHandleAndControls(wrapper, documentView, documentView._conf);
   this._handle = hc.handle;
   this._controls = hc.controls;
 }
 
 BlockView.prototype.getElement = function() {
   return this._elem;
+};
+
+BlockView.prototype.getModel = function() {
+  return this._model;
 };
 
 exports.BlockCodeEditorView = BlockCodeEditorView;

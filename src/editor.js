@@ -77,7 +77,8 @@ function Editor(textarea, toolbar, statusbar, plugins, conf) {
     // use the textarea as-is
     this.setView(new view.TextareaView(textarea, conf));
   } else if (conf.defaultView === 'contenteditable') {
-    this.setView(new view.ContentEditableView($(textarea).val(), conf));
+    this.setView(new view.ContentEditableView($(textarea).val(), conf, false,
+        plugins.blockTypes));
   } else {
     // unknown case
     throw new exceptions.InvalidConfigurationException('no such view: "'

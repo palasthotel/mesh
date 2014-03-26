@@ -118,7 +118,7 @@ BlockModel.prototype.getElement = function() {
 };
 
 BlockModel.prototype.cleanup = function() {
-  this.setElement(dom.cleanupElement(this.getElement()));
+  dom.replaceNode(this.getElement(), dom.cleanupElement(this.getElement()));
 };
 
 BlockModel.prototype.toXML = function() {
