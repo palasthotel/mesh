@@ -411,19 +411,19 @@ BlockView.prototype.getType = function() {
   return this._type;
 };
 
-exports.BlockCodeEditorView = BlockCodeEditorView;
+exports.BlockAttrEditorView = BlockAttrEditorView;
 
-function BlockCodeEditorView(elem) {
+function BlockAttrEditorView(elem) {
   this._elem = elem;
 
   var elem = document.createFragment();
   // TODO
 }
 
-BlockCodeEditorView.setModel = function(code) {
+BlockAttrEditorView.setModel = function(code) {
   $(this._textarea).val(code);
 };
 
-BlockCodeEditorView.getModel = function() {
+BlockAttrEditorView.getModel = function() {
   $(this._textarea).val();
 };

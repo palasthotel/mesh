@@ -282,7 +282,8 @@ Editor.prototype.initSearch = function(query, submit, results) {
     var $results = $('#mesh-results .mesh-block');
     $results.each(function() {
       $(this).draggable({
-        connectToSortable : '#mesh-content-1',
+        connectToSortable : '#mesh-editor-1 div.mesh-content',
+        handle : '.mesh-handle',
         helper : 'clone',
         revert : 'invalid',
         containment : $('#container')

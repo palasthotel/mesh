@@ -2,6 +2,7 @@ var dom = require('./dom.js');
 var exceptions = require('./exceptions.js');
 var oo = require('./oo.js');
 var view = require('./view.js');
+var model = require('./model.js');
 
 // ControlElement
 
@@ -218,10 +219,27 @@ BlockType.prototype.convertFrom = function(blockView, documentView) {
   var modelElem = blockView.getModel().getElement();
   var newModelElem = document.createElement(this._elementName);
 
-  dom.moveChildNodes(modelElem, newModelElem);
+  // handle lists
+  if (dom.hasType(modelElem, 'UL') || dom.hasType(modelElem, 'OL')) {
+    $(modelElem).find('li').append('<br />');
+    var html = modelElem.innerHTML;
+    html = html.replace(/<\/?li>/ig, '');
+    newModelElem.innerHTML = html;
+  } else if (dom.hasType(newModelElem, 'UL') || dom.hasType(newModelElem, 'OL')) {
+    var html = modelElem.innerHTML;
+    console.log(html);
+    html = html.split('<br>');
+    for (var i = 0; i < html.length; i++) {
+      $(newModelElem).append('<li>' + html[i].trim() + '</li>');
+    }
+  } else {
+    // default elements like <p>s
+    dom.moveChildNodes(modelElem, newModelElem);
+  }
   dom.replaceNode(modelElem, newModelElem);
 
   blockView._type = this;
+  blockView._model = new model.BlockModel(newModelElem);
 };
 
 BlockType.prototype.onKeyPressed = function(e, documentView, blockView) {

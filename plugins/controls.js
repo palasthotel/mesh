@@ -293,7 +293,9 @@ ContentTypeSelect.prototype.action = function(value) {
     }
   }
 
-  editor.emit('edit');
+  editor.getView().updateModel();
+  //editor.getView().updateView();
+  editor.getView().emit('edit');
 };
 
 // finally set the order of the buttons
