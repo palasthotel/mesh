@@ -4,11 +4,15 @@ body {
 }
 
 h1,h2,h3,h4,h5,h6 {
-  font-weight: normal;
+  font-weight: bold;
 }
 
 h2 {
   font-size: 1.2em;
+}
+
+h3 {
+  font-size: 1.1em;
 }
 
 h2:first-child {
@@ -227,6 +231,11 @@ textarea.mesh-content {
 }
 
 .mesh-content p {
+  margin: 0;
+  padding: 1em 16px;
+}
+
+.mesh-content h2, .mesh-content h3 {
   margin: 0;
   padding: 1em 16px;
 }

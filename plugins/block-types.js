@@ -32,9 +32,24 @@ function OrderedList() {
 
 oo.extend(OrderedList, plugin.BlockType);
 
+
+function H2() {
+  plugin.BlockType.call(this, 'h2', 'heading-2', 'Heading');
+}
+
+oo.extend(H2, plugin.BlockType);
+
+function H3() {
+  plugin.BlockType.call(this, 'h3', 'heading-3', 'Sub-Heading');
+}
+
+oo.extend(H3, plugin.BlockType);
+
 blockTypes.push(new OrderedList());
 blockTypes.push(new UnorderedList());
 blockTypes.push(new Quote());
+blockTypes.push(new H3());
+blockTypes.push(new H2());
 
 // This will be used as a fallback
 blockTypes.push(new Paragraph());
