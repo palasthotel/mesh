@@ -332,6 +332,12 @@ dom.removeAllChildren = function(elem) {
   }
 };
 
+dom.removeAllAttributes = function(elem) {
+  while (elem.attributes.length > 0) {
+    elem.removeAttributeNode(elem.attributes[0]);
+  }
+};
+
 dom.moveChildNodes = function(from, to) {
   while (from.firstChild) {
     to.appendChild(from.firstChild);

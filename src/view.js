@@ -414,16 +414,98 @@ BlockView.prototype.getType = function() {
 exports.BlockAttrEditorView = BlockAttrEditorView;
 
 function BlockAttrEditorView(elem) {
+  events.EventEmitter.call(this);
+  var attrEditor = this;
   this._elem = elem;
 
-  var elem = document.createFragment();
-  // TODO
+  elem.innerHTML = '<table><tbody>'
+      + '<tr class="mesh-last"><td><button class="mesh-addattr">add attribute</button></td><td></td><td></td></tr>'
+      + '</tbody></table>';
+
+  this._body = $(this._elem).find('tbody')[0];
+  this._lastRow = $(this._elem).find('.mesh-last')[0];
+
+  $(this._body).click(function(e) {
+    e.stopPropagation();
+  });
+
+  $(this._elem).click(function(e) {
+    attrEditor.setVisible(false);
+    var elem = attrEditor.getModel();
+  });
+
+  $(this._elem).find('.mesh-addattr').click(function(e) {
+    e.stopPropagation();
+    attrEditor.append();
+  });
 }
 
-BlockAttrEditorView.setModel = function(code) {
-  $(this._textarea).val(code);
+oo.extend(BlockAttrEditorView, events.EventEmitter);
+
+BlockAttrEditorView.prototype.setModel = function(model) {
+  $(this._body).find('.mesh-attr').remove();
+  this._model = model;
+
+  for ( var key in model) {
+    this.append(key, model[key]);
+  }
 };
 
-BlockAttrEditorView.getModel = function() {
-  $(this._textarea).val();
+BlockAttrEditorView.prototype.getModel = function() {
+  return this._model;
+};
+
+BlockAttrEditorView.prototype.updateModel = function() {
+  var newModel = {};
+  $(this._body).find('.mesh-attr').each(function() {
+    var key = $(this).find('.mesh-attr-key').val();
+    var value = $(this).find('.mesh-attr-value').val();
+    newModel[key] = value;
+  });
+  this._model = newModel;
+};
+
+BlockAttrEditorView.prototype.setVisible = function(visible) {
+  if (visible) {
+    $(this._elem).show();
+  } else {
+    $(this._elem).hide();
+  }
+};
+
+BlockAttrEditorView.prototype.append = function(key, value) {
+  if (typeof key == 'undefined')
+    key = '';
+  if (typeof value == 'undefined')
+    value = '';
+
+  var attrs = this;
+
+  var attr = document.createElement('tr');
+  attr.innerHTML = '<td><input class="mesh-attr-key" type="text" placeholder="attribute name" value="'
+      + key
+      + '" /></td><td><input class="mesh-attr-value" type="text" placeholder="value" value="'
+      + value
+      + '" /></td><td><button class="mesh-attr-del"><i class="fa fa-trash-o"></i></button>';
+  this._body.insertBefore(attr, this._lastRow);
+
+  var $attr = $(attr);
+  $attr.addClass('mesh-attr');
+  $attr.find('.mesh-attr-del').click(function(e) {
+    e.stopPropagation();
+    $attr.remove();
+    attrs.updateModel();
+    attrs.emit('change');
+  });
+
+  // emit 'change' events when a attribute is changed
+  $attr.find('input').bind('change keydown', function(e) {
+    if (attrs.changeTimeout)
+      clearTimeout(attrs.changeTimeout);
+
+    attrs.changeTimeout = setTimeout(function() {
+      attrs.updateModel();
+      attrs.emit('change');
+    }, 800);
+  });
 };

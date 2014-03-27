@@ -14,7 +14,7 @@
         <input type="text" name="title" placeholder="Title" />
       </div>
       <div class="mesh-tools"></div>
-      <textarea class="mesh-content" name="text">&lt;p&gt;Single line text without formatting&lt;/p&gt;
+      <textarea class="mesh-content" name="text">&lt;p class=&quot;example&quot;&gt;Single line text without formatting&lt;/p&gt;
 &lt;p&gt;Text &lt;strong&gt;wi&lt;/strong&gt;&lt;strong&gt;th&lt;/strong&gt; &lt;strong&gt;some&lt;/strong&gt; &lt;em&gt;form&lt;strong&gt;atting&lt;/strong&gt;&lt;/em&gt;&lt;br /&gt;
 &lt;a href=&quot;/&quot;&gt;Link 1&lt;/a&gt; &lt;a href=&quot;/&quot;&gt;Link 2&lt;/a&gt; &lt;a href=&quot;/&quot;&gt;Link 3&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;Quote &lt;/blockquote&gt;
@@ -95,6 +95,7 @@
         throw err;
       }
 
+      console.log(ed);
       ed.initSearch(query, submit, results);
       // Do something with it. Usually not required.
     });

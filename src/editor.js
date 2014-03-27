@@ -36,6 +36,7 @@ exports.Editor = Editor;
  */
 function Editor(textarea, toolbar, statusbar, plugins, conf) {
   events.EventEmitter.call(this);
+  var editor = this;
 
   if (typeof textarea === 'string') {
     textarea = document.getElementById(textarea);
@@ -61,7 +62,12 @@ function Editor(textarea, toolbar, statusbar, plugins, conf) {
   this._codeEditor = null;
 
   if (conf.enableBlockAttrEditor) {
-    this._attrEditor = dom.createDivIfNotFound('mesh-attr-editor');
+    this._attrEditor = new view.BlockAttrEditorView(dom
+        .createDivIfNotFound('mesh-attr-editor'));
+
+    this._attrEditor.on('change', function() {
+      editor.attrsChange();
+    });
   }
 
   if (conf.enableBlockCodeEditor) {
@@ -94,7 +100,6 @@ function Editor(textarea, toolbar, statusbar, plugins, conf) {
   this._undo.addState(cleaned);
 
   // handle key shortcuts
-  var editor = this;
   $(document).bind('keyup', function(e) {
     if (!e.ctrlKey)
       return;
@@ -164,6 +169,50 @@ Editor.prototype.contentChange = function contentChange(event) {
   }, this._conf.undoDelay);
 };
 
+Editor.prototype.attrsChange = function() {
+  var view = this.getView();
+  var selModel = view.getSelectionModel();
+  var attrEditor = this._attrEditor;
+
+  if (selModel.length !== 1) {
+    return;
+  }
+
+  var elem = selModel[0].getModel().getElement();
+  var attrModel = attrEditor.getModel();
+
+  // remove existing attributes
+  dom.removeAllAttributes(elem);
+
+  // set the attributes
+  for ( var key in attrModel) {
+    $(elem).attr(key, attrModel[key]);
+  }
+
+  this.getView().updateView();
+  this.getView().emit('edit');
+};
+
+Editor.prototype.editBlockAttrs = function() {
+  var view = this.getView();
+  var selModel = view.getSelectionModel();
+  var attrEditor = this._attrEditor;
+
+  if (attrEditor === null || selModel.length !== 1) {
+    return;
+  }
+
+  var elem = selModel[0].getModel().getElement();
+  var attrModel = {};
+
+  util.forEach(elem.attributes, function(attr) {
+    attrModel[attr.nodeName] = attr.nodeValue;
+  });
+
+  attrEditor.setModel(attrModel);
+  attrEditor.setVisible(true);
+};
+
 Editor.prototype.undo = function onUndo() {
   this.getView().deselectAll();
   if (this._undo.hasPreviousState()) {
@@ -182,8 +231,6 @@ Editor.prototype.redo = function onRedo() {
 Editor.prototype.setView = function(v) {
   var editor = this;
   this._view = v;
-
-  v.getElement().id = 'mesh-content-1';
 
   this._textarea.spellcheck = this._conf.enableSpellChecking;
 
@@ -207,6 +254,10 @@ Editor.prototype.setView = function(v) {
 
   v.on('edit', function(event) {
     editor.contentChange(event);
+  });
+
+  v.on('edit-block-attrs', function() {
+    editor.editBlockAttrs();
   });
 
   this.emit('view-change');
