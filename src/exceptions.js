@@ -28,10 +28,6 @@ exceptions.Exception = function Exception(name, message) {
   this.message = message;
 };
 
-exceptions.Exception.prototype.toString = function() {
-  return this.name + ': ' + this.message;
-};
-
 /**
  * No such element.
  * 
