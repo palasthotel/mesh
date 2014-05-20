@@ -27,7 +27,7 @@ oo.extend(UnorderedList, plugin.BlockType);
 
 
 function OrderedList() {
-  plugin.BlockType.call(this, 'ol', 'sorted-list', 'Unsorted List');
+  plugin.BlockType.call(this, 'ol', 'ordered-list', 'Ordered List');
 }
 
 oo.extend(OrderedList, plugin.BlockType);
