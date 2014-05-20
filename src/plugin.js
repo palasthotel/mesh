@@ -220,7 +220,10 @@ BlockType.prototype.convertFrom = function(blockView, documentView) {
   var newModelElem = document.createElement(this._elementName);
 
   // handle lists
-  if (dom.hasType(modelElem, 'UL') || dom.hasType(modelElem, 'OL')) {
+  if ((dom.hasType(modelElem, 'UL') || dom.hasType(modelElem, 'OL'))
+      && (dom.hasType(newModelElem, 'UL') || dom.hasType(newModelElem, 'OL'))) {
+    dom.moveChildNodes(modelElem, newModelElem);
+  } else if (dom.hasType(modelElem, 'UL') || dom.hasType(modelElem, 'OL')) {
     $(modelElem).find('li').append('<br />');
     var html = modelElem.innerHTML;
     html = html.replace(/<\/?li>/ig, '');
