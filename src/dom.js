@@ -361,6 +361,11 @@ dom.cleanupElement = function(elem) {
   var prevNode = null;
 
   util.forEach(elem.childNodes, function(childNode) {
+    // if (elem.lastChild === childNode && childNode.nodeName === 'BR'
+    // && elem.lastChild !== elem.firstChild) {
+    // return elem.removeChild(childNode);
+    // }
+
     // if the parent node of this node is of the same type, remove child node
     // example: '<b>Hello <b>you</b>!</b>' --> '<b>Hello you!</b>'
     if (elem.nodeName === childNode.nodeName && isInherited(childNode)) {
